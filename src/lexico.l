@@ -4,6 +4,7 @@ int num_linha = 1;
 int num_coluna = 0;
 int erro_linha;
 int erro_coluna;
+int num_erros = 0;
 %}
 %x COMENTARIO_MULT
 
@@ -79,6 +80,11 @@ IDENTIFICADOR   [a-zA-Z_][_a-zA-Z0-9]*
                 num_coluna += yyleng;}
 
 
+    /*   VIRGULA   */
+","             {printf("Token: %s\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
+                num_coluna += yyleng;}
+
+
     /*   PONTO E VIRGULA   */
 ";"             {printf("Token: %s\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
                 num_coluna += yyleng;}
@@ -103,12 +109,13 @@ IDENTIFICADOR   [a-zA-Z_][_a-zA-Z0-9]*
 
 
     /*   ERROS   */
-<COMENTARIO_MULT><<EOF>>    {printf("Erro: comentario nao fechado\nLinha: %d\tColuna: %d\n\n", erro_linha, erro_coluna);
+<COMENTARIO_MULT><<EOF>>    {printf("ERRO: comentario nao fechado\nLinha: %d\tColuna: %d\n\n", erro_linha, erro_coluna);
+                            ++num_erros;
                             yyterminate();}
-\"[^"\n]*\n                 {printf("Erro: string nao fechada\nLinha: %d\tColuna: %d\n\n", num_linha, num_coluna);
-                            ++num_linha; num_coluna = 1;}
-.                           {printf("Erro lexico encontrado no elemento: %s\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
-                            num_coluna += yyleng;}
+\"[^"\n]*\n                 {printf("ERRO: string nao fechada\nLinha: %d\tColuna: %d\n\n", num_linha, num_coluna);
+                            ++num_erros; ++num_linha; num_coluna = 1;}
+.                           {printf("ERRO lexico encontrado no elemento: %s\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
+                            ++num_erros; num_coluna += yyleng;}
 
 %%
 
@@ -120,6 +127,7 @@ int main(int argc, char **argv) {
         yyin = fopen(argv[1], "r");
         if(yyin)
             yylex();
+        printf("Numeros de erros lexicos: %d\n\n", num_erros);
     }
 
     return 0;

@@ -1,12 +1,12 @@
 NAME = *
 
-all: a.out
+all: tests/$(NAME)
 
-lex.yy.c: lexico.l
-	lex lexico.l
+lexico:
+	lex ./src/lexico.l
 
-a.out: lex.yy.c $(NAME)
+a.out: lexico
 	gcc lex.yy.c
 
-$(NAME): lex.yy.c
-	./a.out $(NAME)
+tests/$(NAME): a.out
+	./a.out tests/$(NAME)

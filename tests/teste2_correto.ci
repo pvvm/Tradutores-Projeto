@@ -1,0 +1,42 @@
+int fibonacci(int num) {
+    if(num == 0 || num == 1) {
+        return 1;
+    } else {
+        return fibonacci(num-1) + fibonacci(num-2);
+    }
+}
+
+int _write_list(int list lista, int tamanho) {
+    int i;
+    int header;
+    for(i = 0; i < tamanho; i = i + 1) {
+        header = ?lista;
+        lista = %lista;
+        write(header);
+        write(" ");
+    }
+    return 1;
+}
+
+int main() {
+    int n;
+    writeln("Digite um numero positivo: ");
+    read(n);
+
+    if(n > 0) {
+        int i;
+        int list lista;
+        lista = NIL;
+        for(i = n-1; i >= 0; i = i - 1){
+            lista = fibonacci(i) : lista;
+        }
+
+        write("A sequencia de fibonacci ate a ");
+        write(n);
+        write(" posicao eh:");
+        _write_list(lista, n);
+
+    }
+
+    return 0;
+}
