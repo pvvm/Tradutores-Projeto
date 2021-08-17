@@ -7,13 +7,18 @@ int erro_coluna;
 int num_erros = 0;
 %}
 %x COMENTARIO_MULT
+%option noyywrap
+%option nounput
+%option noinput
+%option outfile="src/lex.yy.c"
+%option header-file="lib/lexico.h"
 
 
 DIGITO          [0-9]
 TIPO            (int|float|"int list"|"float list")
-CONSTANTE       ({DIGITO}+|{DIGITO}+"."{DIGITO}+|NIL|\"[^\n"]*\")
+CONSTANTE       ({DIGITO}+|{DIGITO}*"."{DIGITO}+|NIL|\"[^\n"]*\")
 ARIT_OP         [\+\-\*/]
-LOG_OP          (~|&&|\|\|)
+LOG_OP          (!|&&|\|\|)
 REL_OP          (<=?|>=?|==|!=)
 LIST_OP         (\:|\?|\!|\%|\>\>|\<\<)
 FLUXO_CTRL      (if|else|for|return)
@@ -120,7 +125,6 @@ IDENTIFICADOR   [a-zA-Z_][_a-zA-Z0-9]*
 %%
 
 
-int yywrap(){}
 int main(int argc, char **argv) {
 
     if(argc > 0){
@@ -128,6 +132,8 @@ int main(int argc, char **argv) {
         if(yyin)
             yylex();
         printf("Numeros de erros lexicos: %d\n\n", num_erros);
+        fclose(yyin);
+        yylex_destroy();
     }
 
     return 0;

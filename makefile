@@ -1,12 +1,7 @@
-NAME = *
-
-all: tests/$(NAME)
+all: a.out
 
 lexico:
 	lex ./src/lexico.l
 
 a.out: lexico
-	gcc lex.yy.c
-
-tests/$(NAME): a.out
-	./a.out tests/$(NAME)
+	gcc ./src/lex.yy.c -Wall -o tradutor
