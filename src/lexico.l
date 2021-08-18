@@ -16,10 +16,13 @@ int num_erros = 0;
 
 DIGITO          [0-9]
 TIPO            (int|float|"int list"|"float list")
-CONSTANTE       ({DIGITO}+|{DIGITO}*"."{DIGITO}+|NIL|\"[^\n"]*\")
-ARIT_OP         [\+\-\*/]
+CONSTANTE       ({DIGITO}+|{DIGITO}*"."{DIGITO}+|NIL)
+STRING          \"[^\n"]*\"
+ARIT_OP_ALTA    [\*/]
+ARIT_OP_BAIXA   [\+\-]
 LOG_OP          (!|&&|\|\|)
-REL_OP          (<=?|>=?|==|!=)
+REL_OP_ALTA     (<=?|>=?)
+REL_OP_BAIXA    (==|!=)
 LIST_OP         (\:|\?|\!|\%|\>\>|\<\<)
 FLUXO_CTRL      (if|else|for|return)
 ENTRADA         (read)
@@ -37,10 +40,14 @@ IDENTIFICADOR   [a-zA-Z_][_a-zA-Z0-9]*
     /*   CONSTANTES   */
 {CONSTANTE}             {printf("Token: (CONSTANTE, %s)\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
                         num_coluna += yyleng;}
+{STRING}                {printf("Token: (STRING, %s)\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
+                        num_coluna += yyleng;}
     
-    /*   OPERACOES ARITMETICAS   */
-{ARIT_OP}           {printf("Token: (ARITOP, %s)\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
-                    num_coluna += yyleng;}
+    /*   OPERACOES ARITMETICAS COM PRIORIDADES DIFERENTES   */
+{ARIT_OP_ALTA}          {printf("Token: (ARITOP_ALTA, %s)\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
+                        num_coluna += yyleng;}
+{ARIT_OP_BAIXA}          {printf("Token: (ARITOP_BAIXA, %s)\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
+                        num_coluna += yyleng;}
 
 
     /*   OPERACOES LOGICAS   */
@@ -48,9 +55,11 @@ IDENTIFICADOR   [a-zA-Z_][_a-zA-Z0-9]*
                     num_coluna += yyleng;}
 
 
-    /*   OPERACOES RELACIONAIS   */
-{REL_OP}            {printf("Token: (RELOP, %s)\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
-                    num_coluna += yyleng;}
+    /*   OPERACOES RELACIONAIS COM PRIORIDADES DIFERENTES   */
+{REL_OP_ALTA}           {printf("Token: (RELOP_ALTA, %s)\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
+                        num_coluna += yyleng;}
+{REL_OP_BAIXA}           {printf("Token: (RELOP_BAIXA, %s)\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
+                        num_coluna += yyleng;}
 
 
     /*   OPERADORES LISTAS   */
