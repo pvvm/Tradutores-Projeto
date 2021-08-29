@@ -39,11 +39,21 @@
 # define YY_YY_SRC_SINTAXE_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+# define YYDEBUG 1
 #endif
 #if YYDEBUG
 extern int yydebug;
 #endif
+/* "%code requires" blocks.  */
+#line 24 "./src/sintaxe.y"
+
+    struct token {
+        char lexema[50];
+        int linha;
+        int coluna;
+    };
+
+#line 57 "./src/sintaxe.tab.h"
 
 /* Token kinds.  */
 #ifndef YYTOKENTYPE
@@ -60,32 +70,43 @@ extern int yydebug;
     ELSE = 261,                    /* ELSE  */
     FOR = 262,                     /* FOR  */
     RETURN = 263,                  /* RETURN  */
-    ENTRADA = 264,                 /* ENTRADA  */
-    SAIDA = 265,                   /* SAIDA  */
-    TIPO = 266,                    /* TIPO  */
+    TIPO = 264,                    /* TIPO  */
+    ENTRADA = 265,                 /* ENTRADA  */
+    SAIDA = 266,                   /* SAIDA  */
     VIRG = 267,                    /* VIRG  */
     ATRIB = 268,                   /* ATRIB  */
-    LOG_OP_BIN = 269,              /* LOG_OP_BIN  */
-    REL_OP_BAIXA = 270,            /* REL_OP_BAIXA  */
-    REL_OP_ALTA = 271,             /* REL_OP_ALTA  */
-    LIST_OP = 272,                 /* LIST_OP  */
-    ARIT_OP_BAIXA = 273,           /* ARIT_OP_BAIXA  */
-    ARIT_OP_ALTA = 274,            /* ARIT_OP_ALTA  */
-    LOG_OP_UN = 275,               /* LOG_OP_UN  */
-    CONST = 276,                   /* CONST  */
-    STRING = 277,                  /* STRING  */
-    NIL = 278,                     /* NIL  */
-    ID = 279,                      /* ID  */
-    ABRE_P = 280,                  /* ABRE_P  */
-    FECHA_P = 281,                 /* FECHA_P  */
-    PV = 282                       /* PV  */
+    LOG_OP_OU = 269,               /* LOG_OP_OU  */
+    LOG_OP_E = 270,                /* LOG_OP_E  */
+    REL_OP_BAIXA = 271,            /* REL_OP_BAIXA  */
+    REL_OP_ALTA = 272,             /* REL_OP_ALTA  */
+    LIST_OP_BIN = 273,             /* LIST_OP_BIN  */
+    LIST_OP_UN = 274,              /* LIST_OP_UN  */
+    ARIT_OP_BAIXA = 275,           /* ARIT_OP_BAIXA  */
+    ARIT_OP_ALTA = 276,            /* ARIT_OP_ALTA  */
+    LOG_OP_UN = 277,               /* LOG_OP_UN  */
+    CONST = 278,                   /* CONST  */
+    STRING = 279,                  /* STRING  */
+    NIL = 280,                     /* NIL  */
+    ID = 281,                      /* ID  */
+    ABRE_P = 282,                  /* ABRE_P  */
+    FECHA_P = 283,                 /* FECHA_P  */
+    PV = 284                       /* PV  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 32 "./src/sintaxe.y"
+
+    struct token tok;
+
+#line 107 "./src/sintaxe.tab.h"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif

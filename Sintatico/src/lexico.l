@@ -1,13 +1,16 @@
 %{
 #include <stdio.h>
+#include <string.h>
 #include "sintaxe.tab.h"
 extern int yyval;
 
 int num_linha = 1;
-int num_coluna = 0;
+int num_coluna = 1;
 int erro_linha;
 int erro_coluna;
-int num_erros = 0;
+int num_erros_lexicos = 0;
+
+int cria_token(char *, int, int);
 %}
 
 %x COMENTARIO_MULT
@@ -25,11 +28,13 @@ NIL             (NIL)
 STRING          \"[^\n"]*\"
 ARIT_OP_ALTA    [\*/]
 ARIT_OP_BAIXA   [\+\-]
-LOG_OP_BIN      (&&|\|\|)
+LOG_OP_OU       (\|\|)
+LOG_OP_E        (&&)
 LOG_OP_UN       (!)
 REL_OP_ALTA     (<=?|>=?)
 REL_OP_BAIXA    (==|!=)
-LIST_OP         (\:|\?|\!|\%|\>\>|\<\<)
+LIST_OP_BIN     (\:|\>\>|\<\<)
+LIST_OP_UN      (\?|\!|\%)
 ENTRADA         (read)
 SAIDA           (write|writeln)
 IDENTIFICADOR   [a-zA-Z_][_a-zA-Z0-9]*
@@ -37,118 +42,129 @@ IDENTIFICADOR   [a-zA-Z_][_a-zA-Z0-9]*
 %%
 
     /*   DECLARAÇÕES DE TIPO   */
-{TIPO}                  {return TIPO;
-                        num_coluna += yyleng;}
+{TIPO}                  {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return TIPO;}
 
 
     /*   CONSTANTES   */
-{CONSTANTE}             {return CONST;
-                        num_coluna += yyleng;}
-{STRING}                {return STRING;
-                        num_coluna += yyleng;}
-{NIL}                   {return NIL;
-                        num_coluna += yyleng;}
+{CONSTANTE}             {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return CONST;}
+{STRING}                {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return STRING;}
+{NIL}                   {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return NIL;}
 
     /*   OPERACOES ARITMETICAS COM PRIORIDADES DIFERENTES   */
-{ARIT_OP_ALTA}          {return ARIT_OP_ALTA;
-                        num_coluna += yyleng;}
-{ARIT_OP_BAIXA}         {return ARIT_OP_BAIXA;
-                        num_coluna += yyleng;}
+{ARIT_OP_ALTA}          {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return ARIT_OP_ALTA;}
+{ARIT_OP_BAIXA}         {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return ARIT_OP_BAIXA;}
 
 
     /*   OPERACOES LOGICAS   */
-{LOG_OP_BIN}        {return LOG_OP_BIN;
-                    num_coluna += yyleng;}
-{LOG_OP_UN}         {return LOG_OP_UN;
-                    num_coluna += yyleng;}
+{LOG_OP_OU}             {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return LOG_OP_OU;}
+{LOG_OP_E}              {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return LOG_OP_E;}
+{LOG_OP_UN}             {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return LOG_OP_UN;}
 
 
     /*   OPERACOES RELACIONAIS COM PRIORIDADES DIFERENTES   */
-{REL_OP_ALTA}           {return REL_OP_ALTA;
-                        num_coluna += yyleng;}
-{REL_OP_BAIXA}          {return REL_OP_BAIXA;
-                        num_coluna += yyleng;}
+{REL_OP_ALTA}           {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return REL_OP_ALTA;}
+{REL_OP_BAIXA}          {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return REL_OP_BAIXA;}
 
 
     /*   OPERADORES LISTAS   */
-{LIST_OP}           {return LIST_OP;
-                    num_coluna += yyleng;}
+{LIST_OP_BIN}           {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return LIST_OP_BIN;}
+{LIST_OP_UN}            {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return LIST_OP_UN;}
 
 
     /*   FLUXO DE CONTROLE   */
-"if"                {return IF;
-                    num_coluna += yyleng;}
-"else"              {return ELSE;
-                    num_coluna += yyleng;}
-"for"               {return FOR;
-                    num_coluna += yyleng;}
-"return"            {return RETURN;
-                    num_coluna += yyleng;}
+"if"                    {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return IF;}
+"else"                  {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return ELSE;}
+"for"                   {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return FOR;}
+"return"                {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return RETURN;}
                     
 
     /*   ENTRADA E SAIDA   */
-{ENTRADA}           {return ENTRADA;
-                    num_coluna += yyleng;}
-{SAIDA}             {return SAIDA;
-                    num_coluna += yyleng;}                    
+{ENTRADA}               {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return ENTRADA;}
+{SAIDA}                 {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return SAIDA;}                    
 
 
     /*   DELIMITADORES   */
-"{"                 {return ABRE_C;
-                    num_coluna += yyleng;}
-"}"                 {return FECHA_C;
-                    num_coluna += yyleng;}
-"("                 {return ABRE_P;
-                    num_coluna += yyleng;}
-")"                 {return FECHA_P;
-                    num_coluna += yyleng;}
+"{"                     {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return ABRE_C;}
+"}"                     {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return FECHA_C;}
+"("                     {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return ABRE_P;}
+")"                     {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return FECHA_P;}
 
 
     /*   IDENTIFICADORES   */
-{IDENTIFICADOR}     {return ID;
-                    num_coluna += yyleng;}
+{IDENTIFICADOR}         {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return ID;}
 
 
     /*   ATRIBUICAO   */
-"="             {return ATRIB;
-                num_coluna += yyleng;}
+"="                     {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return ATRIB;}
 
 
     /*   VIRGULA   */
-","             {return VIRG;
-                num_coluna += yyleng;}
+","                     {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return VIRG;}
 
 
     /*   PONTO E VIRGULA   */
-";"             {return PV;
-                num_coluna += yyleng;}
+";"                     {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return PV;}
 
 
     /*   ESPACO EM BRANCO   */
-[ \t]           num_coluna += yyleng;
+[ \t]                   num_coluna += yyleng;
 
 
     /*   NOVA LINHA   */
-\n              {++num_linha;  num_coluna = 1;}
+\n                      {++num_linha;  num_coluna = 1;}
 
 
     /*   COMENTARIO   */
-"//".*                      {}
-<INITIAL>"/*"               {erro_linha = num_linha;
-                            erro_coluna = num_coluna;
-                            BEGIN(COMENTARIO_MULT);}
-<COMENTARIO_MULT>"*/"       {BEGIN(INITIAL);}
-<COMENTARIO_MULT>"\n"       {++num_linha; num_coluna = 1;}
-<COMENTARIO_MULT>.          {++num_coluna;}
+"//".*                  {}
+<INITIAL>"/*"           {erro_linha = num_linha;
+                        erro_coluna = num_coluna;
+                        BEGIN(COMENTARIO_MULT);}
+<COMENTARIO_MULT>"*/"   {BEGIN(INITIAL);}
+<COMENTARIO_MULT>"\n"   {++num_linha; num_coluna = 1;}
+<COMENTARIO_MULT>.      {++num_coluna;}
 
 
     /*   ERROS   */
-<COMENTARIO_MULT><<EOF>>    {printf("ERRO: comentario nao fechado\nLinha: %d\tColuna: %d\n\n", erro_linha, erro_coluna);
-                            ++num_erros;
+<COMENTARIO_MULT><<EOF>>    {printf("ERRO lexico: comentario nao fechado\nLinha: %d\tColuna: %d\n\n", erro_linha, erro_coluna);
+                            ++num_erros_lexicos;
                             yyterminate();}
-\"[^"\n]*\n                 {printf("ERRO: string nao fechada\nLinha: %d\tColuna: %d\n\n", num_linha, num_coluna);
-                            ++num_erros; ++num_linha; num_coluna = 1;}
-.                           {printf("ERRO lexico encontrado no elemento: %s\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
-                            ++num_erros; num_coluna += yyleng;}
+\"[^"\n]*\n                 {printf("ERRO lexico: string nao fechada\nLinha: %d\tColuna: %d\n\n", num_linha, num_coluna);
+                            ++num_erros_lexicos; ++num_linha; num_coluna = 1;}
+.                           {printf("ERRO lexico elemento: %s\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
+                            ++num_erros_lexicos; num_coluna += yyleng;}
 
 %%
+
+int cria_token(char *lexem, int linha, int coluna) {
+    strcpy(yylval.tok.lexema, lexem);
+    yylval.tok.linha = linha;
+    yylval.tok.coluna = coluna;
+    return (num_coluna += yyleng);
+}
