@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include <string.h>
+#include "../lib/arvore.h"
 #include "sintaxe.tab.h"
 extern int yyval;
 
@@ -166,5 +167,5 @@ int cria_token(char *lexem, int linha, int coluna) {
     strcpy(yylval.tok.lexema, lexem);
     yylval.tok.linha = linha;
     yylval.tok.coluna = coluna;
-    return (num_coluna += yyleng);
+    return (coluna);
 }

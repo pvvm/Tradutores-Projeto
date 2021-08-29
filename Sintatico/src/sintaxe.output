@@ -9,7 +9,7 @@ Gramática
     4             | declaration
 
     5 declaration: function
-    6            | variable
+    6            | variable PV
     7            | error
 
     8 function: TIPO ID ABRE_P parameters FECHA_P ABRE_C moreStmt FECHA_C
@@ -43,88 +43,84 @@ Gramática
    27            | io PV
    28            | ret PV
 
-   29 io: in
-   30   | out
+   29 io: ENTRADA ABRE_P ID FECHA_P
+   30   | SAIDA ABRE_P attribuition FECHA_P
+   31   | SAIDA ABRE_P STRING FECHA_P
 
-   31 in: ENTRADA ABRE_P ID FECHA_P
+   32 variable: TIPO ID
 
-   32 out: SAIDA ABRE_P attribuition FECHA_P
-   33    | SAIDA ABRE_P STRING FECHA_P
+   33 attribuition: ID ATRIB expList
+   34             | expList
 
-   34 variable: TIPO ID
+   35 expList: LIST_OP_UN expLogic
+   36        | expList LIST_OP_BIN expLogic
+   37        | expLogic
 
-   35 attribuition: ID ATRIB expList
-   36             | expList
+   38 expLogic: expLogic LOG_OP_OU andLogic
+   39         | andLogic
 
-   37 expList: LIST_OP_UN expLogic
-   38        | expList LIST_OP_BIN expLogic
-   39        | expLogic
+   40 andLogic: andLogic LOG_OP_E expComp
+   41         | expComp
 
-   40 expLogic: expLogic LOG_OP_OU andLogic
-   41         | andLogic
+   42 expComp: expComp REL_OP_BAIXA expRel
+   43        | expRel
 
-   42 andLogic: andLogic LOG_OP_E expComp
-   43         | expComp
+   44 expRel: expRel REL_OP_ALTA expArit
+   45       | expArit
 
-   44 expComp: expComp REL_OP_BAIXA expRel
-   45        | expRel
+   46 expArit: expArit ARIT_OP_BAIXA expMul
+   47        | expMul
 
-   46 expRel: expRel REL_OP_ALTA expArit
-   47       | expArit
+   48 expMul: expMul ARIT_OP_ALTA negElement
+   49       | negElement
 
-   48 expArit: expArit ARIT_OP_BAIXA expMul
-   49        | expMul
+   50 negElement: LOG_OP_UN element
+   51           | element
 
-   50 expMul: expMul ARIT_OP_ALTA negElement
-   51       | negElement
+   52 element: ID
+   53        | ABRE_P attribuition FECHA_P
+   54        | ID ABRE_P arguments FECHA_P
+   55        | ID ABRE_P FECHA_P
+   56        | CONST
+   57        | NIL
 
-   52 negElement: LOG_OP_UN element
-   53           | element
+   58 arguments: arguments VIRG attribuition
+   59          | attribuition
 
-   54 element: ID
-   55        | ABRE_P attribuition FECHA_P
-   56        | ID ABRE_P arguments FECHA_P
-   57        | ID ABRE_P FECHA_P
-   58        | CONST
-   59        | NIL
-
-   60 arguments: arguments VIRG attribuition
-   61          | attribuition
-
-   62 ret: RETURN attribuition
+   60 ret: RETURN attribuition
 
 
 Terminais, com as regras onde eles aparecem
 
     $end (0) 0
     error (256) 7
-    ABRE_C <tok> (258) 8 9 20
-    FECHA_C <tok> (259) 8 9 20
-    IF <tok> (260) 18 19
-    ELSE <tok> (261) 19
-    FOR <tok> (262) 22
-    RETURN <tok> (263) 62
-    TIPO <tok> (264) 8 9 34
-    ENTRADA <tok> (265) 31
-    SAIDA <tok> (266) 32 33
-    VIRG <tok> (267) 10 60
-    ATRIB <tok> (268) 35
-    LOG_OP_OU <tok> (269) 40
-    LOG_OP_E <tok> (270) 42
-    REL_OP_BAIXA <tok> (271) 44
-    REL_OP_ALTA <tok> (272) 46
-    LIST_OP_BIN <tok> (273) 38
-    LIST_OP_UN <tok> (274) 37
-    ARIT_OP_BAIXA <tok> (275) 48
-    ARIT_OP_ALTA <tok> (276) 50
-    LOG_OP_UN <tok> (277) 52
-    CONST <tok> (278) 58
-    STRING <tok> (279) 33
-    NIL <tok> (280) 59
-    ID <tok> (281) 8 9 31 34 35 54 56 57
-    ABRE_P <tok> (282) 8 9 18 19 22 31 32 33 55 56 57
-    FECHA_P <tok> (283) 8 9 18 19 22 31 32 33 55 56 57
-    PV <tok> (284) 22 25 26 27 28
+    IF <tok> (258) 18 19
+    ELSE <tok> (259) 19
+    FOR <tok> (260) 22
+    RETURN <tok> (261) 60
+    TIPO <tok> (262) 8 9 32
+    ENTRADA <tok> (263) 29
+    SAIDA <tok> (264) 30 31
+    VIRG <tok> (265) 10 58
+    PV <tok> (266) 6 22 25 26 27 28
+    ATRIB <tok> (267) 33
+    LOG_OP_OU <tok> (268) 38
+    LOG_OP_E <tok> (269) 40
+    REL_OP_BAIXA <tok> (270) 42
+    REL_OP_ALTA <tok> (271) 44
+    LIST_OP_BIN <tok> (272) 36
+    LIST_OP_UN <tok> (273) 35
+    ARIT_OP_BAIXA <tok> (274) 46
+    ARIT_OP_ALTA <tok> (275) 48
+    LOG_OP_UN <tok> (276) 50
+    CONST <tok> (277) 56
+    STRING <tok> (278) 31
+    NIL <tok> (279) 57
+    ID <tok> (280) 8 9 29 32 33 52 54 55
+    ABRE_P <tok> (281) 8 9 18 19 22 29 30 31 53 54 55
+    FECHA_P <tok> (282) 8 9 18 19 22 29 30 31 53 54 55
+    ABRE_C <tok> (283) 8 9 20
+    FECHA_C <tok> (284) 8 9 20
 
 
 Não terminais com as regras onde eles aparecem
@@ -134,89 +130,83 @@ Não terminais com as regras onde eles aparecem
     program (31)
         à esquerda: 1 2
         à direita: 0
-    declarations (32)
+    declarations <no> (32)
         à esquerda: 3 4
         à direita: 1 3
-    declaration (33)
+    declaration <no> (33)
         à esquerda: 5 6 7
         à direita: 3 4
-    function (34)
+    function <no> (34)
         à esquerda: 8 9
         à direita: 5
-    parameters (35)
+    parameters <no> (35)
         à esquerda: 10 11
         à direita: 8 10
-    moreStmt (36)
+    moreStmt <no> (36)
         à esquerda: 12 13
         à direita: 8 9 12 20
-    stmt (37)
+    stmt <no> (37)
         à esquerda: 14 15
         à direita: 12 13
-    multLineStmt (38)
+    multLineStmt <no> (38)
         à esquerda: 16 17
         à direita: 15
-    conditional (39)
+    conditional <no> (39)
         à esquerda: 18 19
         à direita: 16
-    bracesStmt (40)
+    bracesStmt <no> (40)
         à esquerda: 20 21
         à direita: 18 19 22
-    iteration (41)
+    iteration <no> (41)
         à esquerda: 22
         à direita: 17
-    expIte (42)
+    expIte <no> (42)
         à esquerda: 23 24
         à direita: 22
-    oneLineStmt (43)
+    oneLineStmt <no> (43)
         à esquerda: 25 26 27 28
         à direita: 14 21
-    io (44)
-        à esquerda: 29 30
+    io <no> (44)
+        à esquerda: 29 30 31
         à direita: 27
-    in (45)
-        à esquerda: 31
-        à direita: 29
-    out (46)
-        à esquerda: 32 33
-        à direita: 30
-    variable (47)
-        à esquerda: 34
+    variable <no> (45)
+        à esquerda: 32
         à direita: 6 10 11 25
-    attribuition (48)
-        à esquerda: 35 36
-        à direita: 18 19 23 26 32 55 60 61 62
-    expList (49)
-        à esquerda: 37 38 39
-        à direita: 35 36 38
-    expLogic (50)
+    attribuition <no> (46)
+        à esquerda: 33 34
+        à direita: 18 19 23 26 30 53 58 59 60
+    expList <no> (47)
+        à esquerda: 35 36 37
+        à direita: 33 34 36
+    expLogic <no> (48)
+        à esquerda: 38 39
+        à direita: 35 36 37 38
+    andLogic <no> (49)
         à esquerda: 40 41
-        à direita: 37 38 39 40
-    andLogic (51)
+        à direita: 38 39 40
+    expComp <no> (50)
         à esquerda: 42 43
         à direita: 40 41 42
-    expComp (52)
+    expRel <no> (51)
         à esquerda: 44 45
         à direita: 42 43 44
-    expRel (53)
+    expArit <no> (52)
         à esquerda: 46 47
         à direita: 44 45 46
-    expArit (54)
+    expMul <no> (53)
         à esquerda: 48 49
         à direita: 46 47 48
-    expMul (55)
+    negElement <no> (54)
         à esquerda: 50 51
-        à direita: 48 49 50
-    negElement (56)
-        à esquerda: 52 53
+        à direita: 48 49
+    element <no> (55)
+        à esquerda: 52 53 54 55 56 57
         à direita: 50 51
-    element (57)
-        à esquerda: 54 55 56 57 58 59
-        à direita: 52 53
-    arguments (58)
-        à esquerda: 60 61
-        à direita: 56 60
-    ret (59)
-        à esquerda: 62
+    arguments <no> (56)
+        à esquerda: 58 59
+        à direita: 54 58
+    ret <no> (57)
+        à esquerda: 60
         à direita: 28
 
 
@@ -249,7 +239,7 @@ Estado 2
 
     8 function: TIPO • ID ABRE_P parameters FECHA_P ABRE_C moreStmt FECHA_C
     9         | TIPO • ID ABRE_P FECHA_P ABRE_C moreStmt FECHA_C
-   34 variable: TIPO • ID
+   32 variable: TIPO • ID
 
     ID  deslocar, e ir ao estado 8
 
@@ -296,24 +286,20 @@ Estado 6
 
 Estado 7
 
-    6 declaration: variable •
+    6 declaration: variable • PV
 
-    $end   reduzir usando a regra 6 (declaration)
-    error  reduzir usando a regra 6 (declaration)
-    TIPO   reduzir usando a regra 6 (declaration)
+    PV  deslocar, e ir ao estado 11
 
 
 Estado 8
 
     8 function: TIPO ID • ABRE_P parameters FECHA_P ABRE_C moreStmt FECHA_C
     9         | TIPO ID • ABRE_P FECHA_P ABRE_C moreStmt FECHA_C
-   34 variable: TIPO ID •
+   32 variable: TIPO ID •
 
-    ABRE_P  deslocar, e ir ao estado 11
+    ABRE_P  deslocar, e ir ao estado 12
 
-    $end   reduzir usando a regra 34 (variable)
-    error  reduzir usando a regra 34 (variable)
-    TIPO   reduzir usando a regra 34 (variable)
+    PV  reduzir usando a regra 32 (variable)
 
 
 Estado 9
@@ -334,40 +320,49 @@ Estado 10
 
 Estado 11
 
-    8 function: TIPO ID ABRE_P • parameters FECHA_P ABRE_C moreStmt FECHA_C
-    9         | TIPO ID ABRE_P • FECHA_P ABRE_C moreStmt FECHA_C
+    6 declaration: variable PV •
 
-    TIPO     deslocar, e ir ao estado 12
-    FECHA_P  deslocar, e ir ao estado 13
-
-    parameters  ir ao estado 14
-    variable    ir ao estado 15
+    $end   reduzir usando a regra 6 (declaration)
+    error  reduzir usando a regra 6 (declaration)
+    TIPO   reduzir usando a regra 6 (declaration)
 
 
 Estado 12
 
-   34 variable: TIPO • ID
+    8 function: TIPO ID ABRE_P • parameters FECHA_P ABRE_C moreStmt FECHA_C
+    9         | TIPO ID ABRE_P • FECHA_P ABRE_C moreStmt FECHA_C
 
-    ID  deslocar, e ir ao estado 16
+    TIPO     deslocar, e ir ao estado 13
+    FECHA_P  deslocar, e ir ao estado 14
+
+    parameters  ir ao estado 15
+    variable    ir ao estado 16
 
 
 Estado 13
 
-    9 function: TIPO ID ABRE_P FECHA_P • ABRE_C moreStmt FECHA_C
+   32 variable: TIPO • ID
 
-    ABRE_C  deslocar, e ir ao estado 17
+    ID  deslocar, e ir ao estado 17
 
 
 Estado 14
 
-    8 function: TIPO ID ABRE_P parameters • FECHA_P ABRE_C moreStmt FECHA_C
-   10 parameters: parameters • VIRG variable
+    9 function: TIPO ID ABRE_P FECHA_P • ABRE_C moreStmt FECHA_C
 
-    VIRG     deslocar, e ir ao estado 18
-    FECHA_P  deslocar, e ir ao estado 19
+    ABRE_C  deslocar, e ir ao estado 18
 
 
 Estado 15
+
+    8 function: TIPO ID ABRE_P parameters • FECHA_P ABRE_C moreStmt FECHA_C
+   10 parameters: parameters • VIRG variable
+
+    VIRG     deslocar, e ir ao estado 19
+    FECHA_P  deslocar, e ir ao estado 20
+
+
+Estado 16
 
    11 parameters: variable •
 
@@ -375,272 +370,267 @@ Estado 15
     FECHA_P  reduzir usando a regra 11 (parameters)
 
 
-Estado 16
-
-   34 variable: TIPO ID •
-
-    VIRG     reduzir usando a regra 34 (variable)
-    FECHA_P  reduzir usando a regra 34 (variable)
-
-
 Estado 17
 
-    9 function: TIPO ID ABRE_P FECHA_P ABRE_C • moreStmt FECHA_C
+   32 variable: TIPO ID •
 
-    IF          deslocar, e ir ao estado 20
-    FOR         deslocar, e ir ao estado 21
-    RETURN      deslocar, e ir ao estado 22
-    TIPO        deslocar, e ir ao estado 118
-    ENTRADA     deslocar, e ir ao estado 23
-    SAIDA       deslocar, e ir ao estado 24
-    LIST_OP_UN  deslocar, e ir ao estado 25
-    LOG_OP_UN   deslocar, e ir ao estado 26
-    CONST       deslocar, e ir ao estado 27
-    NIL         deslocar, e ir ao estado 28
-    ID          deslocar, e ir ao estado 29
-    ABRE_P      deslocar, e ir ao estado 30
-
-    moreStmt      ir ao estado 31
-    stmt          ir ao estado 32
-    multLineStmt  ir ao estado 33
-    conditional   ir ao estado 34
-    iteration     ir ao estado 35
-    oneLineStmt   ir ao estado 36
-    io            ir ao estado 37
-    in            ir ao estado 38
-    out           ir ao estado 39
-    variable      ir ao estado 40
-    attribuition  ir ao estado 41
-    expList       ir ao estado 42
-    expLogic      ir ao estado 43
-    andLogic      ir ao estado 44
-    expComp       ir ao estado 45
-    expRel        ir ao estado 46
-    expArit       ir ao estado 47
-    expMul        ir ao estado 48
-    negElement    ir ao estado 49
-    element       ir ao estado 50
-    ret           ir ao estado 51
+    VIRG     reduzir usando a regra 32 (variable)
+    FECHA_P  reduzir usando a regra 32 (variable)
 
 
 Estado 18
 
-   10 parameters: parameters VIRG • variable
+    9 function: TIPO ID ABRE_P FECHA_P ABRE_C • moreStmt FECHA_C
 
-    TIPO  deslocar, e ir ao estado 12
+    IF          deslocar, e ir ao estado 21
+    FOR         deslocar, e ir ao estado 22
+    RETURN      deslocar, e ir ao estado 23
+    TIPO        deslocar, e ir ao estado 117
+    ENTRADA     deslocar, e ir ao estado 24
+    SAIDA       deslocar, e ir ao estado 25
+    LIST_OP_UN  deslocar, e ir ao estado 26
+    LOG_OP_UN   deslocar, e ir ao estado 27
+    CONST       deslocar, e ir ao estado 28
+    NIL         deslocar, e ir ao estado 29
+    ID          deslocar, e ir ao estado 30
+    ABRE_P      deslocar, e ir ao estado 31
 
-    variable  ir ao estado 52
+    moreStmt      ir ao estado 32
+    stmt          ir ao estado 33
+    multLineStmt  ir ao estado 34
+    conditional   ir ao estado 35
+    iteration     ir ao estado 36
+    oneLineStmt   ir ao estado 37
+    io            ir ao estado 38
+    variable      ir ao estado 39
+    attribuition  ir ao estado 40
+    expList       ir ao estado 41
+    expLogic      ir ao estado 42
+    andLogic      ir ao estado 43
+    expComp       ir ao estado 44
+    expRel        ir ao estado 45
+    expArit       ir ao estado 46
+    expMul        ir ao estado 47
+    negElement    ir ao estado 48
+    element       ir ao estado 49
+    ret           ir ao estado 50
 
 
 Estado 19
 
-    8 function: TIPO ID ABRE_P parameters FECHA_P • ABRE_C moreStmt FECHA_C
+   10 parameters: parameters VIRG • variable
 
-    ABRE_C  deslocar, e ir ao estado 53
+    TIPO  deslocar, e ir ao estado 13
+
+    variable  ir ao estado 51
 
 
 Estado 20
 
-   18 conditional: IF • ABRE_P attribuition FECHA_P bracesStmt
-   19            | IF • ABRE_P attribuition FECHA_P bracesStmt ELSE bracesStmt
+    8 function: TIPO ID ABRE_P parameters FECHA_P • ABRE_C moreStmt FECHA_C
 
-    ABRE_P  deslocar, e ir ao estado 54
+    ABRE_C  deslocar, e ir ao estado 52
 
 
 Estado 21
 
-   22 iteration: FOR • ABRE_P expIte PV expIte PV expIte FECHA_P bracesStmt
+   18 conditional: IF • ABRE_P attribuition FECHA_P bracesStmt
+   19            | IF • ABRE_P attribuition FECHA_P bracesStmt ELSE bracesStmt
 
-    ABRE_P  deslocar, e ir ao estado 55
+    ABRE_P  deslocar, e ir ao estado 53
 
 
 Estado 22
 
-   62 ret: RETURN • attribuition
+   22 iteration: FOR • ABRE_P expIte PV expIte PV expIte FECHA_P bracesStmt
 
-    LIST_OP_UN  deslocar, e ir ao estado 25
-    LOG_OP_UN   deslocar, e ir ao estado 26
-    CONST       deslocar, e ir ao estado 27
-    NIL         deslocar, e ir ao estado 28
-    ID          deslocar, e ir ao estado 29
-    ABRE_P      deslocar, e ir ao estado 30
-
-    attribuition  ir ao estado 56
-    expList       ir ao estado 42
-    expLogic      ir ao estado 43
-    andLogic      ir ao estado 44
-    expComp       ir ao estado 45
-    expRel        ir ao estado 46
-    expArit       ir ao estado 47
-    expMul        ir ao estado 48
-    negElement    ir ao estado 49
-    element       ir ao estado 50
+    ABRE_P  deslocar, e ir ao estado 54
 
 
 Estado 23
 
-   31 in: ENTRADA • ABRE_P ID FECHA_P
+   60 ret: RETURN • attribuition
 
-    ABRE_P  deslocar, e ir ao estado 57
+    LIST_OP_UN  deslocar, e ir ao estado 26
+    LOG_OP_UN   deslocar, e ir ao estado 27
+    CONST       deslocar, e ir ao estado 28
+    NIL         deslocar, e ir ao estado 29
+    ID          deslocar, e ir ao estado 30
+    ABRE_P      deslocar, e ir ao estado 31
+
+    attribuition  ir ao estado 55
+    expList       ir ao estado 41
+    expLogic      ir ao estado 42
+    andLogic      ir ao estado 43
+    expComp       ir ao estado 44
+    expRel        ir ao estado 45
+    expArit       ir ao estado 46
+    expMul        ir ao estado 47
+    negElement    ir ao estado 48
+    element       ir ao estado 49
 
 
 Estado 24
 
-   32 out: SAIDA • ABRE_P attribuition FECHA_P
-   33    | SAIDA • ABRE_P STRING FECHA_P
+   29 io: ENTRADA • ABRE_P ID FECHA_P
 
-    ABRE_P  deslocar, e ir ao estado 58
+    ABRE_P  deslocar, e ir ao estado 56
 
 
 Estado 25
 
-   37 expList: LIST_OP_UN • expLogic
+   30 io: SAIDA • ABRE_P attribuition FECHA_P
+   31   | SAIDA • ABRE_P STRING FECHA_P
 
-    LOG_OP_UN  deslocar, e ir ao estado 26
-    CONST      deslocar, e ir ao estado 27
-    NIL        deslocar, e ir ao estado 28
-    ID         deslocar, e ir ao estado 59
-    ABRE_P     deslocar, e ir ao estado 30
-
-    expLogic    ir ao estado 60
-    andLogic    ir ao estado 44
-    expComp     ir ao estado 45
-    expRel      ir ao estado 46
-    expArit     ir ao estado 47
-    expMul      ir ao estado 48
-    negElement  ir ao estado 49
-    element     ir ao estado 50
+    ABRE_P  deslocar, e ir ao estado 57
 
 
 Estado 26
 
-   52 negElement: LOG_OP_UN • element
+   35 expList: LIST_OP_UN • expLogic
 
-    CONST   deslocar, e ir ao estado 27
-    NIL     deslocar, e ir ao estado 28
-    ID      deslocar, e ir ao estado 59
-    ABRE_P  deslocar, e ir ao estado 30
+    LOG_OP_UN  deslocar, e ir ao estado 27
+    CONST      deslocar, e ir ao estado 28
+    NIL        deslocar, e ir ao estado 29
+    ID         deslocar, e ir ao estado 58
+    ABRE_P     deslocar, e ir ao estado 31
 
-    element  ir ao estado 61
+    expLogic    ir ao estado 59
+    andLogic    ir ao estado 43
+    expComp     ir ao estado 44
+    expRel      ir ao estado 45
+    expArit     ir ao estado 46
+    expMul      ir ao estado 47
+    negElement  ir ao estado 48
+    element     ir ao estado 49
 
 
 Estado 27
 
-   58 element: CONST •
+   50 negElement: LOG_OP_UN • element
 
-    LOG_OP_OU      reduzir usando a regra 58 (element)
-    LOG_OP_E       reduzir usando a regra 58 (element)
-    REL_OP_BAIXA   reduzir usando a regra 58 (element)
-    REL_OP_ALTA    reduzir usando a regra 58 (element)
-    LIST_OP_BIN    reduzir usando a regra 58 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 58 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 58 (element)
-    PV             reduzir usando a regra 58 (element)
+    CONST   deslocar, e ir ao estado 28
+    NIL     deslocar, e ir ao estado 29
+    ID      deslocar, e ir ao estado 58
+    ABRE_P  deslocar, e ir ao estado 31
+
+    element  ir ao estado 60
 
 
 Estado 28
 
-   59 element: NIL •
+   56 element: CONST •
 
-    LOG_OP_OU      reduzir usando a regra 59 (element)
-    LOG_OP_E       reduzir usando a regra 59 (element)
-    REL_OP_BAIXA   reduzir usando a regra 59 (element)
-    REL_OP_ALTA    reduzir usando a regra 59 (element)
-    LIST_OP_BIN    reduzir usando a regra 59 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 59 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 59 (element)
-    PV             reduzir usando a regra 59 (element)
+    PV             reduzir usando a regra 56 (element)
+    LOG_OP_OU      reduzir usando a regra 56 (element)
+    LOG_OP_E       reduzir usando a regra 56 (element)
+    REL_OP_BAIXA   reduzir usando a regra 56 (element)
+    REL_OP_ALTA    reduzir usando a regra 56 (element)
+    LIST_OP_BIN    reduzir usando a regra 56 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 56 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 56 (element)
 
 
 Estado 29
 
-   35 attribuition: ID • ATRIB expList
-   54 element: ID •
-   56        | ID • ABRE_P arguments FECHA_P
-   57        | ID • ABRE_P FECHA_P
+   57 element: NIL •
 
-    ATRIB   deslocar, e ir ao estado 62
-    ABRE_P  deslocar, e ir ao estado 63
-
-    LOG_OP_OU      reduzir usando a regra 54 (element)
-    LOG_OP_E       reduzir usando a regra 54 (element)
-    REL_OP_BAIXA   reduzir usando a regra 54 (element)
-    REL_OP_ALTA    reduzir usando a regra 54 (element)
-    LIST_OP_BIN    reduzir usando a regra 54 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 54 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 54 (element)
-    PV             reduzir usando a regra 54 (element)
+    PV             reduzir usando a regra 57 (element)
+    LOG_OP_OU      reduzir usando a regra 57 (element)
+    LOG_OP_E       reduzir usando a regra 57 (element)
+    REL_OP_BAIXA   reduzir usando a regra 57 (element)
+    REL_OP_ALTA    reduzir usando a regra 57 (element)
+    LIST_OP_BIN    reduzir usando a regra 57 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 57 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 57 (element)
 
 
 Estado 30
 
-   55 element: ABRE_P • attribuition FECHA_P
+   33 attribuition: ID • ATRIB expList
+   52 element: ID •
+   54        | ID • ABRE_P arguments FECHA_P
+   55        | ID • ABRE_P FECHA_P
 
-    LIST_OP_UN  deslocar, e ir ao estado 119
-    LOG_OP_UN   deslocar, e ir ao estado 120
-    CONST       deslocar, e ir ao estado 121
-    NIL         deslocar, e ir ao estado 122
-    ID          deslocar, e ir ao estado 123
-    ABRE_P      deslocar, e ir ao estado 124
+    ATRIB   deslocar, e ir ao estado 61
+    ABRE_P  deslocar, e ir ao estado 62
 
-    attribuition  ir ao estado 64
-    expList       ir ao estado 125
-    expLogic      ir ao estado 126
-    andLogic      ir ao estado 127
-    expComp       ir ao estado 128
-    expRel        ir ao estado 129
-    expArit       ir ao estado 130
-    expMul        ir ao estado 131
-    negElement    ir ao estado 132
-    element       ir ao estado 133
+    PV             reduzir usando a regra 52 (element)
+    LOG_OP_OU      reduzir usando a regra 52 (element)
+    LOG_OP_E       reduzir usando a regra 52 (element)
+    REL_OP_BAIXA   reduzir usando a regra 52 (element)
+    REL_OP_ALTA    reduzir usando a regra 52 (element)
+    LIST_OP_BIN    reduzir usando a regra 52 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 52 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 52 (element)
 
 
 Estado 31
 
-    9 function: TIPO ID ABRE_P FECHA_P ABRE_C moreStmt • FECHA_C
-   12 moreStmt: moreStmt • stmt
+   53 element: ABRE_P • attribuition FECHA_P
 
-    FECHA_C     deslocar, e ir ao estado 65
-    IF          deslocar, e ir ao estado 20
-    FOR         deslocar, e ir ao estado 21
-    RETURN      deslocar, e ir ao estado 22
-    TIPO        deslocar, e ir ao estado 118
-    ENTRADA     deslocar, e ir ao estado 23
-    SAIDA       deslocar, e ir ao estado 24
-    LIST_OP_UN  deslocar, e ir ao estado 25
-    LOG_OP_UN   deslocar, e ir ao estado 26
-    CONST       deslocar, e ir ao estado 27
-    NIL         deslocar, e ir ao estado 28
-    ID          deslocar, e ir ao estado 29
-    ABRE_P      deslocar, e ir ao estado 30
+    LIST_OP_UN  deslocar, e ir ao estado 118
+    LOG_OP_UN   deslocar, e ir ao estado 119
+    CONST       deslocar, e ir ao estado 120
+    NIL         deslocar, e ir ao estado 121
+    ID          deslocar, e ir ao estado 122
+    ABRE_P      deslocar, e ir ao estado 123
 
-    stmt          ir ao estado 66
-    multLineStmt  ir ao estado 33
-    conditional   ir ao estado 34
-    iteration     ir ao estado 35
-    oneLineStmt   ir ao estado 36
-    io            ir ao estado 37
-    in            ir ao estado 38
-    out           ir ao estado 39
-    variable      ir ao estado 40
-    attribuition  ir ao estado 41
-    expList       ir ao estado 42
-    expLogic      ir ao estado 43
-    andLogic      ir ao estado 44
-    expComp       ir ao estado 45
-    expRel        ir ao estado 46
-    expArit       ir ao estado 47
-    expMul        ir ao estado 48
-    negElement    ir ao estado 49
-    element       ir ao estado 50
-    ret           ir ao estado 51
+    attribuition  ir ao estado 63
+    expList       ir ao estado 124
+    expLogic      ir ao estado 125
+    andLogic      ir ao estado 126
+    expComp       ir ao estado 127
+    expRel        ir ao estado 128
+    expArit       ir ao estado 129
+    expMul        ir ao estado 130
+    negElement    ir ao estado 131
+    element       ir ao estado 132
 
 
 Estado 32
 
+    9 function: TIPO ID ABRE_P FECHA_P ABRE_C moreStmt • FECHA_C
+   12 moreStmt: moreStmt • stmt
+
+    IF          deslocar, e ir ao estado 21
+    FOR         deslocar, e ir ao estado 22
+    RETURN      deslocar, e ir ao estado 23
+    TIPO        deslocar, e ir ao estado 117
+    ENTRADA     deslocar, e ir ao estado 24
+    SAIDA       deslocar, e ir ao estado 25
+    LIST_OP_UN  deslocar, e ir ao estado 26
+    LOG_OP_UN   deslocar, e ir ao estado 27
+    CONST       deslocar, e ir ao estado 28
+    NIL         deslocar, e ir ao estado 29
+    ID          deslocar, e ir ao estado 30
+    ABRE_P      deslocar, e ir ao estado 31
+    FECHA_C     deslocar, e ir ao estado 64
+
+    stmt          ir ao estado 65
+    multLineStmt  ir ao estado 34
+    conditional   ir ao estado 35
+    iteration     ir ao estado 36
+    oneLineStmt   ir ao estado 37
+    io            ir ao estado 38
+    variable      ir ao estado 39
+    attribuition  ir ao estado 40
+    expList       ir ao estado 41
+    expLogic      ir ao estado 42
+    andLogic      ir ao estado 43
+    expComp       ir ao estado 44
+    expRel        ir ao estado 45
+    expArit       ir ao estado 46
+    expMul        ir ao estado 47
+    negElement    ir ao estado 48
+    element       ir ao estado 49
+    ret           ir ao estado 50
+
+
+Estado 33
+
    13 moreStmt: stmt •
 
-    FECHA_C     reduzir usando a regra 13 (moreStmt)
     IF          reduzir usando a regra 13 (moreStmt)
     FOR         reduzir usando a regra 13 (moreStmt)
     RETURN      reduzir usando a regra 13 (moreStmt)
@@ -653,13 +643,13 @@ Estado 32
     NIL         reduzir usando a regra 13 (moreStmt)
     ID          reduzir usando a regra 13 (moreStmt)
     ABRE_P      reduzir usando a regra 13 (moreStmt)
+    FECHA_C     reduzir usando a regra 13 (moreStmt)
 
 
-Estado 33
+Estado 34
 
    15 stmt: multLineStmt •
 
-    FECHA_C     reduzir usando a regra 15 (stmt)
     IF          reduzir usando a regra 15 (stmt)
     FOR         reduzir usando a regra 15 (stmt)
     RETURN      reduzir usando a regra 15 (stmt)
@@ -672,13 +662,13 @@ Estado 33
     NIL         reduzir usando a regra 15 (stmt)
     ID          reduzir usando a regra 15 (stmt)
     ABRE_P      reduzir usando a regra 15 (stmt)
+    FECHA_C     reduzir usando a regra 15 (stmt)
 
 
-Estado 34
+Estado 35
 
    16 multLineStmt: conditional •
 
-    FECHA_C     reduzir usando a regra 16 (multLineStmt)
     IF          reduzir usando a regra 16 (multLineStmt)
     FOR         reduzir usando a regra 16 (multLineStmt)
     RETURN      reduzir usando a regra 16 (multLineStmt)
@@ -691,13 +681,13 @@ Estado 34
     NIL         reduzir usando a regra 16 (multLineStmt)
     ID          reduzir usando a regra 16 (multLineStmt)
     ABRE_P      reduzir usando a regra 16 (multLineStmt)
+    FECHA_C     reduzir usando a regra 16 (multLineStmt)
 
 
-Estado 35
+Estado 36
 
    17 multLineStmt: iteration •
 
-    FECHA_C     reduzir usando a regra 17 (multLineStmt)
     IF          reduzir usando a regra 17 (multLineStmt)
     FOR         reduzir usando a regra 17 (multLineStmt)
     RETURN      reduzir usando a regra 17 (multLineStmt)
@@ -710,13 +700,13 @@ Estado 35
     NIL         reduzir usando a regra 17 (multLineStmt)
     ID          reduzir usando a regra 17 (multLineStmt)
     ABRE_P      reduzir usando a regra 17 (multLineStmt)
+    FECHA_C     reduzir usando a regra 17 (multLineStmt)
 
 
-Estado 36
+Estado 37
 
    14 stmt: oneLineStmt •
 
-    FECHA_C     reduzir usando a regra 14 (stmt)
     IF          reduzir usando a regra 14 (stmt)
     FOR         reduzir usando a regra 14 (stmt)
     RETURN      reduzir usando a regra 14 (stmt)
@@ -729,170 +719,157 @@ Estado 36
     NIL         reduzir usando a regra 14 (stmt)
     ID          reduzir usando a regra 14 (stmt)
     ABRE_P      reduzir usando a regra 14 (stmt)
-
-
-Estado 37
-
-   27 oneLineStmt: io • PV
-
-    PV  deslocar, e ir ao estado 67
+    FECHA_C     reduzir usando a regra 14 (stmt)
 
 
 Estado 38
 
-   29 io: in •
+   27 oneLineStmt: io • PV
 
-    PV  reduzir usando a regra 29 (io)
+    PV  deslocar, e ir ao estado 66
 
 
 Estado 39
 
-   30 io: out •
+   25 oneLineStmt: variable • PV
 
-    PV  reduzir usando a regra 30 (io)
+    PV  deslocar, e ir ao estado 67
 
 
 Estado 40
 
-   25 oneLineStmt: variable • PV
+   26 oneLineStmt: attribuition • PV
 
     PV  deslocar, e ir ao estado 68
 
 
 Estado 41
 
-   26 oneLineStmt: attribuition • PV
+   34 attribuition: expList •
+   36 expList: expList • LIST_OP_BIN expLogic
 
-    PV  deslocar, e ir ao estado 69
+    LIST_OP_BIN  deslocar, e ir ao estado 69
+
+    PV  reduzir usando a regra 34 (attribuition)
 
 
 Estado 42
 
-   36 attribuition: expList •
-   38 expList: expList • LIST_OP_BIN expLogic
+   37 expList: expLogic •
+   38 expLogic: expLogic • LOG_OP_OU andLogic
 
-    LIST_OP_BIN  deslocar, e ir ao estado 70
+    LOG_OP_OU  deslocar, e ir ao estado 70
 
-    PV  reduzir usando a regra 36 (attribuition)
+    PV           reduzir usando a regra 37 (expList)
+    LIST_OP_BIN  reduzir usando a regra 37 (expList)
 
 
 Estado 43
 
-   39 expList: expLogic •
-   40 expLogic: expLogic • LOG_OP_OU andLogic
+   39 expLogic: andLogic •
+   40 andLogic: andLogic • LOG_OP_E expComp
 
-    LOG_OP_OU  deslocar, e ir ao estado 71
+    LOG_OP_E  deslocar, e ir ao estado 71
 
-    LIST_OP_BIN  reduzir usando a regra 39 (expList)
-    PV           reduzir usando a regra 39 (expList)
+    PV           reduzir usando a regra 39 (expLogic)
+    LOG_OP_OU    reduzir usando a regra 39 (expLogic)
+    LIST_OP_BIN  reduzir usando a regra 39 (expLogic)
 
 
 Estado 44
 
-   41 expLogic: andLogic •
-   42 andLogic: andLogic • LOG_OP_E expComp
+   41 andLogic: expComp •
+   42 expComp: expComp • REL_OP_BAIXA expRel
 
-    LOG_OP_E  deslocar, e ir ao estado 72
+    REL_OP_BAIXA  deslocar, e ir ao estado 72
 
-    LOG_OP_OU    reduzir usando a regra 41 (expLogic)
-    LIST_OP_BIN  reduzir usando a regra 41 (expLogic)
-    PV           reduzir usando a regra 41 (expLogic)
+    PV           reduzir usando a regra 41 (andLogic)
+    LOG_OP_OU    reduzir usando a regra 41 (andLogic)
+    LOG_OP_E     reduzir usando a regra 41 (andLogic)
+    LIST_OP_BIN  reduzir usando a regra 41 (andLogic)
 
 
 Estado 45
 
-   43 andLogic: expComp •
-   44 expComp: expComp • REL_OP_BAIXA expRel
+   43 expComp: expRel •
+   44 expRel: expRel • REL_OP_ALTA expArit
 
-    REL_OP_BAIXA  deslocar, e ir ao estado 73
+    REL_OP_ALTA  deslocar, e ir ao estado 73
 
-    LOG_OP_OU    reduzir usando a regra 43 (andLogic)
-    LOG_OP_E     reduzir usando a regra 43 (andLogic)
-    LIST_OP_BIN  reduzir usando a regra 43 (andLogic)
-    PV           reduzir usando a regra 43 (andLogic)
+    PV            reduzir usando a regra 43 (expComp)
+    LOG_OP_OU     reduzir usando a regra 43 (expComp)
+    LOG_OP_E      reduzir usando a regra 43 (expComp)
+    REL_OP_BAIXA  reduzir usando a regra 43 (expComp)
+    LIST_OP_BIN   reduzir usando a regra 43 (expComp)
 
 
 Estado 46
 
-   45 expComp: expRel •
-   46 expRel: expRel • REL_OP_ALTA expArit
+   45 expRel: expArit •
+   46 expArit: expArit • ARIT_OP_BAIXA expMul
 
-    REL_OP_ALTA  deslocar, e ir ao estado 74
+    ARIT_OP_BAIXA  deslocar, e ir ao estado 74
 
-    LOG_OP_OU     reduzir usando a regra 45 (expComp)
-    LOG_OP_E      reduzir usando a regra 45 (expComp)
-    REL_OP_BAIXA  reduzir usando a regra 45 (expComp)
-    LIST_OP_BIN   reduzir usando a regra 45 (expComp)
-    PV            reduzir usando a regra 45 (expComp)
+    PV            reduzir usando a regra 45 (expRel)
+    LOG_OP_OU     reduzir usando a regra 45 (expRel)
+    LOG_OP_E      reduzir usando a regra 45 (expRel)
+    REL_OP_BAIXA  reduzir usando a regra 45 (expRel)
+    REL_OP_ALTA   reduzir usando a regra 45 (expRel)
+    LIST_OP_BIN   reduzir usando a regra 45 (expRel)
 
 
 Estado 47
 
-   47 expRel: expArit •
-   48 expArit: expArit • ARIT_OP_BAIXA expMul
+   47 expArit: expMul •
+   48 expMul: expMul • ARIT_OP_ALTA negElement
 
-    ARIT_OP_BAIXA  deslocar, e ir ao estado 75
+    ARIT_OP_ALTA  deslocar, e ir ao estado 75
 
-    LOG_OP_OU     reduzir usando a regra 47 (expRel)
-    LOG_OP_E      reduzir usando a regra 47 (expRel)
-    REL_OP_BAIXA  reduzir usando a regra 47 (expRel)
-    REL_OP_ALTA   reduzir usando a regra 47 (expRel)
-    LIST_OP_BIN   reduzir usando a regra 47 (expRel)
-    PV            reduzir usando a regra 47 (expRel)
+    PV             reduzir usando a regra 47 (expArit)
+    LOG_OP_OU      reduzir usando a regra 47 (expArit)
+    LOG_OP_E       reduzir usando a regra 47 (expArit)
+    REL_OP_BAIXA   reduzir usando a regra 47 (expArit)
+    REL_OP_ALTA    reduzir usando a regra 47 (expArit)
+    LIST_OP_BIN    reduzir usando a regra 47 (expArit)
+    ARIT_OP_BAIXA  reduzir usando a regra 47 (expArit)
 
 
 Estado 48
 
-   49 expArit: expMul •
-   50 expMul: expMul • ARIT_OP_ALTA negElement
+   49 expMul: negElement •
 
-    ARIT_OP_ALTA  deslocar, e ir ao estado 76
-
-    LOG_OP_OU      reduzir usando a regra 49 (expArit)
-    LOG_OP_E       reduzir usando a regra 49 (expArit)
-    REL_OP_BAIXA   reduzir usando a regra 49 (expArit)
-    REL_OP_ALTA    reduzir usando a regra 49 (expArit)
-    LIST_OP_BIN    reduzir usando a regra 49 (expArit)
-    ARIT_OP_BAIXA  reduzir usando a regra 49 (expArit)
-    PV             reduzir usando a regra 49 (expArit)
+    PV             reduzir usando a regra 49 (expMul)
+    LOG_OP_OU      reduzir usando a regra 49 (expMul)
+    LOG_OP_E       reduzir usando a regra 49 (expMul)
+    REL_OP_BAIXA   reduzir usando a regra 49 (expMul)
+    REL_OP_ALTA    reduzir usando a regra 49 (expMul)
+    LIST_OP_BIN    reduzir usando a regra 49 (expMul)
+    ARIT_OP_BAIXA  reduzir usando a regra 49 (expMul)
+    ARIT_OP_ALTA   reduzir usando a regra 49 (expMul)
 
 
 Estado 49
 
-   51 expMul: negElement •
+   51 negElement: element •
 
-    LOG_OP_OU      reduzir usando a regra 51 (expMul)
-    LOG_OP_E       reduzir usando a regra 51 (expMul)
-    REL_OP_BAIXA   reduzir usando a regra 51 (expMul)
-    REL_OP_ALTA    reduzir usando a regra 51 (expMul)
-    LIST_OP_BIN    reduzir usando a regra 51 (expMul)
-    ARIT_OP_BAIXA  reduzir usando a regra 51 (expMul)
-    ARIT_OP_ALTA   reduzir usando a regra 51 (expMul)
-    PV             reduzir usando a regra 51 (expMul)
+    PV             reduzir usando a regra 51 (negElement)
+    LOG_OP_OU      reduzir usando a regra 51 (negElement)
+    LOG_OP_E       reduzir usando a regra 51 (negElement)
+    REL_OP_BAIXA   reduzir usando a regra 51 (negElement)
+    REL_OP_ALTA    reduzir usando a regra 51 (negElement)
+    LIST_OP_BIN    reduzir usando a regra 51 (negElement)
+    ARIT_OP_BAIXA  reduzir usando a regra 51 (negElement)
+    ARIT_OP_ALTA   reduzir usando a regra 51 (negElement)
 
 
 Estado 50
 
-   53 negElement: element •
+   28 oneLineStmt: ret • PV
 
-    LOG_OP_OU      reduzir usando a regra 53 (negElement)
-    LOG_OP_E       reduzir usando a regra 53 (negElement)
-    REL_OP_BAIXA   reduzir usando a regra 53 (negElement)
-    REL_OP_ALTA    reduzir usando a regra 53 (negElement)
-    LIST_OP_BIN    reduzir usando a regra 53 (negElement)
-    ARIT_OP_BAIXA  reduzir usando a regra 53 (negElement)
-    ARIT_OP_ALTA   reduzir usando a regra 53 (negElement)
-    PV             reduzir usando a regra 53 (negElement)
+    PV  deslocar, e ir ao estado 76
 
 
 Estado 51
-
-   28 oneLineStmt: ret • PV
-
-    PV  deslocar, e ir ao estado 77
-
-
-Estado 52
 
    10 parameters: parameters VIRG variable •
 
@@ -900,234 +877,232 @@ Estado 52
     FECHA_P  reduzir usando a regra 10 (parameters)
 
 
-Estado 53
+Estado 52
 
     8 function: TIPO ID ABRE_P parameters FECHA_P ABRE_C • moreStmt FECHA_C
 
-    IF          deslocar, e ir ao estado 20
-    FOR         deslocar, e ir ao estado 21
-    RETURN      deslocar, e ir ao estado 22
-    TIPO        deslocar, e ir ao estado 118
-    ENTRADA     deslocar, e ir ao estado 23
-    SAIDA       deslocar, e ir ao estado 24
-    LIST_OP_UN  deslocar, e ir ao estado 25
-    LOG_OP_UN   deslocar, e ir ao estado 26
-    CONST       deslocar, e ir ao estado 27
-    NIL         deslocar, e ir ao estado 28
-    ID          deslocar, e ir ao estado 29
-    ABRE_P      deslocar, e ir ao estado 30
+    IF          deslocar, e ir ao estado 21
+    FOR         deslocar, e ir ao estado 22
+    RETURN      deslocar, e ir ao estado 23
+    TIPO        deslocar, e ir ao estado 117
+    ENTRADA     deslocar, e ir ao estado 24
+    SAIDA       deslocar, e ir ao estado 25
+    LIST_OP_UN  deslocar, e ir ao estado 26
+    LOG_OP_UN   deslocar, e ir ao estado 27
+    CONST       deslocar, e ir ao estado 28
+    NIL         deslocar, e ir ao estado 29
+    ID          deslocar, e ir ao estado 30
+    ABRE_P      deslocar, e ir ao estado 31
 
-    moreStmt      ir ao estado 78
-    stmt          ir ao estado 32
-    multLineStmt  ir ao estado 33
-    conditional   ir ao estado 34
-    iteration     ir ao estado 35
-    oneLineStmt   ir ao estado 36
-    io            ir ao estado 37
-    in            ir ao estado 38
-    out           ir ao estado 39
-    variable      ir ao estado 40
-    attribuition  ir ao estado 41
-    expList       ir ao estado 42
-    expLogic      ir ao estado 43
-    andLogic      ir ao estado 44
-    expComp       ir ao estado 45
-    expRel        ir ao estado 46
-    expArit       ir ao estado 47
-    expMul        ir ao estado 48
-    negElement    ir ao estado 49
-    element       ir ao estado 50
-    ret           ir ao estado 51
+    moreStmt      ir ao estado 77
+    stmt          ir ao estado 33
+    multLineStmt  ir ao estado 34
+    conditional   ir ao estado 35
+    iteration     ir ao estado 36
+    oneLineStmt   ir ao estado 37
+    io            ir ao estado 38
+    variable      ir ao estado 39
+    attribuition  ir ao estado 40
+    expList       ir ao estado 41
+    expLogic      ir ao estado 42
+    andLogic      ir ao estado 43
+    expComp       ir ao estado 44
+    expRel        ir ao estado 45
+    expArit       ir ao estado 46
+    expMul        ir ao estado 47
+    negElement    ir ao estado 48
+    element       ir ao estado 49
+    ret           ir ao estado 50
 
 
-Estado 54
+Estado 53
 
    18 conditional: IF ABRE_P • attribuition FECHA_P bracesStmt
    19            | IF ABRE_P • attribuition FECHA_P bracesStmt ELSE bracesStmt
 
-    LIST_OP_UN  deslocar, e ir ao estado 119
-    LOG_OP_UN   deslocar, e ir ao estado 120
-    CONST       deslocar, e ir ao estado 121
-    NIL         deslocar, e ir ao estado 122
-    ID          deslocar, e ir ao estado 123
-    ABRE_P      deslocar, e ir ao estado 124
+    LIST_OP_UN  deslocar, e ir ao estado 118
+    LOG_OP_UN   deslocar, e ir ao estado 119
+    CONST       deslocar, e ir ao estado 120
+    NIL         deslocar, e ir ao estado 121
+    ID          deslocar, e ir ao estado 122
+    ABRE_P      deslocar, e ir ao estado 123
 
-    attribuition  ir ao estado 79
-    expList       ir ao estado 125
-    expLogic      ir ao estado 126
-    andLogic      ir ao estado 127
-    expComp       ir ao estado 128
-    expRel        ir ao estado 129
-    expArit       ir ao estado 130
-    expMul        ir ao estado 131
-    negElement    ir ao estado 132
-    element       ir ao estado 133
+    attribuition  ir ao estado 78
+    expList       ir ao estado 124
+    expLogic      ir ao estado 125
+    andLogic      ir ao estado 126
+    expComp       ir ao estado 127
+    expRel        ir ao estado 128
+    expArit       ir ao estado 129
+    expMul        ir ao estado 130
+    negElement    ir ao estado 131
+    element       ir ao estado 132
+
+
+Estado 54
+
+   22 iteration: FOR ABRE_P • expIte PV expIte PV expIte FECHA_P bracesStmt
+
+    LIST_OP_UN  deslocar, e ir ao estado 26
+    LOG_OP_UN   deslocar, e ir ao estado 27
+    CONST       deslocar, e ir ao estado 28
+    NIL         deslocar, e ir ao estado 29
+    ID          deslocar, e ir ao estado 30
+    ABRE_P      deslocar, e ir ao estado 31
+
+    PV  reduzir usando a regra 24 (expIte)
+
+    expIte        ir ao estado 79
+    attribuition  ir ao estado 80
+    expList       ir ao estado 41
+    expLogic      ir ao estado 42
+    andLogic      ir ao estado 43
+    expComp       ir ao estado 44
+    expRel        ir ao estado 45
+    expArit       ir ao estado 46
+    expMul        ir ao estado 47
+    negElement    ir ao estado 48
+    element       ir ao estado 49
 
 
 Estado 55
 
-   22 iteration: FOR ABRE_P • expIte PV expIte PV expIte FECHA_P bracesStmt
+   60 ret: RETURN attribuition •
 
-    LIST_OP_UN  deslocar, e ir ao estado 25
-    LOG_OP_UN   deslocar, e ir ao estado 26
-    CONST       deslocar, e ir ao estado 27
-    NIL         deslocar, e ir ao estado 28
-    ID          deslocar, e ir ao estado 29
-    ABRE_P      deslocar, e ir ao estado 30
-
-    PV  reduzir usando a regra 24 (expIte)
-
-    expIte        ir ao estado 80
-    attribuition  ir ao estado 81
-    expList       ir ao estado 42
-    expLogic      ir ao estado 43
-    andLogic      ir ao estado 44
-    expComp       ir ao estado 45
-    expRel        ir ao estado 46
-    expArit       ir ao estado 47
-    expMul        ir ao estado 48
-    negElement    ir ao estado 49
-    element       ir ao estado 50
+    PV  reduzir usando a regra 60 (ret)
 
 
 Estado 56
 
-   62 ret: RETURN attribuition •
+   29 io: ENTRADA ABRE_P • ID FECHA_P
 
-    PV  reduzir usando a regra 62 (ret)
+    ID  deslocar, e ir ao estado 81
 
 
 Estado 57
 
-   31 in: ENTRADA ABRE_P • ID FECHA_P
+   30 io: SAIDA ABRE_P • attribuition FECHA_P
+   31   | SAIDA ABRE_P • STRING FECHA_P
 
-    ID  deslocar, e ir ao estado 82
+    LIST_OP_UN  deslocar, e ir ao estado 118
+    LOG_OP_UN   deslocar, e ir ao estado 119
+    CONST       deslocar, e ir ao estado 120
+    STRING      deslocar, e ir ao estado 82
+    NIL         deslocar, e ir ao estado 121
+    ID          deslocar, e ir ao estado 122
+    ABRE_P      deslocar, e ir ao estado 123
+
+    attribuition  ir ao estado 83
+    expList       ir ao estado 124
+    expLogic      ir ao estado 125
+    andLogic      ir ao estado 126
+    expComp       ir ao estado 127
+    expRel        ir ao estado 128
+    expArit       ir ao estado 129
+    expMul        ir ao estado 130
+    negElement    ir ao estado 131
+    element       ir ao estado 132
 
 
 Estado 58
 
-   32 out: SAIDA ABRE_P • attribuition FECHA_P
-   33    | SAIDA ABRE_P • STRING FECHA_P
+   52 element: ID •
+   54        | ID • ABRE_P arguments FECHA_P
+   55        | ID • ABRE_P FECHA_P
 
-    LIST_OP_UN  deslocar, e ir ao estado 119
-    LOG_OP_UN   deslocar, e ir ao estado 120
-    CONST       deslocar, e ir ao estado 121
-    STRING      deslocar, e ir ao estado 83
-    NIL         deslocar, e ir ao estado 122
-    ID          deslocar, e ir ao estado 123
-    ABRE_P      deslocar, e ir ao estado 124
+    ABRE_P  deslocar, e ir ao estado 62
 
-    attribuition  ir ao estado 84
-    expList       ir ao estado 125
-    expLogic      ir ao estado 126
-    andLogic      ir ao estado 127
-    expComp       ir ao estado 128
-    expRel        ir ao estado 129
-    expArit       ir ao estado 130
-    expMul        ir ao estado 131
-    negElement    ir ao estado 132
-    element       ir ao estado 133
+    PV             reduzir usando a regra 52 (element)
+    LOG_OP_OU      reduzir usando a regra 52 (element)
+    LOG_OP_E       reduzir usando a regra 52 (element)
+    REL_OP_BAIXA   reduzir usando a regra 52 (element)
+    REL_OP_ALTA    reduzir usando a regra 52 (element)
+    LIST_OP_BIN    reduzir usando a regra 52 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 52 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 52 (element)
 
 
 Estado 59
 
-   54 element: ID •
-   56        | ID • ABRE_P arguments FECHA_P
-   57        | ID • ABRE_P FECHA_P
+   35 expList: LIST_OP_UN expLogic •
+   38 expLogic: expLogic • LOG_OP_OU andLogic
 
-    ABRE_P  deslocar, e ir ao estado 63
+    LOG_OP_OU  deslocar, e ir ao estado 70
 
-    LOG_OP_OU      reduzir usando a regra 54 (element)
-    LOG_OP_E       reduzir usando a regra 54 (element)
-    REL_OP_BAIXA   reduzir usando a regra 54 (element)
-    REL_OP_ALTA    reduzir usando a regra 54 (element)
-    LIST_OP_BIN    reduzir usando a regra 54 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 54 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 54 (element)
-    PV             reduzir usando a regra 54 (element)
+    PV           reduzir usando a regra 35 (expList)
+    LIST_OP_BIN  reduzir usando a regra 35 (expList)
 
 
 Estado 60
 
-   37 expList: LIST_OP_UN expLogic •
-   40 expLogic: expLogic • LOG_OP_OU andLogic
+   50 negElement: LOG_OP_UN element •
 
-    LOG_OP_OU  deslocar, e ir ao estado 71
-
-    LIST_OP_BIN  reduzir usando a regra 37 (expList)
-    PV           reduzir usando a regra 37 (expList)
+    PV             reduzir usando a regra 50 (negElement)
+    LOG_OP_OU      reduzir usando a regra 50 (negElement)
+    LOG_OP_E       reduzir usando a regra 50 (negElement)
+    REL_OP_BAIXA   reduzir usando a regra 50 (negElement)
+    REL_OP_ALTA    reduzir usando a regra 50 (negElement)
+    LIST_OP_BIN    reduzir usando a regra 50 (negElement)
+    ARIT_OP_BAIXA  reduzir usando a regra 50 (negElement)
+    ARIT_OP_ALTA   reduzir usando a regra 50 (negElement)
 
 
 Estado 61
 
-   52 negElement: LOG_OP_UN element •
+   33 attribuition: ID ATRIB • expList
 
-    LOG_OP_OU      reduzir usando a regra 52 (negElement)
-    LOG_OP_E       reduzir usando a regra 52 (negElement)
-    REL_OP_BAIXA   reduzir usando a regra 52 (negElement)
-    REL_OP_ALTA    reduzir usando a regra 52 (negElement)
-    LIST_OP_BIN    reduzir usando a regra 52 (negElement)
-    ARIT_OP_BAIXA  reduzir usando a regra 52 (negElement)
-    ARIT_OP_ALTA   reduzir usando a regra 52 (negElement)
-    PV             reduzir usando a regra 52 (negElement)
+    LIST_OP_UN  deslocar, e ir ao estado 26
+    LOG_OP_UN   deslocar, e ir ao estado 27
+    CONST       deslocar, e ir ao estado 28
+    NIL         deslocar, e ir ao estado 29
+    ID          deslocar, e ir ao estado 58
+    ABRE_P      deslocar, e ir ao estado 31
+
+    expList     ir ao estado 84
+    expLogic    ir ao estado 42
+    andLogic    ir ao estado 43
+    expComp     ir ao estado 44
+    expRel      ir ao estado 45
+    expArit     ir ao estado 46
+    expMul      ir ao estado 47
+    negElement  ir ao estado 48
+    element     ir ao estado 49
 
 
 Estado 62
 
-   35 attribuition: ID ATRIB • expList
+   54 element: ID ABRE_P • arguments FECHA_P
+   55        | ID ABRE_P • FECHA_P
 
-    LIST_OP_UN  deslocar, e ir ao estado 25
-    LOG_OP_UN   deslocar, e ir ao estado 26
-    CONST       deslocar, e ir ao estado 27
-    NIL         deslocar, e ir ao estado 28
-    ID          deslocar, e ir ao estado 59
-    ABRE_P      deslocar, e ir ao estado 30
+    LIST_OP_UN  deslocar, e ir ao estado 133
+    LOG_OP_UN   deslocar, e ir ao estado 134
+    CONST       deslocar, e ir ao estado 135
+    NIL         deslocar, e ir ao estado 136
+    ID          deslocar, e ir ao estado 137
+    ABRE_P      deslocar, e ir ao estado 138
+    FECHA_P     deslocar, e ir ao estado 85
 
-    expList     ir ao estado 85
-    expLogic    ir ao estado 43
-    andLogic    ir ao estado 44
-    expComp     ir ao estado 45
-    expRel      ir ao estado 46
-    expArit     ir ao estado 47
-    expMul      ir ao estado 48
-    negElement  ir ao estado 49
-    element     ir ao estado 50
+    attribuition  ir ao estado 86
+    expList       ir ao estado 139
+    expLogic      ir ao estado 140
+    andLogic      ir ao estado 141
+    expComp       ir ao estado 142
+    expRel        ir ao estado 143
+    expArit       ir ao estado 144
+    expMul        ir ao estado 145
+    negElement    ir ao estado 146
+    element       ir ao estado 147
+    arguments     ir ao estado 87
 
 
 Estado 63
 
-   56 element: ID ABRE_P • arguments FECHA_P
-   57        | ID ABRE_P • FECHA_P
+   53 element: ABRE_P attribuition • FECHA_P
 
-    LIST_OP_UN  deslocar, e ir ao estado 134
-    LOG_OP_UN   deslocar, e ir ao estado 135
-    CONST       deslocar, e ir ao estado 136
-    NIL         deslocar, e ir ao estado 137
-    ID          deslocar, e ir ao estado 138
-    ABRE_P      deslocar, e ir ao estado 139
-    FECHA_P     deslocar, e ir ao estado 86
-
-    attribuition  ir ao estado 87
-    expList       ir ao estado 140
-    expLogic      ir ao estado 141
-    andLogic      ir ao estado 142
-    expComp       ir ao estado 143
-    expRel        ir ao estado 144
-    expArit       ir ao estado 145
-    expMul        ir ao estado 146
-    negElement    ir ao estado 147
-    element       ir ao estado 148
-    arguments     ir ao estado 88
+    FECHA_P  deslocar, e ir ao estado 88
 
 
 Estado 64
-
-   55 element: ABRE_P attribuition • FECHA_P
-
-    FECHA_P  deslocar, e ir ao estado 89
-
-
-Estado 65
 
     9 function: TIPO ID ABRE_P FECHA_P ABRE_C moreStmt FECHA_C •
 
@@ -1136,11 +1111,10 @@ Estado 65
     TIPO   reduzir usando a regra 9 (function)
 
 
-Estado 66
+Estado 65
 
    12 moreStmt: moreStmt stmt •
 
-    FECHA_C     reduzir usando a regra 12 (moreStmt)
     IF          reduzir usando a regra 12 (moreStmt)
     FOR         reduzir usando a regra 12 (moreStmt)
     RETURN      reduzir usando a regra 12 (moreStmt)
@@ -1153,13 +1127,13 @@ Estado 66
     NIL         reduzir usando a regra 12 (moreStmt)
     ID          reduzir usando a regra 12 (moreStmt)
     ABRE_P      reduzir usando a regra 12 (moreStmt)
+    FECHA_C     reduzir usando a regra 12 (moreStmt)
 
 
-Estado 67
+Estado 66
 
    27 oneLineStmt: io PV •
 
-    FECHA_C     reduzir usando a regra 27 (oneLineStmt)
     IF          reduzir usando a regra 27 (oneLineStmt)
     FOR         reduzir usando a regra 27 (oneLineStmt)
     RETURN      reduzir usando a regra 27 (oneLineStmt)
@@ -1172,13 +1146,13 @@ Estado 67
     NIL         reduzir usando a regra 27 (oneLineStmt)
     ID          reduzir usando a regra 27 (oneLineStmt)
     ABRE_P      reduzir usando a regra 27 (oneLineStmt)
+    FECHA_C     reduzir usando a regra 27 (oneLineStmt)
 
 
-Estado 68
+Estado 67
 
    25 oneLineStmt: variable PV •
 
-    FECHA_C     reduzir usando a regra 25 (oneLineStmt)
     IF          reduzir usando a regra 25 (oneLineStmt)
     FOR         reduzir usando a regra 25 (oneLineStmt)
     RETURN      reduzir usando a regra 25 (oneLineStmt)
@@ -1191,13 +1165,13 @@ Estado 68
     NIL         reduzir usando a regra 25 (oneLineStmt)
     ID          reduzir usando a regra 25 (oneLineStmt)
     ABRE_P      reduzir usando a regra 25 (oneLineStmt)
+    FECHA_C     reduzir usando a regra 25 (oneLineStmt)
 
 
-Estado 69
+Estado 68
 
    26 oneLineStmt: attribuition PV •
 
-    FECHA_C     reduzir usando a regra 26 (oneLineStmt)
     IF          reduzir usando a regra 26 (oneLineStmt)
     FOR         reduzir usando a regra 26 (oneLineStmt)
     RETURN      reduzir usando a regra 26 (oneLineStmt)
@@ -1210,132 +1184,132 @@ Estado 69
     NIL         reduzir usando a regra 26 (oneLineStmt)
     ID          reduzir usando a regra 26 (oneLineStmt)
     ABRE_P      reduzir usando a regra 26 (oneLineStmt)
+    FECHA_C     reduzir usando a regra 26 (oneLineStmt)
+
+
+Estado 69
+
+   36 expList: expList LIST_OP_BIN • expLogic
+
+    LOG_OP_UN  deslocar, e ir ao estado 27
+    CONST      deslocar, e ir ao estado 28
+    NIL        deslocar, e ir ao estado 29
+    ID         deslocar, e ir ao estado 58
+    ABRE_P     deslocar, e ir ao estado 31
+
+    expLogic    ir ao estado 89
+    andLogic    ir ao estado 43
+    expComp     ir ao estado 44
+    expRel      ir ao estado 45
+    expArit     ir ao estado 46
+    expMul      ir ao estado 47
+    negElement  ir ao estado 48
+    element     ir ao estado 49
 
 
 Estado 70
 
-   38 expList: expList LIST_OP_BIN • expLogic
+   38 expLogic: expLogic LOG_OP_OU • andLogic
 
-    LOG_OP_UN  deslocar, e ir ao estado 26
-    CONST      deslocar, e ir ao estado 27
-    NIL        deslocar, e ir ao estado 28
-    ID         deslocar, e ir ao estado 59
-    ABRE_P     deslocar, e ir ao estado 30
+    LOG_OP_UN  deslocar, e ir ao estado 27
+    CONST      deslocar, e ir ao estado 28
+    NIL        deslocar, e ir ao estado 29
+    ID         deslocar, e ir ao estado 58
+    ABRE_P     deslocar, e ir ao estado 31
 
-    expLogic    ir ao estado 90
-    andLogic    ir ao estado 44
-    expComp     ir ao estado 45
-    expRel      ir ao estado 46
-    expArit     ir ao estado 47
-    expMul      ir ao estado 48
-    negElement  ir ao estado 49
-    element     ir ao estado 50
+    andLogic    ir ao estado 90
+    expComp     ir ao estado 44
+    expRel      ir ao estado 45
+    expArit     ir ao estado 46
+    expMul      ir ao estado 47
+    negElement  ir ao estado 48
+    element     ir ao estado 49
 
 
 Estado 71
 
-   40 expLogic: expLogic LOG_OP_OU • andLogic
+   40 andLogic: andLogic LOG_OP_E • expComp
 
-    LOG_OP_UN  deslocar, e ir ao estado 26
-    CONST      deslocar, e ir ao estado 27
-    NIL        deslocar, e ir ao estado 28
-    ID         deslocar, e ir ao estado 59
-    ABRE_P     deslocar, e ir ao estado 30
+    LOG_OP_UN  deslocar, e ir ao estado 27
+    CONST      deslocar, e ir ao estado 28
+    NIL        deslocar, e ir ao estado 29
+    ID         deslocar, e ir ao estado 58
+    ABRE_P     deslocar, e ir ao estado 31
 
-    andLogic    ir ao estado 91
-    expComp     ir ao estado 45
-    expRel      ir ao estado 46
-    expArit     ir ao estado 47
-    expMul      ir ao estado 48
-    negElement  ir ao estado 49
-    element     ir ao estado 50
+    expComp     ir ao estado 91
+    expRel      ir ao estado 45
+    expArit     ir ao estado 46
+    expMul      ir ao estado 47
+    negElement  ir ao estado 48
+    element     ir ao estado 49
 
 
 Estado 72
 
-   42 andLogic: andLogic LOG_OP_E • expComp
+   42 expComp: expComp REL_OP_BAIXA • expRel
 
-    LOG_OP_UN  deslocar, e ir ao estado 26
-    CONST      deslocar, e ir ao estado 27
-    NIL        deslocar, e ir ao estado 28
-    ID         deslocar, e ir ao estado 59
-    ABRE_P     deslocar, e ir ao estado 30
+    LOG_OP_UN  deslocar, e ir ao estado 27
+    CONST      deslocar, e ir ao estado 28
+    NIL        deslocar, e ir ao estado 29
+    ID         deslocar, e ir ao estado 58
+    ABRE_P     deslocar, e ir ao estado 31
 
-    expComp     ir ao estado 92
-    expRel      ir ao estado 46
-    expArit     ir ao estado 47
-    expMul      ir ao estado 48
-    negElement  ir ao estado 49
-    element     ir ao estado 50
+    expRel      ir ao estado 92
+    expArit     ir ao estado 46
+    expMul      ir ao estado 47
+    negElement  ir ao estado 48
+    element     ir ao estado 49
 
 
 Estado 73
 
-   44 expComp: expComp REL_OP_BAIXA • expRel
+   44 expRel: expRel REL_OP_ALTA • expArit
 
-    LOG_OP_UN  deslocar, e ir ao estado 26
-    CONST      deslocar, e ir ao estado 27
-    NIL        deslocar, e ir ao estado 28
-    ID         deslocar, e ir ao estado 59
-    ABRE_P     deslocar, e ir ao estado 30
+    LOG_OP_UN  deslocar, e ir ao estado 27
+    CONST      deslocar, e ir ao estado 28
+    NIL        deslocar, e ir ao estado 29
+    ID         deslocar, e ir ao estado 58
+    ABRE_P     deslocar, e ir ao estado 31
 
-    expRel      ir ao estado 93
-    expArit     ir ao estado 47
-    expMul      ir ao estado 48
-    negElement  ir ao estado 49
-    element     ir ao estado 50
+    expArit     ir ao estado 93
+    expMul      ir ao estado 47
+    negElement  ir ao estado 48
+    element     ir ao estado 49
 
 
 Estado 74
 
-   46 expRel: expRel REL_OP_ALTA • expArit
+   46 expArit: expArit ARIT_OP_BAIXA • expMul
 
-    LOG_OP_UN  deslocar, e ir ao estado 26
-    CONST      deslocar, e ir ao estado 27
-    NIL        deslocar, e ir ao estado 28
-    ID         deslocar, e ir ao estado 59
-    ABRE_P     deslocar, e ir ao estado 30
+    LOG_OP_UN  deslocar, e ir ao estado 27
+    CONST      deslocar, e ir ao estado 28
+    NIL        deslocar, e ir ao estado 29
+    ID         deslocar, e ir ao estado 58
+    ABRE_P     deslocar, e ir ao estado 31
 
-    expArit     ir ao estado 94
-    expMul      ir ao estado 48
-    negElement  ir ao estado 49
-    element     ir ao estado 50
+    expMul      ir ao estado 94
+    negElement  ir ao estado 48
+    element     ir ao estado 49
 
 
 Estado 75
 
-   48 expArit: expArit ARIT_OP_BAIXA • expMul
+   48 expMul: expMul ARIT_OP_ALTA • negElement
 
-    LOG_OP_UN  deslocar, e ir ao estado 26
-    CONST      deslocar, e ir ao estado 27
-    NIL        deslocar, e ir ao estado 28
-    ID         deslocar, e ir ao estado 59
-    ABRE_P     deslocar, e ir ao estado 30
+    LOG_OP_UN  deslocar, e ir ao estado 27
+    CONST      deslocar, e ir ao estado 28
+    NIL        deslocar, e ir ao estado 29
+    ID         deslocar, e ir ao estado 58
+    ABRE_P     deslocar, e ir ao estado 31
 
-    expMul      ir ao estado 95
-    negElement  ir ao estado 49
-    element     ir ao estado 50
+    negElement  ir ao estado 95
+    element     ir ao estado 49
 
 
 Estado 76
 
-   50 expMul: expMul ARIT_OP_ALTA • negElement
-
-    LOG_OP_UN  deslocar, e ir ao estado 26
-    CONST      deslocar, e ir ao estado 27
-    NIL        deslocar, e ir ao estado 28
-    ID         deslocar, e ir ao estado 59
-    ABRE_P     deslocar, e ir ao estado 30
-
-    negElement  ir ao estado 96
-    element     ir ao estado 50
-
-
-Estado 77
-
    28 oneLineStmt: ret PV •
 
-    FECHA_C     reduzir usando a regra 28 (oneLineStmt)
     IF          reduzir usando a regra 28 (oneLineStmt)
     FOR         reduzir usando a regra 28 (oneLineStmt)
     RETURN      reduzir usando a regra 28 (oneLineStmt)
@@ -1348,137 +1322,106 @@ Estado 77
     NIL         reduzir usando a regra 28 (oneLineStmt)
     ID          reduzir usando a regra 28 (oneLineStmt)
     ABRE_P      reduzir usando a regra 28 (oneLineStmt)
+    FECHA_C     reduzir usando a regra 28 (oneLineStmt)
 
 
-Estado 78
+Estado 77
 
     8 function: TIPO ID ABRE_P parameters FECHA_P ABRE_C moreStmt • FECHA_C
    12 moreStmt: moreStmt • stmt
 
-    FECHA_C     deslocar, e ir ao estado 97
-    IF          deslocar, e ir ao estado 20
-    FOR         deslocar, e ir ao estado 21
-    RETURN      deslocar, e ir ao estado 22
-    TIPO        deslocar, e ir ao estado 118
-    ENTRADA     deslocar, e ir ao estado 23
-    SAIDA       deslocar, e ir ao estado 24
-    LIST_OP_UN  deslocar, e ir ao estado 25
-    LOG_OP_UN   deslocar, e ir ao estado 26
-    CONST       deslocar, e ir ao estado 27
-    NIL         deslocar, e ir ao estado 28
-    ID          deslocar, e ir ao estado 29
-    ABRE_P      deslocar, e ir ao estado 30
+    IF          deslocar, e ir ao estado 21
+    FOR         deslocar, e ir ao estado 22
+    RETURN      deslocar, e ir ao estado 23
+    TIPO        deslocar, e ir ao estado 117
+    ENTRADA     deslocar, e ir ao estado 24
+    SAIDA       deslocar, e ir ao estado 25
+    LIST_OP_UN  deslocar, e ir ao estado 26
+    LOG_OP_UN   deslocar, e ir ao estado 27
+    CONST       deslocar, e ir ao estado 28
+    NIL         deslocar, e ir ao estado 29
+    ID          deslocar, e ir ao estado 30
+    ABRE_P      deslocar, e ir ao estado 31
+    FECHA_C     deslocar, e ir ao estado 96
 
-    stmt          ir ao estado 66
-    multLineStmt  ir ao estado 33
-    conditional   ir ao estado 34
-    iteration     ir ao estado 35
-    oneLineStmt   ir ao estado 36
-    io            ir ao estado 37
-    in            ir ao estado 38
-    out           ir ao estado 39
-    variable      ir ao estado 40
-    attribuition  ir ao estado 41
-    expList       ir ao estado 42
-    expLogic      ir ao estado 43
-    andLogic      ir ao estado 44
-    expComp       ir ao estado 45
-    expRel        ir ao estado 46
-    expArit       ir ao estado 47
-    expMul        ir ao estado 48
-    negElement    ir ao estado 49
-    element       ir ao estado 50
-    ret           ir ao estado 51
+    stmt          ir ao estado 65
+    multLineStmt  ir ao estado 34
+    conditional   ir ao estado 35
+    iteration     ir ao estado 36
+    oneLineStmt   ir ao estado 37
+    io            ir ao estado 38
+    variable      ir ao estado 39
+    attribuition  ir ao estado 40
+    expList       ir ao estado 41
+    expLogic      ir ao estado 42
+    andLogic      ir ao estado 43
+    expComp       ir ao estado 44
+    expRel        ir ao estado 45
+    expArit       ir ao estado 46
+    expMul        ir ao estado 47
+    negElement    ir ao estado 48
+    element       ir ao estado 49
+    ret           ir ao estado 50
 
 
-Estado 79
+Estado 78
 
    18 conditional: IF ABRE_P attribuition • FECHA_P bracesStmt
    19            | IF ABRE_P attribuition • FECHA_P bracesStmt ELSE bracesStmt
 
-    FECHA_P  deslocar, e ir ao estado 98
+    FECHA_P  deslocar, e ir ao estado 97
 
 
-Estado 80
+Estado 79
 
    22 iteration: FOR ABRE_P expIte • PV expIte PV expIte FECHA_P bracesStmt
 
-    PV  deslocar, e ir ao estado 99
+    PV  deslocar, e ir ao estado 98
 
 
-Estado 81
+Estado 80
 
    23 expIte: attribuition •
 
     PV  reduzir usando a regra 23 (expIte)
 
 
+Estado 81
+
+   29 io: ENTRADA ABRE_P ID • FECHA_P
+
+    FECHA_P  deslocar, e ir ao estado 99
+
+
 Estado 82
 
-   31 in: ENTRADA ABRE_P ID • FECHA_P
+   31 io: SAIDA ABRE_P STRING • FECHA_P
 
     FECHA_P  deslocar, e ir ao estado 100
 
 
 Estado 83
 
-   33 out: SAIDA ABRE_P STRING • FECHA_P
+   30 io: SAIDA ABRE_P attribuition • FECHA_P
 
     FECHA_P  deslocar, e ir ao estado 101
 
 
 Estado 84
 
-   32 out: SAIDA ABRE_P attribuition • FECHA_P
+   33 attribuition: ID ATRIB expList •
+   36 expList: expList • LIST_OP_BIN expLogic
 
-    FECHA_P  deslocar, e ir ao estado 102
+    LIST_OP_BIN  deslocar, e ir ao estado 69
+
+    PV  reduzir usando a regra 33 (attribuition)
 
 
 Estado 85
 
-   35 attribuition: ID ATRIB expList •
-   38 expList: expList • LIST_OP_BIN expLogic
+   55 element: ID ABRE_P FECHA_P •
 
-    LIST_OP_BIN  deslocar, e ir ao estado 70
-
-    PV  reduzir usando a regra 35 (attribuition)
-
-
-Estado 86
-
-   57 element: ID ABRE_P FECHA_P •
-
-    LOG_OP_OU      reduzir usando a regra 57 (element)
-    LOG_OP_E       reduzir usando a regra 57 (element)
-    REL_OP_BAIXA   reduzir usando a regra 57 (element)
-    REL_OP_ALTA    reduzir usando a regra 57 (element)
-    LIST_OP_BIN    reduzir usando a regra 57 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 57 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 57 (element)
-    PV             reduzir usando a regra 57 (element)
-
-
-Estado 87
-
-   61 arguments: attribuition •
-
-    VIRG     reduzir usando a regra 61 (arguments)
-    FECHA_P  reduzir usando a regra 61 (arguments)
-
-
-Estado 88
-
-   56 element: ID ABRE_P arguments • FECHA_P
-   60 arguments: arguments • VIRG attribuition
-
-    VIRG     deslocar, e ir ao estado 103
-    FECHA_P  deslocar, e ir ao estado 104
-
-
-Estado 89
-
-   55 element: ABRE_P attribuition FECHA_P •
-
+    PV             reduzir usando a regra 55 (element)
     LOG_OP_OU      reduzir usando a regra 55 (element)
     LOG_OP_E       reduzir usando a regra 55 (element)
     REL_OP_BAIXA   reduzir usando a regra 55 (element)
@@ -1486,105 +1429,135 @@ Estado 89
     LIST_OP_BIN    reduzir usando a regra 55 (element)
     ARIT_OP_BAIXA  reduzir usando a regra 55 (element)
     ARIT_OP_ALTA   reduzir usando a regra 55 (element)
-    PV             reduzir usando a regra 55 (element)
+
+
+Estado 86
+
+   59 arguments: attribuition •
+
+    VIRG     reduzir usando a regra 59 (arguments)
+    FECHA_P  reduzir usando a regra 59 (arguments)
+
+
+Estado 87
+
+   54 element: ID ABRE_P arguments • FECHA_P
+   58 arguments: arguments • VIRG attribuition
+
+    VIRG     deslocar, e ir ao estado 102
+    FECHA_P  deslocar, e ir ao estado 103
+
+
+Estado 88
+
+   53 element: ABRE_P attribuition FECHA_P •
+
+    PV             reduzir usando a regra 53 (element)
+    LOG_OP_OU      reduzir usando a regra 53 (element)
+    LOG_OP_E       reduzir usando a regra 53 (element)
+    REL_OP_BAIXA   reduzir usando a regra 53 (element)
+    REL_OP_ALTA    reduzir usando a regra 53 (element)
+    LIST_OP_BIN    reduzir usando a regra 53 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 53 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 53 (element)
+
+
+Estado 89
+
+   36 expList: expList LIST_OP_BIN expLogic •
+   38 expLogic: expLogic • LOG_OP_OU andLogic
+
+    LOG_OP_OU  deslocar, e ir ao estado 70
+
+    PV           reduzir usando a regra 36 (expList)
+    LIST_OP_BIN  reduzir usando a regra 36 (expList)
 
 
 Estado 90
 
-   38 expList: expList LIST_OP_BIN expLogic •
-   40 expLogic: expLogic • LOG_OP_OU andLogic
+   38 expLogic: expLogic LOG_OP_OU andLogic •
+   40 andLogic: andLogic • LOG_OP_E expComp
 
-    LOG_OP_OU  deslocar, e ir ao estado 71
+    LOG_OP_E  deslocar, e ir ao estado 71
 
-    LIST_OP_BIN  reduzir usando a regra 38 (expList)
-    PV           reduzir usando a regra 38 (expList)
+    PV           reduzir usando a regra 38 (expLogic)
+    LOG_OP_OU    reduzir usando a regra 38 (expLogic)
+    LIST_OP_BIN  reduzir usando a regra 38 (expLogic)
 
 
 Estado 91
 
-   40 expLogic: expLogic LOG_OP_OU andLogic •
-   42 andLogic: andLogic • LOG_OP_E expComp
+   40 andLogic: andLogic LOG_OP_E expComp •
+   42 expComp: expComp • REL_OP_BAIXA expRel
 
-    LOG_OP_E  deslocar, e ir ao estado 72
+    REL_OP_BAIXA  deslocar, e ir ao estado 72
 
-    LOG_OP_OU    reduzir usando a regra 40 (expLogic)
-    LIST_OP_BIN  reduzir usando a regra 40 (expLogic)
-    PV           reduzir usando a regra 40 (expLogic)
+    PV           reduzir usando a regra 40 (andLogic)
+    LOG_OP_OU    reduzir usando a regra 40 (andLogic)
+    LOG_OP_E     reduzir usando a regra 40 (andLogic)
+    LIST_OP_BIN  reduzir usando a regra 40 (andLogic)
 
 
 Estado 92
 
-   42 andLogic: andLogic LOG_OP_E expComp •
-   44 expComp: expComp • REL_OP_BAIXA expRel
+   42 expComp: expComp REL_OP_BAIXA expRel •
+   44 expRel: expRel • REL_OP_ALTA expArit
 
-    REL_OP_BAIXA  deslocar, e ir ao estado 73
+    REL_OP_ALTA  deslocar, e ir ao estado 73
 
-    LOG_OP_OU    reduzir usando a regra 42 (andLogic)
-    LOG_OP_E     reduzir usando a regra 42 (andLogic)
-    LIST_OP_BIN  reduzir usando a regra 42 (andLogic)
-    PV           reduzir usando a regra 42 (andLogic)
+    PV            reduzir usando a regra 42 (expComp)
+    LOG_OP_OU     reduzir usando a regra 42 (expComp)
+    LOG_OP_E      reduzir usando a regra 42 (expComp)
+    REL_OP_BAIXA  reduzir usando a regra 42 (expComp)
+    LIST_OP_BIN   reduzir usando a regra 42 (expComp)
 
 
 Estado 93
 
-   44 expComp: expComp REL_OP_BAIXA expRel •
-   46 expRel: expRel • REL_OP_ALTA expArit
+   44 expRel: expRel REL_OP_ALTA expArit •
+   46 expArit: expArit • ARIT_OP_BAIXA expMul
 
-    REL_OP_ALTA  deslocar, e ir ao estado 74
+    ARIT_OP_BAIXA  deslocar, e ir ao estado 74
 
-    LOG_OP_OU     reduzir usando a regra 44 (expComp)
-    LOG_OP_E      reduzir usando a regra 44 (expComp)
-    REL_OP_BAIXA  reduzir usando a regra 44 (expComp)
-    LIST_OP_BIN   reduzir usando a regra 44 (expComp)
-    PV            reduzir usando a regra 44 (expComp)
+    PV            reduzir usando a regra 44 (expRel)
+    LOG_OP_OU     reduzir usando a regra 44 (expRel)
+    LOG_OP_E      reduzir usando a regra 44 (expRel)
+    REL_OP_BAIXA  reduzir usando a regra 44 (expRel)
+    REL_OP_ALTA   reduzir usando a regra 44 (expRel)
+    LIST_OP_BIN   reduzir usando a regra 44 (expRel)
 
 
 Estado 94
 
-   46 expRel: expRel REL_OP_ALTA expArit •
-   48 expArit: expArit • ARIT_OP_BAIXA expMul
+   46 expArit: expArit ARIT_OP_BAIXA expMul •
+   48 expMul: expMul • ARIT_OP_ALTA negElement
 
-    ARIT_OP_BAIXA  deslocar, e ir ao estado 75
+    ARIT_OP_ALTA  deslocar, e ir ao estado 75
 
-    LOG_OP_OU     reduzir usando a regra 46 (expRel)
-    LOG_OP_E      reduzir usando a regra 46 (expRel)
-    REL_OP_BAIXA  reduzir usando a regra 46 (expRel)
-    REL_OP_ALTA   reduzir usando a regra 46 (expRel)
-    LIST_OP_BIN   reduzir usando a regra 46 (expRel)
-    PV            reduzir usando a regra 46 (expRel)
+    PV             reduzir usando a regra 46 (expArit)
+    LOG_OP_OU      reduzir usando a regra 46 (expArit)
+    LOG_OP_E       reduzir usando a regra 46 (expArit)
+    REL_OP_BAIXA   reduzir usando a regra 46 (expArit)
+    REL_OP_ALTA    reduzir usando a regra 46 (expArit)
+    LIST_OP_BIN    reduzir usando a regra 46 (expArit)
+    ARIT_OP_BAIXA  reduzir usando a regra 46 (expArit)
 
 
 Estado 95
 
-   48 expArit: expArit ARIT_OP_BAIXA expMul •
-   50 expMul: expMul • ARIT_OP_ALTA negElement
+   48 expMul: expMul ARIT_OP_ALTA negElement •
 
-    ARIT_OP_ALTA  deslocar, e ir ao estado 76
-
-    LOG_OP_OU      reduzir usando a regra 48 (expArit)
-    LOG_OP_E       reduzir usando a regra 48 (expArit)
-    REL_OP_BAIXA   reduzir usando a regra 48 (expArit)
-    REL_OP_ALTA    reduzir usando a regra 48 (expArit)
-    LIST_OP_BIN    reduzir usando a regra 48 (expArit)
-    ARIT_OP_BAIXA  reduzir usando a regra 48 (expArit)
-    PV             reduzir usando a regra 48 (expArit)
+    PV             reduzir usando a regra 48 (expMul)
+    LOG_OP_OU      reduzir usando a regra 48 (expMul)
+    LOG_OP_E       reduzir usando a regra 48 (expMul)
+    REL_OP_BAIXA   reduzir usando a regra 48 (expMul)
+    REL_OP_ALTA    reduzir usando a regra 48 (expMul)
+    LIST_OP_BIN    reduzir usando a regra 48 (expMul)
+    ARIT_OP_BAIXA  reduzir usando a regra 48 (expMul)
+    ARIT_OP_ALTA   reduzir usando a regra 48 (expMul)
 
 
 Estado 96
-
-   50 expMul: expMul ARIT_OP_ALTA negElement •
-
-    LOG_OP_OU      reduzir usando a regra 50 (expMul)
-    LOG_OP_E       reduzir usando a regra 50 (expMul)
-    REL_OP_BAIXA   reduzir usando a regra 50 (expMul)
-    REL_OP_ALTA    reduzir usando a regra 50 (expMul)
-    LIST_OP_BIN    reduzir usando a regra 50 (expMul)
-    ARIT_OP_BAIXA  reduzir usando a regra 50 (expMul)
-    ARIT_OP_ALTA   reduzir usando a regra 50 (expMul)
-    PV             reduzir usando a regra 50 (expMul)
-
-
-Estado 97
 
     8 function: TIPO ID ABRE_P parameters FECHA_P ABRE_C moreStmt FECHA_C •
 
@@ -1593,174 +1566,169 @@ Estado 97
     TIPO   reduzir usando a regra 8 (function)
 
 
-Estado 98
+Estado 97
 
    18 conditional: IF ABRE_P attribuition FECHA_P • bracesStmt
    19            | IF ABRE_P attribuition FECHA_P • bracesStmt ELSE bracesStmt
 
-    ABRE_C      deslocar, e ir ao estado 105
-    RETURN      deslocar, e ir ao estado 22
-    TIPO        deslocar, e ir ao estado 118
-    ENTRADA     deslocar, e ir ao estado 23
-    SAIDA       deslocar, e ir ao estado 24
-    LIST_OP_UN  deslocar, e ir ao estado 25
-    LOG_OP_UN   deslocar, e ir ao estado 26
-    CONST       deslocar, e ir ao estado 27
-    NIL         deslocar, e ir ao estado 28
-    ID          deslocar, e ir ao estado 29
-    ABRE_P      deslocar, e ir ao estado 30
+    RETURN      deslocar, e ir ao estado 23
+    TIPO        deslocar, e ir ao estado 117
+    ENTRADA     deslocar, e ir ao estado 24
+    SAIDA       deslocar, e ir ao estado 25
+    LIST_OP_UN  deslocar, e ir ao estado 26
+    LOG_OP_UN   deslocar, e ir ao estado 27
+    CONST       deslocar, e ir ao estado 28
+    NIL         deslocar, e ir ao estado 29
+    ID          deslocar, e ir ao estado 30
+    ABRE_P      deslocar, e ir ao estado 31
+    ABRE_C      deslocar, e ir ao estado 104
 
-    bracesStmt    ir ao estado 106
-    oneLineStmt   ir ao estado 107
-    io            ir ao estado 149
-    in            ir ao estado 38
-    out           ir ao estado 39
-    variable      ir ao estado 150
-    attribuition  ir ao estado 151
-    expList       ir ao estado 42
-    expLogic      ir ao estado 43
-    andLogic      ir ao estado 44
-    expComp       ir ao estado 45
-    expRel        ir ao estado 46
-    expArit       ir ao estado 47
-    expMul        ir ao estado 48
-    negElement    ir ao estado 49
-    element       ir ao estado 50
-    ret           ir ao estado 152
+    bracesStmt    ir ao estado 105
+    oneLineStmt   ir ao estado 106
+    io            ir ao estado 148
+    variable      ir ao estado 149
+    attribuition  ir ao estado 150
+    expList       ir ao estado 41
+    expLogic      ir ao estado 42
+    andLogic      ir ao estado 43
+    expComp       ir ao estado 44
+    expRel        ir ao estado 45
+    expArit       ir ao estado 46
+    expMul        ir ao estado 47
+    negElement    ir ao estado 48
+    element       ir ao estado 49
+    ret           ir ao estado 151
+
+
+Estado 98
+
+   22 iteration: FOR ABRE_P expIte PV • expIte PV expIte FECHA_P bracesStmt
+
+    LIST_OP_UN  deslocar, e ir ao estado 26
+    LOG_OP_UN   deslocar, e ir ao estado 27
+    CONST       deslocar, e ir ao estado 28
+    NIL         deslocar, e ir ao estado 29
+    ID          deslocar, e ir ao estado 30
+    ABRE_P      deslocar, e ir ao estado 31
+
+    PV  reduzir usando a regra 24 (expIte)
+
+    expIte        ir ao estado 107
+    attribuition  ir ao estado 80
+    expList       ir ao estado 41
+    expLogic      ir ao estado 42
+    andLogic      ir ao estado 43
+    expComp       ir ao estado 44
+    expRel        ir ao estado 45
+    expArit       ir ao estado 46
+    expMul        ir ao estado 47
+    negElement    ir ao estado 48
+    element       ir ao estado 49
 
 
 Estado 99
 
-   22 iteration: FOR ABRE_P expIte PV • expIte PV expIte FECHA_P bracesStmt
+   29 io: ENTRADA ABRE_P ID FECHA_P •
 
-    LIST_OP_UN  deslocar, e ir ao estado 25
-    LOG_OP_UN   deslocar, e ir ao estado 26
-    CONST       deslocar, e ir ao estado 27
-    NIL         deslocar, e ir ao estado 28
-    ID          deslocar, e ir ao estado 29
-    ABRE_P      deslocar, e ir ao estado 30
-
-    PV  reduzir usando a regra 24 (expIte)
-
-    expIte        ir ao estado 108
-    attribuition  ir ao estado 81
-    expList       ir ao estado 42
-    expLogic      ir ao estado 43
-    andLogic      ir ao estado 44
-    expComp       ir ao estado 45
-    expRel        ir ao estado 46
-    expArit       ir ao estado 47
-    expMul        ir ao estado 48
-    negElement    ir ao estado 49
-    element       ir ao estado 50
+    PV  reduzir usando a regra 29 (io)
 
 
 Estado 100
 
-   31 in: ENTRADA ABRE_P ID FECHA_P •
+   31 io: SAIDA ABRE_P STRING FECHA_P •
 
-    PV  reduzir usando a regra 31 (in)
+    PV  reduzir usando a regra 31 (io)
 
 
 Estado 101
 
-   33 out: SAIDA ABRE_P STRING FECHA_P •
+   30 io: SAIDA ABRE_P attribuition FECHA_P •
 
-    PV  reduzir usando a regra 33 (out)
+    PV  reduzir usando a regra 30 (io)
 
 
 Estado 102
 
-   32 out: SAIDA ABRE_P attribuition FECHA_P •
+   58 arguments: arguments VIRG • attribuition
 
-    PV  reduzir usando a regra 32 (out)
+    LIST_OP_UN  deslocar, e ir ao estado 133
+    LOG_OP_UN   deslocar, e ir ao estado 134
+    CONST       deslocar, e ir ao estado 135
+    NIL         deslocar, e ir ao estado 136
+    ID          deslocar, e ir ao estado 137
+    ABRE_P      deslocar, e ir ao estado 138
+
+    attribuition  ir ao estado 108
+    expList       ir ao estado 139
+    expLogic      ir ao estado 140
+    andLogic      ir ao estado 141
+    expComp       ir ao estado 142
+    expRel        ir ao estado 143
+    expArit       ir ao estado 144
+    expMul        ir ao estado 145
+    negElement    ir ao estado 146
+    element       ir ao estado 147
 
 
 Estado 103
 
-   60 arguments: arguments VIRG • attribuition
+   54 element: ID ABRE_P arguments FECHA_P •
 
-    LIST_OP_UN  deslocar, e ir ao estado 134
-    LOG_OP_UN   deslocar, e ir ao estado 135
-    CONST       deslocar, e ir ao estado 136
-    NIL         deslocar, e ir ao estado 137
-    ID          deslocar, e ir ao estado 138
-    ABRE_P      deslocar, e ir ao estado 139
-
-    attribuition  ir ao estado 109
-    expList       ir ao estado 140
-    expLogic      ir ao estado 141
-    andLogic      ir ao estado 142
-    expComp       ir ao estado 143
-    expRel        ir ao estado 144
-    expArit       ir ao estado 145
-    expMul        ir ao estado 146
-    negElement    ir ao estado 147
-    element       ir ao estado 148
+    PV             reduzir usando a regra 54 (element)
+    LOG_OP_OU      reduzir usando a regra 54 (element)
+    LOG_OP_E       reduzir usando a regra 54 (element)
+    REL_OP_BAIXA   reduzir usando a regra 54 (element)
+    REL_OP_ALTA    reduzir usando a regra 54 (element)
+    LIST_OP_BIN    reduzir usando a regra 54 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 54 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 54 (element)
 
 
 Estado 104
 
-   56 element: ID ABRE_P arguments FECHA_P •
+   20 bracesStmt: ABRE_C • moreStmt FECHA_C
 
-    LOG_OP_OU      reduzir usando a regra 56 (element)
-    LOG_OP_E       reduzir usando a regra 56 (element)
-    REL_OP_BAIXA   reduzir usando a regra 56 (element)
-    REL_OP_ALTA    reduzir usando a regra 56 (element)
-    LIST_OP_BIN    reduzir usando a regra 56 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 56 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 56 (element)
-    PV             reduzir usando a regra 56 (element)
+    IF          deslocar, e ir ao estado 21
+    FOR         deslocar, e ir ao estado 22
+    RETURN      deslocar, e ir ao estado 23
+    TIPO        deslocar, e ir ao estado 117
+    ENTRADA     deslocar, e ir ao estado 24
+    SAIDA       deslocar, e ir ao estado 25
+    LIST_OP_UN  deslocar, e ir ao estado 26
+    LOG_OP_UN   deslocar, e ir ao estado 27
+    CONST       deslocar, e ir ao estado 28
+    NIL         deslocar, e ir ao estado 29
+    ID          deslocar, e ir ao estado 30
+    ABRE_P      deslocar, e ir ao estado 31
+
+    moreStmt      ir ao estado 109
+    stmt          ir ao estado 33
+    multLineStmt  ir ao estado 34
+    conditional   ir ao estado 35
+    iteration     ir ao estado 36
+    oneLineStmt   ir ao estado 37
+    io            ir ao estado 38
+    variable      ir ao estado 39
+    attribuition  ir ao estado 40
+    expList       ir ao estado 41
+    expLogic      ir ao estado 42
+    andLogic      ir ao estado 43
+    expComp       ir ao estado 44
+    expRel        ir ao estado 45
+    expArit       ir ao estado 46
+    expMul        ir ao estado 47
+    negElement    ir ao estado 48
+    element       ir ao estado 49
+    ret           ir ao estado 50
 
 
 Estado 105
 
-   20 bracesStmt: ABRE_C • moreStmt FECHA_C
-
-    IF          deslocar, e ir ao estado 20
-    FOR         deslocar, e ir ao estado 21
-    RETURN      deslocar, e ir ao estado 22
-    TIPO        deslocar, e ir ao estado 118
-    ENTRADA     deslocar, e ir ao estado 23
-    SAIDA       deslocar, e ir ao estado 24
-    LIST_OP_UN  deslocar, e ir ao estado 25
-    LOG_OP_UN   deslocar, e ir ao estado 26
-    CONST       deslocar, e ir ao estado 27
-    NIL         deslocar, e ir ao estado 28
-    ID          deslocar, e ir ao estado 29
-    ABRE_P      deslocar, e ir ao estado 30
-
-    moreStmt      ir ao estado 110
-    stmt          ir ao estado 32
-    multLineStmt  ir ao estado 33
-    conditional   ir ao estado 34
-    iteration     ir ao estado 35
-    oneLineStmt   ir ao estado 36
-    io            ir ao estado 37
-    in            ir ao estado 38
-    out           ir ao estado 39
-    variable      ir ao estado 40
-    attribuition  ir ao estado 41
-    expList       ir ao estado 42
-    expLogic      ir ao estado 43
-    andLogic      ir ao estado 44
-    expComp       ir ao estado 45
-    expRel        ir ao estado 46
-    expArit       ir ao estado 47
-    expMul        ir ao estado 48
-    negElement    ir ao estado 49
-    element       ir ao estado 50
-    ret           ir ao estado 51
-
-
-Estado 106
-
    18 conditional: IF ABRE_P attribuition FECHA_P bracesStmt •
    19            | IF ABRE_P attribuition FECHA_P bracesStmt • ELSE bracesStmt
 
-    ELSE  deslocar, e ir ao estado 111
+    ELSE  deslocar, e ir ao estado 110
 
-    FECHA_C     reduzir usando a regra 18 (conditional)
     IF          reduzir usando a regra 18 (conditional)
     FOR         reduzir usando a regra 18 (conditional)
     RETURN      reduzir usando a regra 18 (conditional)
@@ -1773,13 +1741,13 @@ Estado 106
     NIL         reduzir usando a regra 18 (conditional)
     ID          reduzir usando a regra 18 (conditional)
     ABRE_P      reduzir usando a regra 18 (conditional)
+    FECHA_C     reduzir usando a regra 18 (conditional)
 
 
-Estado 107
+Estado 106
 
    21 bracesStmt: oneLineStmt •
 
-    FECHA_C     reduzir usando a regra 21 (bracesStmt)
     IF          reduzir usando a regra 21 (bracesStmt)
     ELSE        reduzir usando a regra 21 (bracesStmt)
     FOR         reduzir usando a regra 21 (bracesStmt)
@@ -1793,130 +1761,126 @@ Estado 107
     NIL         reduzir usando a regra 21 (bracesStmt)
     ID          reduzir usando a regra 21 (bracesStmt)
     ABRE_P      reduzir usando a regra 21 (bracesStmt)
+    FECHA_C     reduzir usando a regra 21 (bracesStmt)
+
+
+Estado 107
+
+   22 iteration: FOR ABRE_P expIte PV expIte • PV expIte FECHA_P bracesStmt
+
+    PV  deslocar, e ir ao estado 111
 
 
 Estado 108
 
-   22 iteration: FOR ABRE_P expIte PV expIte • PV expIte FECHA_P bracesStmt
+   58 arguments: arguments VIRG attribuition •
 
-    PV  deslocar, e ir ao estado 112
+    VIRG     reduzir usando a regra 58 (arguments)
+    FECHA_P  reduzir usando a regra 58 (arguments)
 
 
 Estado 109
 
-   60 arguments: arguments VIRG attribuition •
+   12 moreStmt: moreStmt • stmt
+   20 bracesStmt: ABRE_C moreStmt • FECHA_C
 
-    VIRG     reduzir usando a regra 60 (arguments)
-    FECHA_P  reduzir usando a regra 60 (arguments)
+    IF          deslocar, e ir ao estado 21
+    FOR         deslocar, e ir ao estado 22
+    RETURN      deslocar, e ir ao estado 23
+    TIPO        deslocar, e ir ao estado 117
+    ENTRADA     deslocar, e ir ao estado 24
+    SAIDA       deslocar, e ir ao estado 25
+    LIST_OP_UN  deslocar, e ir ao estado 26
+    LOG_OP_UN   deslocar, e ir ao estado 27
+    CONST       deslocar, e ir ao estado 28
+    NIL         deslocar, e ir ao estado 29
+    ID          deslocar, e ir ao estado 30
+    ABRE_P      deslocar, e ir ao estado 31
+    FECHA_C     deslocar, e ir ao estado 112
+
+    stmt          ir ao estado 65
+    multLineStmt  ir ao estado 34
+    conditional   ir ao estado 35
+    iteration     ir ao estado 36
+    oneLineStmt   ir ao estado 37
+    io            ir ao estado 38
+    variable      ir ao estado 39
+    attribuition  ir ao estado 40
+    expList       ir ao estado 41
+    expLogic      ir ao estado 42
+    andLogic      ir ao estado 43
+    expComp       ir ao estado 44
+    expRel        ir ao estado 45
+    expArit       ir ao estado 46
+    expMul        ir ao estado 47
+    negElement    ir ao estado 48
+    element       ir ao estado 49
+    ret           ir ao estado 50
 
 
 Estado 110
 
-   12 moreStmt: moreStmt • stmt
-   20 bracesStmt: ABRE_C moreStmt • FECHA_C
+   19 conditional: IF ABRE_P attribuition FECHA_P bracesStmt ELSE • bracesStmt
 
-    FECHA_C     deslocar, e ir ao estado 113
-    IF          deslocar, e ir ao estado 20
-    FOR         deslocar, e ir ao estado 21
-    RETURN      deslocar, e ir ao estado 22
-    TIPO        deslocar, e ir ao estado 118
-    ENTRADA     deslocar, e ir ao estado 23
-    SAIDA       deslocar, e ir ao estado 24
-    LIST_OP_UN  deslocar, e ir ao estado 25
-    LOG_OP_UN   deslocar, e ir ao estado 26
-    CONST       deslocar, e ir ao estado 27
-    NIL         deslocar, e ir ao estado 28
-    ID          deslocar, e ir ao estado 29
-    ABRE_P      deslocar, e ir ao estado 30
+    RETURN      deslocar, e ir ao estado 23
+    TIPO        deslocar, e ir ao estado 117
+    ENTRADA     deslocar, e ir ao estado 24
+    SAIDA       deslocar, e ir ao estado 25
+    LIST_OP_UN  deslocar, e ir ao estado 26
+    LOG_OP_UN   deslocar, e ir ao estado 27
+    CONST       deslocar, e ir ao estado 28
+    NIL         deslocar, e ir ao estado 29
+    ID          deslocar, e ir ao estado 30
+    ABRE_P      deslocar, e ir ao estado 31
+    ABRE_C      deslocar, e ir ao estado 152
 
-    stmt          ir ao estado 66
-    multLineStmt  ir ao estado 33
-    conditional   ir ao estado 34
-    iteration     ir ao estado 35
-    oneLineStmt   ir ao estado 36
-    io            ir ao estado 37
-    in            ir ao estado 38
-    out           ir ao estado 39
-    variable      ir ao estado 40
-    attribuition  ir ao estado 41
-    expList       ir ao estado 42
-    expLogic      ir ao estado 43
-    andLogic      ir ao estado 44
-    expComp       ir ao estado 45
-    expRel        ir ao estado 46
-    expArit       ir ao estado 47
-    expMul        ir ao estado 48
-    negElement    ir ao estado 49
-    element       ir ao estado 50
-    ret           ir ao estado 51
+    bracesStmt    ir ao estado 113
+    oneLineStmt   ir ao estado 153
+    io            ir ao estado 38
+    variable      ir ao estado 39
+    attribuition  ir ao estado 40
+    expList       ir ao estado 41
+    expLogic      ir ao estado 42
+    andLogic      ir ao estado 43
+    expComp       ir ao estado 44
+    expRel        ir ao estado 45
+    expArit       ir ao estado 46
+    expMul        ir ao estado 47
+    negElement    ir ao estado 48
+    element       ir ao estado 49
+    ret           ir ao estado 50
 
 
 Estado 111
 
-   19 conditional: IF ABRE_P attribuition FECHA_P bracesStmt ELSE • bracesStmt
+   22 iteration: FOR ABRE_P expIte PV expIte PV • expIte FECHA_P bracesStmt
 
-    ABRE_C      deslocar, e ir ao estado 153
-    RETURN      deslocar, e ir ao estado 22
-    TIPO        deslocar, e ir ao estado 118
-    ENTRADA     deslocar, e ir ao estado 23
-    SAIDA       deslocar, e ir ao estado 24
-    LIST_OP_UN  deslocar, e ir ao estado 25
-    LOG_OP_UN   deslocar, e ir ao estado 26
-    CONST       deslocar, e ir ao estado 27
-    NIL         deslocar, e ir ao estado 28
-    ID          deslocar, e ir ao estado 29
-    ABRE_P      deslocar, e ir ao estado 30
+    LIST_OP_UN  deslocar, e ir ao estado 118
+    LOG_OP_UN   deslocar, e ir ao estado 119
+    CONST       deslocar, e ir ao estado 120
+    NIL         deslocar, e ir ao estado 121
+    ID          deslocar, e ir ao estado 122
+    ABRE_P      deslocar, e ir ao estado 123
 
-    bracesStmt    ir ao estado 114
-    oneLineStmt   ir ao estado 154
-    io            ir ao estado 37
-    in            ir ao estado 38
-    out           ir ao estado 39
-    variable      ir ao estado 40
-    attribuition  ir ao estado 41
-    expList       ir ao estado 42
-    expLogic      ir ao estado 43
-    andLogic      ir ao estado 44
-    expComp       ir ao estado 45
-    expRel        ir ao estado 46
-    expArit       ir ao estado 47
-    expMul        ir ao estado 48
-    negElement    ir ao estado 49
-    element       ir ao estado 50
-    ret           ir ao estado 51
+    FECHA_P  reduzir usando a regra 24 (expIte)
+
+    expIte        ir ao estado 114
+    attribuition  ir ao estado 154
+    expList       ir ao estado 124
+    expLogic      ir ao estado 125
+    andLogic      ir ao estado 126
+    expComp       ir ao estado 127
+    expRel        ir ao estado 128
+    expArit       ir ao estado 129
+    expMul        ir ao estado 130
+    negElement    ir ao estado 131
+    element       ir ao estado 132
 
 
 Estado 112
 
-   22 iteration: FOR ABRE_P expIte PV expIte PV • expIte FECHA_P bracesStmt
-
-    LIST_OP_UN  deslocar, e ir ao estado 119
-    LOG_OP_UN   deslocar, e ir ao estado 120
-    CONST       deslocar, e ir ao estado 121
-    NIL         deslocar, e ir ao estado 122
-    ID          deslocar, e ir ao estado 123
-    ABRE_P      deslocar, e ir ao estado 124
-
-    FECHA_P  reduzir usando a regra 24 (expIte)
-
-    expIte        ir ao estado 115
-    attribuition  ir ao estado 155
-    expList       ir ao estado 125
-    expLogic      ir ao estado 126
-    andLogic      ir ao estado 127
-    expComp       ir ao estado 128
-    expRel        ir ao estado 129
-    expArit       ir ao estado 130
-    expMul        ir ao estado 131
-    negElement    ir ao estado 132
-    element       ir ao estado 133
-
-
-Estado 113
-
    20 bracesStmt: ABRE_C moreStmt FECHA_C •
 
-    FECHA_C     reduzir usando a regra 20 (bracesStmt)
     IF          reduzir usando a regra 20 (bracesStmt)
     ELSE        reduzir usando a regra 20 (bracesStmt)
     FOR         reduzir usando a regra 20 (bracesStmt)
@@ -1930,13 +1894,13 @@ Estado 113
     NIL         reduzir usando a regra 20 (bracesStmt)
     ID          reduzir usando a regra 20 (bracesStmt)
     ABRE_P      reduzir usando a regra 20 (bracesStmt)
+    FECHA_C     reduzir usando a regra 20 (bracesStmt)
 
 
-Estado 114
+Estado 113
 
    19 conditional: IF ABRE_P attribuition FECHA_P bracesStmt ELSE bracesStmt •
 
-    FECHA_C     reduzir usando a regra 19 (conditional)
     IF          reduzir usando a regra 19 (conditional)
     FOR         reduzir usando a regra 19 (conditional)
     RETURN      reduzir usando a regra 19 (conditional)
@@ -1949,55 +1913,53 @@ Estado 114
     NIL         reduzir usando a regra 19 (conditional)
     ID          reduzir usando a regra 19 (conditional)
     ABRE_P      reduzir usando a regra 19 (conditional)
+    FECHA_C     reduzir usando a regra 19 (conditional)
+
+
+Estado 114
+
+   22 iteration: FOR ABRE_P expIte PV expIte PV expIte • FECHA_P bracesStmt
+
+    FECHA_P  deslocar, e ir ao estado 115
 
 
 Estado 115
 
-   22 iteration: FOR ABRE_P expIte PV expIte PV expIte • FECHA_P bracesStmt
+   22 iteration: FOR ABRE_P expIte PV expIte PV expIte FECHA_P • bracesStmt
 
-    FECHA_P  deslocar, e ir ao estado 116
+    RETURN      deslocar, e ir ao estado 23
+    TIPO        deslocar, e ir ao estado 117
+    ENTRADA     deslocar, e ir ao estado 24
+    SAIDA       deslocar, e ir ao estado 25
+    LIST_OP_UN  deslocar, e ir ao estado 26
+    LOG_OP_UN   deslocar, e ir ao estado 27
+    CONST       deslocar, e ir ao estado 28
+    NIL         deslocar, e ir ao estado 29
+    ID          deslocar, e ir ao estado 30
+    ABRE_P      deslocar, e ir ao estado 31
+    ABRE_C      deslocar, e ir ao estado 152
+
+    bracesStmt    ir ao estado 116
+    oneLineStmt   ir ao estado 153
+    io            ir ao estado 38
+    variable      ir ao estado 39
+    attribuition  ir ao estado 40
+    expList       ir ao estado 41
+    expLogic      ir ao estado 42
+    andLogic      ir ao estado 43
+    expComp       ir ao estado 44
+    expRel        ir ao estado 45
+    expArit       ir ao estado 46
+    expMul        ir ao estado 47
+    negElement    ir ao estado 48
+    element       ir ao estado 49
+    ret           ir ao estado 50
 
 
 Estado 116
 
-   22 iteration: FOR ABRE_P expIte PV expIte PV expIte FECHA_P • bracesStmt
-
-    ABRE_C      deslocar, e ir ao estado 153
-    RETURN      deslocar, e ir ao estado 22
-    TIPO        deslocar, e ir ao estado 118
-    ENTRADA     deslocar, e ir ao estado 23
-    SAIDA       deslocar, e ir ao estado 24
-    LIST_OP_UN  deslocar, e ir ao estado 25
-    LOG_OP_UN   deslocar, e ir ao estado 26
-    CONST       deslocar, e ir ao estado 27
-    NIL         deslocar, e ir ao estado 28
-    ID          deslocar, e ir ao estado 29
-    ABRE_P      deslocar, e ir ao estado 30
-
-    bracesStmt    ir ao estado 117
-    oneLineStmt   ir ao estado 154
-    io            ir ao estado 37
-    in            ir ao estado 38
-    out           ir ao estado 39
-    variable      ir ao estado 40
-    attribuition  ir ao estado 41
-    expList       ir ao estado 42
-    expLogic      ir ao estado 43
-    andLogic      ir ao estado 44
-    expComp       ir ao estado 45
-    expRel        ir ao estado 46
-    expArit       ir ao estado 47
-    expMul        ir ao estado 48
-    negElement    ir ao estado 49
-    element       ir ao estado 50
-    ret           ir ao estado 51
-
-
-Estado 117
-
    22 iteration: FOR ABRE_P expIte PV expIte PV expIte FECHA_P bracesStmt •
 
-    FECHA_C     reduzir usando a regra 22 (iteration)
     IF          reduzir usando a regra 22 (iteration)
     FOR         reduzir usando a regra 22 (iteration)
     RETURN      reduzir usando a regra 22 (iteration)
@@ -2010,544 +1972,542 @@ Estado 117
     NIL         reduzir usando a regra 22 (iteration)
     ID          reduzir usando a regra 22 (iteration)
     ABRE_P      reduzir usando a regra 22 (iteration)
+    FECHA_C     reduzir usando a regra 22 (iteration)
+
+
+Estado 117
+
+   32 variable: TIPO • ID
+
+    ID  deslocar, e ir ao estado 155
 
 
 Estado 118
 
-   34 variable: TIPO • ID
+   35 expList: LIST_OP_UN • expLogic
 
-    ID  deslocar, e ir ao estado 156
+    LOG_OP_UN  deslocar, e ir ao estado 119
+    CONST      deslocar, e ir ao estado 120
+    NIL        deslocar, e ir ao estado 121
+    ID         deslocar, e ir ao estado 156
+    ABRE_P     deslocar, e ir ao estado 123
+
+    expLogic    ir ao estado 157
+    andLogic    ir ao estado 126
+    expComp     ir ao estado 127
+    expRel      ir ao estado 128
+    expArit     ir ao estado 129
+    expMul      ir ao estado 130
+    negElement  ir ao estado 131
+    element     ir ao estado 132
 
 
 Estado 119
 
-   37 expList: LIST_OP_UN • expLogic
+   50 negElement: LOG_OP_UN • element
 
-    LOG_OP_UN  deslocar, e ir ao estado 120
-    CONST      deslocar, e ir ao estado 121
-    NIL        deslocar, e ir ao estado 122
-    ID         deslocar, e ir ao estado 157
-    ABRE_P     deslocar, e ir ao estado 124
+    CONST   deslocar, e ir ao estado 120
+    NIL     deslocar, e ir ao estado 121
+    ID      deslocar, e ir ao estado 156
+    ABRE_P  deslocar, e ir ao estado 123
 
-    expLogic    ir ao estado 158
-    andLogic    ir ao estado 127
-    expComp     ir ao estado 128
-    expRel      ir ao estado 129
-    expArit     ir ao estado 130
-    expMul      ir ao estado 131
-    negElement  ir ao estado 132
-    element     ir ao estado 133
+    element  ir ao estado 158
 
 
 Estado 120
 
-   52 negElement: LOG_OP_UN • element
+   56 element: CONST •
 
-    CONST   deslocar, e ir ao estado 121
-    NIL     deslocar, e ir ao estado 122
-    ID      deslocar, e ir ao estado 157
-    ABRE_P  deslocar, e ir ao estado 124
-
-    element  ir ao estado 159
+    LOG_OP_OU      reduzir usando a regra 56 (element)
+    LOG_OP_E       reduzir usando a regra 56 (element)
+    REL_OP_BAIXA   reduzir usando a regra 56 (element)
+    REL_OP_ALTA    reduzir usando a regra 56 (element)
+    LIST_OP_BIN    reduzir usando a regra 56 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 56 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 56 (element)
+    FECHA_P        reduzir usando a regra 56 (element)
 
 
 Estado 121
 
-   58 element: CONST •
+   57 element: NIL •
 
-    LOG_OP_OU      reduzir usando a regra 58 (element)
-    LOG_OP_E       reduzir usando a regra 58 (element)
-    REL_OP_BAIXA   reduzir usando a regra 58 (element)
-    REL_OP_ALTA    reduzir usando a regra 58 (element)
-    LIST_OP_BIN    reduzir usando a regra 58 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 58 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 58 (element)
-    FECHA_P        reduzir usando a regra 58 (element)
+    LOG_OP_OU      reduzir usando a regra 57 (element)
+    LOG_OP_E       reduzir usando a regra 57 (element)
+    REL_OP_BAIXA   reduzir usando a regra 57 (element)
+    REL_OP_ALTA    reduzir usando a regra 57 (element)
+    LIST_OP_BIN    reduzir usando a regra 57 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 57 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 57 (element)
+    FECHA_P        reduzir usando a regra 57 (element)
 
 
 Estado 122
 
-   59 element: NIL •
+   33 attribuition: ID • ATRIB expList
+   52 element: ID •
+   54        | ID • ABRE_P arguments FECHA_P
+   55        | ID • ABRE_P FECHA_P
 
-    LOG_OP_OU      reduzir usando a regra 59 (element)
-    LOG_OP_E       reduzir usando a regra 59 (element)
-    REL_OP_BAIXA   reduzir usando a regra 59 (element)
-    REL_OP_ALTA    reduzir usando a regra 59 (element)
-    LIST_OP_BIN    reduzir usando a regra 59 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 59 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 59 (element)
-    FECHA_P        reduzir usando a regra 59 (element)
+    ATRIB   deslocar, e ir ao estado 159
+    ABRE_P  deslocar, e ir ao estado 160
+
+    LOG_OP_OU      reduzir usando a regra 52 (element)
+    LOG_OP_E       reduzir usando a regra 52 (element)
+    REL_OP_BAIXA   reduzir usando a regra 52 (element)
+    REL_OP_ALTA    reduzir usando a regra 52 (element)
+    LIST_OP_BIN    reduzir usando a regra 52 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 52 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 52 (element)
+    FECHA_P        reduzir usando a regra 52 (element)
 
 
 Estado 123
 
-   35 attribuition: ID • ATRIB expList
-   54 element: ID •
-   56        | ID • ABRE_P arguments FECHA_P
-   57        | ID • ABRE_P FECHA_P
+   53 element: ABRE_P • attribuition FECHA_P
 
-    ATRIB   deslocar, e ir ao estado 160
-    ABRE_P  deslocar, e ir ao estado 161
+    LIST_OP_UN  deslocar, e ir ao estado 118
+    LOG_OP_UN   deslocar, e ir ao estado 119
+    CONST       deslocar, e ir ao estado 120
+    NIL         deslocar, e ir ao estado 121
+    ID          deslocar, e ir ao estado 122
+    ABRE_P      deslocar, e ir ao estado 123
 
-    LOG_OP_OU      reduzir usando a regra 54 (element)
-    LOG_OP_E       reduzir usando a regra 54 (element)
-    REL_OP_BAIXA   reduzir usando a regra 54 (element)
-    REL_OP_ALTA    reduzir usando a regra 54 (element)
-    LIST_OP_BIN    reduzir usando a regra 54 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 54 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 54 (element)
-    FECHA_P        reduzir usando a regra 54 (element)
+    attribuition  ir ao estado 161
+    expList       ir ao estado 124
+    expLogic      ir ao estado 125
+    andLogic      ir ao estado 126
+    expComp       ir ao estado 127
+    expRel        ir ao estado 128
+    expArit       ir ao estado 129
+    expMul        ir ao estado 130
+    negElement    ir ao estado 131
+    element       ir ao estado 132
 
 
 Estado 124
 
-   55 element: ABRE_P • attribuition FECHA_P
+   34 attribuition: expList •
+   36 expList: expList • LIST_OP_BIN expLogic
 
-    LIST_OP_UN  deslocar, e ir ao estado 119
-    LOG_OP_UN   deslocar, e ir ao estado 120
-    CONST       deslocar, e ir ao estado 121
-    NIL         deslocar, e ir ao estado 122
-    ID          deslocar, e ir ao estado 123
-    ABRE_P      deslocar, e ir ao estado 124
+    LIST_OP_BIN  deslocar, e ir ao estado 162
 
-    attribuition  ir ao estado 162
-    expList       ir ao estado 125
-    expLogic      ir ao estado 126
-    andLogic      ir ao estado 127
-    expComp       ir ao estado 128
-    expRel        ir ao estado 129
-    expArit       ir ao estado 130
-    expMul        ir ao estado 131
-    negElement    ir ao estado 132
-    element       ir ao estado 133
+    FECHA_P  reduzir usando a regra 34 (attribuition)
 
 
 Estado 125
 
-   36 attribuition: expList •
-   38 expList: expList • LIST_OP_BIN expLogic
+   37 expList: expLogic •
+   38 expLogic: expLogic • LOG_OP_OU andLogic
 
-    LIST_OP_BIN  deslocar, e ir ao estado 163
+    LOG_OP_OU  deslocar, e ir ao estado 163
 
-    FECHA_P  reduzir usando a regra 36 (attribuition)
+    LIST_OP_BIN  reduzir usando a regra 37 (expList)
+    FECHA_P      reduzir usando a regra 37 (expList)
 
 
 Estado 126
 
-   39 expList: expLogic •
-   40 expLogic: expLogic • LOG_OP_OU andLogic
+   39 expLogic: andLogic •
+   40 andLogic: andLogic • LOG_OP_E expComp
 
-    LOG_OP_OU  deslocar, e ir ao estado 164
+    LOG_OP_E  deslocar, e ir ao estado 164
 
-    LIST_OP_BIN  reduzir usando a regra 39 (expList)
-    FECHA_P      reduzir usando a regra 39 (expList)
+    LOG_OP_OU    reduzir usando a regra 39 (expLogic)
+    LIST_OP_BIN  reduzir usando a regra 39 (expLogic)
+    FECHA_P      reduzir usando a regra 39 (expLogic)
 
 
 Estado 127
 
-   41 expLogic: andLogic •
-   42 andLogic: andLogic • LOG_OP_E expComp
+   41 andLogic: expComp •
+   42 expComp: expComp • REL_OP_BAIXA expRel
 
-    LOG_OP_E  deslocar, e ir ao estado 165
+    REL_OP_BAIXA  deslocar, e ir ao estado 165
 
-    LOG_OP_OU    reduzir usando a regra 41 (expLogic)
-    LIST_OP_BIN  reduzir usando a regra 41 (expLogic)
-    FECHA_P      reduzir usando a regra 41 (expLogic)
+    LOG_OP_OU    reduzir usando a regra 41 (andLogic)
+    LOG_OP_E     reduzir usando a regra 41 (andLogic)
+    LIST_OP_BIN  reduzir usando a regra 41 (andLogic)
+    FECHA_P      reduzir usando a regra 41 (andLogic)
 
 
 Estado 128
 
-   43 andLogic: expComp •
-   44 expComp: expComp • REL_OP_BAIXA expRel
+   43 expComp: expRel •
+   44 expRel: expRel • REL_OP_ALTA expArit
 
-    REL_OP_BAIXA  deslocar, e ir ao estado 166
+    REL_OP_ALTA  deslocar, e ir ao estado 166
 
-    LOG_OP_OU    reduzir usando a regra 43 (andLogic)
-    LOG_OP_E     reduzir usando a regra 43 (andLogic)
-    LIST_OP_BIN  reduzir usando a regra 43 (andLogic)
-    FECHA_P      reduzir usando a regra 43 (andLogic)
+    LOG_OP_OU     reduzir usando a regra 43 (expComp)
+    LOG_OP_E      reduzir usando a regra 43 (expComp)
+    REL_OP_BAIXA  reduzir usando a regra 43 (expComp)
+    LIST_OP_BIN   reduzir usando a regra 43 (expComp)
+    FECHA_P       reduzir usando a regra 43 (expComp)
 
 
 Estado 129
 
-   45 expComp: expRel •
-   46 expRel: expRel • REL_OP_ALTA expArit
+   45 expRel: expArit •
+   46 expArit: expArit • ARIT_OP_BAIXA expMul
 
-    REL_OP_ALTA  deslocar, e ir ao estado 167
+    ARIT_OP_BAIXA  deslocar, e ir ao estado 167
 
-    LOG_OP_OU     reduzir usando a regra 45 (expComp)
-    LOG_OP_E      reduzir usando a regra 45 (expComp)
-    REL_OP_BAIXA  reduzir usando a regra 45 (expComp)
-    LIST_OP_BIN   reduzir usando a regra 45 (expComp)
-    FECHA_P       reduzir usando a regra 45 (expComp)
+    LOG_OP_OU     reduzir usando a regra 45 (expRel)
+    LOG_OP_E      reduzir usando a regra 45 (expRel)
+    REL_OP_BAIXA  reduzir usando a regra 45 (expRel)
+    REL_OP_ALTA   reduzir usando a regra 45 (expRel)
+    LIST_OP_BIN   reduzir usando a regra 45 (expRel)
+    FECHA_P       reduzir usando a regra 45 (expRel)
 
 
 Estado 130
 
-   47 expRel: expArit •
-   48 expArit: expArit • ARIT_OP_BAIXA expMul
+   47 expArit: expMul •
+   48 expMul: expMul • ARIT_OP_ALTA negElement
 
-    ARIT_OP_BAIXA  deslocar, e ir ao estado 168
+    ARIT_OP_ALTA  deslocar, e ir ao estado 168
 
-    LOG_OP_OU     reduzir usando a regra 47 (expRel)
-    LOG_OP_E      reduzir usando a regra 47 (expRel)
-    REL_OP_BAIXA  reduzir usando a regra 47 (expRel)
-    REL_OP_ALTA   reduzir usando a regra 47 (expRel)
-    LIST_OP_BIN   reduzir usando a regra 47 (expRel)
-    FECHA_P       reduzir usando a regra 47 (expRel)
+    LOG_OP_OU      reduzir usando a regra 47 (expArit)
+    LOG_OP_E       reduzir usando a regra 47 (expArit)
+    REL_OP_BAIXA   reduzir usando a regra 47 (expArit)
+    REL_OP_ALTA    reduzir usando a regra 47 (expArit)
+    LIST_OP_BIN    reduzir usando a regra 47 (expArit)
+    ARIT_OP_BAIXA  reduzir usando a regra 47 (expArit)
+    FECHA_P        reduzir usando a regra 47 (expArit)
 
 
 Estado 131
 
-   49 expArit: expMul •
-   50 expMul: expMul • ARIT_OP_ALTA negElement
+   49 expMul: negElement •
 
-    ARIT_OP_ALTA  deslocar, e ir ao estado 169
-
-    LOG_OP_OU      reduzir usando a regra 49 (expArit)
-    LOG_OP_E       reduzir usando a regra 49 (expArit)
-    REL_OP_BAIXA   reduzir usando a regra 49 (expArit)
-    REL_OP_ALTA    reduzir usando a regra 49 (expArit)
-    LIST_OP_BIN    reduzir usando a regra 49 (expArit)
-    ARIT_OP_BAIXA  reduzir usando a regra 49 (expArit)
-    FECHA_P        reduzir usando a regra 49 (expArit)
+    LOG_OP_OU      reduzir usando a regra 49 (expMul)
+    LOG_OP_E       reduzir usando a regra 49 (expMul)
+    REL_OP_BAIXA   reduzir usando a regra 49 (expMul)
+    REL_OP_ALTA    reduzir usando a regra 49 (expMul)
+    LIST_OP_BIN    reduzir usando a regra 49 (expMul)
+    ARIT_OP_BAIXA  reduzir usando a regra 49 (expMul)
+    ARIT_OP_ALTA   reduzir usando a regra 49 (expMul)
+    FECHA_P        reduzir usando a regra 49 (expMul)
 
 
 Estado 132
 
-   51 expMul: negElement •
+   51 negElement: element •
 
-    LOG_OP_OU      reduzir usando a regra 51 (expMul)
-    LOG_OP_E       reduzir usando a regra 51 (expMul)
-    REL_OP_BAIXA   reduzir usando a regra 51 (expMul)
-    REL_OP_ALTA    reduzir usando a regra 51 (expMul)
-    LIST_OP_BIN    reduzir usando a regra 51 (expMul)
-    ARIT_OP_BAIXA  reduzir usando a regra 51 (expMul)
-    ARIT_OP_ALTA   reduzir usando a regra 51 (expMul)
-    FECHA_P        reduzir usando a regra 51 (expMul)
+    LOG_OP_OU      reduzir usando a regra 51 (negElement)
+    LOG_OP_E       reduzir usando a regra 51 (negElement)
+    REL_OP_BAIXA   reduzir usando a regra 51 (negElement)
+    REL_OP_ALTA    reduzir usando a regra 51 (negElement)
+    LIST_OP_BIN    reduzir usando a regra 51 (negElement)
+    ARIT_OP_BAIXA  reduzir usando a regra 51 (negElement)
+    ARIT_OP_ALTA   reduzir usando a regra 51 (negElement)
+    FECHA_P        reduzir usando a regra 51 (negElement)
 
 
 Estado 133
 
-   53 negElement: element •
+   35 expList: LIST_OP_UN • expLogic
 
-    LOG_OP_OU      reduzir usando a regra 53 (negElement)
-    LOG_OP_E       reduzir usando a regra 53 (negElement)
-    REL_OP_BAIXA   reduzir usando a regra 53 (negElement)
-    REL_OP_ALTA    reduzir usando a regra 53 (negElement)
-    LIST_OP_BIN    reduzir usando a regra 53 (negElement)
-    ARIT_OP_BAIXA  reduzir usando a regra 53 (negElement)
-    ARIT_OP_ALTA   reduzir usando a regra 53 (negElement)
-    FECHA_P        reduzir usando a regra 53 (negElement)
+    LOG_OP_UN  deslocar, e ir ao estado 134
+    CONST      deslocar, e ir ao estado 135
+    NIL        deslocar, e ir ao estado 136
+    ID         deslocar, e ir ao estado 169
+    ABRE_P     deslocar, e ir ao estado 138
+
+    expLogic    ir ao estado 170
+    andLogic    ir ao estado 141
+    expComp     ir ao estado 142
+    expRel      ir ao estado 143
+    expArit     ir ao estado 144
+    expMul      ir ao estado 145
+    negElement  ir ao estado 146
+    element     ir ao estado 147
 
 
 Estado 134
 
-   37 expList: LIST_OP_UN • expLogic
+   50 negElement: LOG_OP_UN • element
 
-    LOG_OP_UN  deslocar, e ir ao estado 135
-    CONST      deslocar, e ir ao estado 136
-    NIL        deslocar, e ir ao estado 137
-    ID         deslocar, e ir ao estado 170
-    ABRE_P     deslocar, e ir ao estado 139
+    CONST   deslocar, e ir ao estado 135
+    NIL     deslocar, e ir ao estado 136
+    ID      deslocar, e ir ao estado 169
+    ABRE_P  deslocar, e ir ao estado 138
 
-    expLogic    ir ao estado 171
-    andLogic    ir ao estado 142
-    expComp     ir ao estado 143
-    expRel      ir ao estado 144
-    expArit     ir ao estado 145
-    expMul      ir ao estado 146
-    negElement  ir ao estado 147
-    element     ir ao estado 148
+    element  ir ao estado 171
 
 
 Estado 135
 
-   52 negElement: LOG_OP_UN • element
+   56 element: CONST •
 
-    CONST   deslocar, e ir ao estado 136
-    NIL     deslocar, e ir ao estado 137
-    ID      deslocar, e ir ao estado 170
-    ABRE_P  deslocar, e ir ao estado 139
-
-    element  ir ao estado 172
+    VIRG           reduzir usando a regra 56 (element)
+    LOG_OP_OU      reduzir usando a regra 56 (element)
+    LOG_OP_E       reduzir usando a regra 56 (element)
+    REL_OP_BAIXA   reduzir usando a regra 56 (element)
+    REL_OP_ALTA    reduzir usando a regra 56 (element)
+    LIST_OP_BIN    reduzir usando a regra 56 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 56 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 56 (element)
+    FECHA_P        reduzir usando a regra 56 (element)
 
 
 Estado 136
 
-   58 element: CONST •
+   57 element: NIL •
 
-    VIRG           reduzir usando a regra 58 (element)
-    LOG_OP_OU      reduzir usando a regra 58 (element)
-    LOG_OP_E       reduzir usando a regra 58 (element)
-    REL_OP_BAIXA   reduzir usando a regra 58 (element)
-    REL_OP_ALTA    reduzir usando a regra 58 (element)
-    LIST_OP_BIN    reduzir usando a regra 58 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 58 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 58 (element)
-    FECHA_P        reduzir usando a regra 58 (element)
+    VIRG           reduzir usando a regra 57 (element)
+    LOG_OP_OU      reduzir usando a regra 57 (element)
+    LOG_OP_E       reduzir usando a regra 57 (element)
+    REL_OP_BAIXA   reduzir usando a regra 57 (element)
+    REL_OP_ALTA    reduzir usando a regra 57 (element)
+    LIST_OP_BIN    reduzir usando a regra 57 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 57 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 57 (element)
+    FECHA_P        reduzir usando a regra 57 (element)
 
 
 Estado 137
 
-   59 element: NIL •
+   33 attribuition: ID • ATRIB expList
+   52 element: ID •
+   54        | ID • ABRE_P arguments FECHA_P
+   55        | ID • ABRE_P FECHA_P
 
-    VIRG           reduzir usando a regra 59 (element)
-    LOG_OP_OU      reduzir usando a regra 59 (element)
-    LOG_OP_E       reduzir usando a regra 59 (element)
-    REL_OP_BAIXA   reduzir usando a regra 59 (element)
-    REL_OP_ALTA    reduzir usando a regra 59 (element)
-    LIST_OP_BIN    reduzir usando a regra 59 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 59 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 59 (element)
-    FECHA_P        reduzir usando a regra 59 (element)
+    ATRIB   deslocar, e ir ao estado 172
+    ABRE_P  deslocar, e ir ao estado 173
+
+    VIRG           reduzir usando a regra 52 (element)
+    LOG_OP_OU      reduzir usando a regra 52 (element)
+    LOG_OP_E       reduzir usando a regra 52 (element)
+    REL_OP_BAIXA   reduzir usando a regra 52 (element)
+    REL_OP_ALTA    reduzir usando a regra 52 (element)
+    LIST_OP_BIN    reduzir usando a regra 52 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 52 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 52 (element)
+    FECHA_P        reduzir usando a regra 52 (element)
 
 
 Estado 138
 
-   35 attribuition: ID • ATRIB expList
-   54 element: ID •
-   56        | ID • ABRE_P arguments FECHA_P
-   57        | ID • ABRE_P FECHA_P
+   53 element: ABRE_P • attribuition FECHA_P
 
-    ATRIB   deslocar, e ir ao estado 173
-    ABRE_P  deslocar, e ir ao estado 174
+    LIST_OP_UN  deslocar, e ir ao estado 118
+    LOG_OP_UN   deslocar, e ir ao estado 119
+    CONST       deslocar, e ir ao estado 120
+    NIL         deslocar, e ir ao estado 121
+    ID          deslocar, e ir ao estado 122
+    ABRE_P      deslocar, e ir ao estado 123
 
-    VIRG           reduzir usando a regra 54 (element)
-    LOG_OP_OU      reduzir usando a regra 54 (element)
-    LOG_OP_E       reduzir usando a regra 54 (element)
-    REL_OP_BAIXA   reduzir usando a regra 54 (element)
-    REL_OP_ALTA    reduzir usando a regra 54 (element)
-    LIST_OP_BIN    reduzir usando a regra 54 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 54 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 54 (element)
-    FECHA_P        reduzir usando a regra 54 (element)
+    attribuition  ir ao estado 174
+    expList       ir ao estado 124
+    expLogic      ir ao estado 125
+    andLogic      ir ao estado 126
+    expComp       ir ao estado 127
+    expRel        ir ao estado 128
+    expArit       ir ao estado 129
+    expMul        ir ao estado 130
+    negElement    ir ao estado 131
+    element       ir ao estado 132
 
 
 Estado 139
 
-   55 element: ABRE_P • attribuition FECHA_P
+   34 attribuition: expList •
+   36 expList: expList • LIST_OP_BIN expLogic
 
-    LIST_OP_UN  deslocar, e ir ao estado 119
-    LOG_OP_UN   deslocar, e ir ao estado 120
-    CONST       deslocar, e ir ao estado 121
-    NIL         deslocar, e ir ao estado 122
-    ID          deslocar, e ir ao estado 123
-    ABRE_P      deslocar, e ir ao estado 124
+    LIST_OP_BIN  deslocar, e ir ao estado 175
 
-    attribuition  ir ao estado 175
-    expList       ir ao estado 125
-    expLogic      ir ao estado 126
-    andLogic      ir ao estado 127
-    expComp       ir ao estado 128
-    expRel        ir ao estado 129
-    expArit       ir ao estado 130
-    expMul        ir ao estado 131
-    negElement    ir ao estado 132
-    element       ir ao estado 133
+    VIRG     reduzir usando a regra 34 (attribuition)
+    FECHA_P  reduzir usando a regra 34 (attribuition)
 
 
 Estado 140
 
-   36 attribuition: expList •
-   38 expList: expList • LIST_OP_BIN expLogic
+   37 expList: expLogic •
+   38 expLogic: expLogic • LOG_OP_OU andLogic
 
-    LIST_OP_BIN  deslocar, e ir ao estado 176
+    LOG_OP_OU  deslocar, e ir ao estado 176
 
-    VIRG     reduzir usando a regra 36 (attribuition)
-    FECHA_P  reduzir usando a regra 36 (attribuition)
+    VIRG         reduzir usando a regra 37 (expList)
+    LIST_OP_BIN  reduzir usando a regra 37 (expList)
+    FECHA_P      reduzir usando a regra 37 (expList)
 
 
 Estado 141
 
-   39 expList: expLogic •
-   40 expLogic: expLogic • LOG_OP_OU andLogic
+   39 expLogic: andLogic •
+   40 andLogic: andLogic • LOG_OP_E expComp
 
-    LOG_OP_OU  deslocar, e ir ao estado 177
+    LOG_OP_E  deslocar, e ir ao estado 177
 
-    VIRG         reduzir usando a regra 39 (expList)
-    LIST_OP_BIN  reduzir usando a regra 39 (expList)
-    FECHA_P      reduzir usando a regra 39 (expList)
+    VIRG         reduzir usando a regra 39 (expLogic)
+    LOG_OP_OU    reduzir usando a regra 39 (expLogic)
+    LIST_OP_BIN  reduzir usando a regra 39 (expLogic)
+    FECHA_P      reduzir usando a regra 39 (expLogic)
 
 
 Estado 142
 
-   41 expLogic: andLogic •
-   42 andLogic: andLogic • LOG_OP_E expComp
+   41 andLogic: expComp •
+   42 expComp: expComp • REL_OP_BAIXA expRel
 
-    LOG_OP_E  deslocar, e ir ao estado 178
+    REL_OP_BAIXA  deslocar, e ir ao estado 178
 
-    VIRG         reduzir usando a regra 41 (expLogic)
-    LOG_OP_OU    reduzir usando a regra 41 (expLogic)
-    LIST_OP_BIN  reduzir usando a regra 41 (expLogic)
-    FECHA_P      reduzir usando a regra 41 (expLogic)
+    VIRG         reduzir usando a regra 41 (andLogic)
+    LOG_OP_OU    reduzir usando a regra 41 (andLogic)
+    LOG_OP_E     reduzir usando a regra 41 (andLogic)
+    LIST_OP_BIN  reduzir usando a regra 41 (andLogic)
+    FECHA_P      reduzir usando a regra 41 (andLogic)
 
 
 Estado 143
 
-   43 andLogic: expComp •
-   44 expComp: expComp • REL_OP_BAIXA expRel
+   43 expComp: expRel •
+   44 expRel: expRel • REL_OP_ALTA expArit
 
-    REL_OP_BAIXA  deslocar, e ir ao estado 179
+    REL_OP_ALTA  deslocar, e ir ao estado 179
 
-    VIRG         reduzir usando a regra 43 (andLogic)
-    LOG_OP_OU    reduzir usando a regra 43 (andLogic)
-    LOG_OP_E     reduzir usando a regra 43 (andLogic)
-    LIST_OP_BIN  reduzir usando a regra 43 (andLogic)
-    FECHA_P      reduzir usando a regra 43 (andLogic)
+    VIRG          reduzir usando a regra 43 (expComp)
+    LOG_OP_OU     reduzir usando a regra 43 (expComp)
+    LOG_OP_E      reduzir usando a regra 43 (expComp)
+    REL_OP_BAIXA  reduzir usando a regra 43 (expComp)
+    LIST_OP_BIN   reduzir usando a regra 43 (expComp)
+    FECHA_P       reduzir usando a regra 43 (expComp)
 
 
 Estado 144
 
-   45 expComp: expRel •
-   46 expRel: expRel • REL_OP_ALTA expArit
+   45 expRel: expArit •
+   46 expArit: expArit • ARIT_OP_BAIXA expMul
 
-    REL_OP_ALTA  deslocar, e ir ao estado 180
+    ARIT_OP_BAIXA  deslocar, e ir ao estado 180
 
-    VIRG          reduzir usando a regra 45 (expComp)
-    LOG_OP_OU     reduzir usando a regra 45 (expComp)
-    LOG_OP_E      reduzir usando a regra 45 (expComp)
-    REL_OP_BAIXA  reduzir usando a regra 45 (expComp)
-    LIST_OP_BIN   reduzir usando a regra 45 (expComp)
-    FECHA_P       reduzir usando a regra 45 (expComp)
+    VIRG          reduzir usando a regra 45 (expRel)
+    LOG_OP_OU     reduzir usando a regra 45 (expRel)
+    LOG_OP_E      reduzir usando a regra 45 (expRel)
+    REL_OP_BAIXA  reduzir usando a regra 45 (expRel)
+    REL_OP_ALTA   reduzir usando a regra 45 (expRel)
+    LIST_OP_BIN   reduzir usando a regra 45 (expRel)
+    FECHA_P       reduzir usando a regra 45 (expRel)
 
 
 Estado 145
 
-   47 expRel: expArit •
-   48 expArit: expArit • ARIT_OP_BAIXA expMul
+   47 expArit: expMul •
+   48 expMul: expMul • ARIT_OP_ALTA negElement
 
-    ARIT_OP_BAIXA  deslocar, e ir ao estado 181
+    ARIT_OP_ALTA  deslocar, e ir ao estado 181
 
-    VIRG          reduzir usando a regra 47 (expRel)
-    LOG_OP_OU     reduzir usando a regra 47 (expRel)
-    LOG_OP_E      reduzir usando a regra 47 (expRel)
-    REL_OP_BAIXA  reduzir usando a regra 47 (expRel)
-    REL_OP_ALTA   reduzir usando a regra 47 (expRel)
-    LIST_OP_BIN   reduzir usando a regra 47 (expRel)
-    FECHA_P       reduzir usando a regra 47 (expRel)
+    VIRG           reduzir usando a regra 47 (expArit)
+    LOG_OP_OU      reduzir usando a regra 47 (expArit)
+    LOG_OP_E       reduzir usando a regra 47 (expArit)
+    REL_OP_BAIXA   reduzir usando a regra 47 (expArit)
+    REL_OP_ALTA    reduzir usando a regra 47 (expArit)
+    LIST_OP_BIN    reduzir usando a regra 47 (expArit)
+    ARIT_OP_BAIXA  reduzir usando a regra 47 (expArit)
+    FECHA_P        reduzir usando a regra 47 (expArit)
 
 
 Estado 146
 
-   49 expArit: expMul •
-   50 expMul: expMul • ARIT_OP_ALTA negElement
+   49 expMul: negElement •
 
-    ARIT_OP_ALTA  deslocar, e ir ao estado 182
-
-    VIRG           reduzir usando a regra 49 (expArit)
-    LOG_OP_OU      reduzir usando a regra 49 (expArit)
-    LOG_OP_E       reduzir usando a regra 49 (expArit)
-    REL_OP_BAIXA   reduzir usando a regra 49 (expArit)
-    REL_OP_ALTA    reduzir usando a regra 49 (expArit)
-    LIST_OP_BIN    reduzir usando a regra 49 (expArit)
-    ARIT_OP_BAIXA  reduzir usando a regra 49 (expArit)
-    FECHA_P        reduzir usando a regra 49 (expArit)
+    VIRG           reduzir usando a regra 49 (expMul)
+    LOG_OP_OU      reduzir usando a regra 49 (expMul)
+    LOG_OP_E       reduzir usando a regra 49 (expMul)
+    REL_OP_BAIXA   reduzir usando a regra 49 (expMul)
+    REL_OP_ALTA    reduzir usando a regra 49 (expMul)
+    LIST_OP_BIN    reduzir usando a regra 49 (expMul)
+    ARIT_OP_BAIXA  reduzir usando a regra 49 (expMul)
+    ARIT_OP_ALTA   reduzir usando a regra 49 (expMul)
+    FECHA_P        reduzir usando a regra 49 (expMul)
 
 
 Estado 147
 
-   51 expMul: negElement •
+   51 negElement: element •
 
-    VIRG           reduzir usando a regra 51 (expMul)
-    LOG_OP_OU      reduzir usando a regra 51 (expMul)
-    LOG_OP_E       reduzir usando a regra 51 (expMul)
-    REL_OP_BAIXA   reduzir usando a regra 51 (expMul)
-    REL_OP_ALTA    reduzir usando a regra 51 (expMul)
-    LIST_OP_BIN    reduzir usando a regra 51 (expMul)
-    ARIT_OP_BAIXA  reduzir usando a regra 51 (expMul)
-    ARIT_OP_ALTA   reduzir usando a regra 51 (expMul)
-    FECHA_P        reduzir usando a regra 51 (expMul)
+    VIRG           reduzir usando a regra 51 (negElement)
+    LOG_OP_OU      reduzir usando a regra 51 (negElement)
+    LOG_OP_E       reduzir usando a regra 51 (negElement)
+    REL_OP_BAIXA   reduzir usando a regra 51 (negElement)
+    REL_OP_ALTA    reduzir usando a regra 51 (negElement)
+    LIST_OP_BIN    reduzir usando a regra 51 (negElement)
+    ARIT_OP_BAIXA  reduzir usando a regra 51 (negElement)
+    ARIT_OP_ALTA   reduzir usando a regra 51 (negElement)
+    FECHA_P        reduzir usando a regra 51 (negElement)
 
 
 Estado 148
 
-   53 negElement: element •
+   27 oneLineStmt: io • PV
 
-    VIRG           reduzir usando a regra 53 (negElement)
-    LOG_OP_OU      reduzir usando a regra 53 (negElement)
-    LOG_OP_E       reduzir usando a regra 53 (negElement)
-    REL_OP_BAIXA   reduzir usando a regra 53 (negElement)
-    REL_OP_ALTA    reduzir usando a regra 53 (negElement)
-    LIST_OP_BIN    reduzir usando a regra 53 (negElement)
-    ARIT_OP_BAIXA  reduzir usando a regra 53 (negElement)
-    ARIT_OP_ALTA   reduzir usando a regra 53 (negElement)
-    FECHA_P        reduzir usando a regra 53 (negElement)
+    PV  deslocar, e ir ao estado 182
 
 
 Estado 149
 
-   27 oneLineStmt: io • PV
+   25 oneLineStmt: variable • PV
 
     PV  deslocar, e ir ao estado 183
 
 
 Estado 150
 
-   25 oneLineStmt: variable • PV
+   26 oneLineStmt: attribuition • PV
 
     PV  deslocar, e ir ao estado 184
 
 
 Estado 151
 
-   26 oneLineStmt: attribuition • PV
+   28 oneLineStmt: ret • PV
 
     PV  deslocar, e ir ao estado 185
 
 
 Estado 152
 
-   28 oneLineStmt: ret • PV
+   20 bracesStmt: ABRE_C • moreStmt FECHA_C
 
-    PV  deslocar, e ir ao estado 186
+    IF          deslocar, e ir ao estado 21
+    FOR         deslocar, e ir ao estado 22
+    RETURN      deslocar, e ir ao estado 23
+    TIPO        deslocar, e ir ao estado 117
+    ENTRADA     deslocar, e ir ao estado 24
+    SAIDA       deslocar, e ir ao estado 25
+    LIST_OP_UN  deslocar, e ir ao estado 26
+    LOG_OP_UN   deslocar, e ir ao estado 27
+    CONST       deslocar, e ir ao estado 28
+    NIL         deslocar, e ir ao estado 29
+    ID          deslocar, e ir ao estado 30
+    ABRE_P      deslocar, e ir ao estado 31
+
+    moreStmt      ir ao estado 186
+    stmt          ir ao estado 33
+    multLineStmt  ir ao estado 34
+    conditional   ir ao estado 35
+    iteration     ir ao estado 36
+    oneLineStmt   ir ao estado 37
+    io            ir ao estado 38
+    variable      ir ao estado 39
+    attribuition  ir ao estado 40
+    expList       ir ao estado 41
+    expLogic      ir ao estado 42
+    andLogic      ir ao estado 43
+    expComp       ir ao estado 44
+    expRel        ir ao estado 45
+    expArit       ir ao estado 46
+    expMul        ir ao estado 47
+    negElement    ir ao estado 48
+    element       ir ao estado 49
+    ret           ir ao estado 50
 
 
 Estado 153
 
-   20 bracesStmt: ABRE_C • moreStmt FECHA_C
-
-    IF          deslocar, e ir ao estado 20
-    FOR         deslocar, e ir ao estado 21
-    RETURN      deslocar, e ir ao estado 22
-    TIPO        deslocar, e ir ao estado 118
-    ENTRADA     deslocar, e ir ao estado 23
-    SAIDA       deslocar, e ir ao estado 24
-    LIST_OP_UN  deslocar, e ir ao estado 25
-    LOG_OP_UN   deslocar, e ir ao estado 26
-    CONST       deslocar, e ir ao estado 27
-    NIL         deslocar, e ir ao estado 28
-    ID          deslocar, e ir ao estado 29
-    ABRE_P      deslocar, e ir ao estado 30
-
-    moreStmt      ir ao estado 187
-    stmt          ir ao estado 32
-    multLineStmt  ir ao estado 33
-    conditional   ir ao estado 34
-    iteration     ir ao estado 35
-    oneLineStmt   ir ao estado 36
-    io            ir ao estado 37
-    in            ir ao estado 38
-    out           ir ao estado 39
-    variable      ir ao estado 40
-    attribuition  ir ao estado 41
-    expList       ir ao estado 42
-    expLogic      ir ao estado 43
-    andLogic      ir ao estado 44
-    expComp       ir ao estado 45
-    expRel        ir ao estado 46
-    expArit       ir ao estado 47
-    expMul        ir ao estado 48
-    negElement    ir ao estado 49
-    element       ir ao estado 50
-    ret           ir ao estado 51
-
-
-Estado 154
-
    21 bracesStmt: oneLineStmt •
 
-    FECHA_C     reduzir usando a regra 21 (bracesStmt)
     IF          reduzir usando a regra 21 (bracesStmt)
     FOR         reduzir usando a regra 21 (bracesStmt)
     RETURN      reduzir usando a regra 21 (bracesStmt)
@@ -2560,464 +2520,464 @@ Estado 154
     NIL         reduzir usando a regra 21 (bracesStmt)
     ID          reduzir usando a regra 21 (bracesStmt)
     ABRE_P      reduzir usando a regra 21 (bracesStmt)
+    FECHA_C     reduzir usando a regra 21 (bracesStmt)
 
 
-Estado 155
+Estado 154
 
    23 expIte: attribuition •
 
     FECHA_P  reduzir usando a regra 23 (expIte)
 
 
+Estado 155
+
+   32 variable: TIPO ID •
+
+    PV  reduzir usando a regra 32 (variable)
+
+
 Estado 156
 
-   34 variable: TIPO ID •
+   52 element: ID •
+   54        | ID • ABRE_P arguments FECHA_P
+   55        | ID • ABRE_P FECHA_P
 
-    PV  reduzir usando a regra 34 (variable)
+    ABRE_P  deslocar, e ir ao estado 160
+
+    LOG_OP_OU      reduzir usando a regra 52 (element)
+    LOG_OP_E       reduzir usando a regra 52 (element)
+    REL_OP_BAIXA   reduzir usando a regra 52 (element)
+    REL_OP_ALTA    reduzir usando a regra 52 (element)
+    LIST_OP_BIN    reduzir usando a regra 52 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 52 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 52 (element)
+    FECHA_P        reduzir usando a regra 52 (element)
 
 
 Estado 157
 
-   54 element: ID •
-   56        | ID • ABRE_P arguments FECHA_P
-   57        | ID • ABRE_P FECHA_P
+   35 expList: LIST_OP_UN expLogic •
+   38 expLogic: expLogic • LOG_OP_OU andLogic
 
-    ABRE_P  deslocar, e ir ao estado 161
+    LOG_OP_OU  deslocar, e ir ao estado 163
 
-    LOG_OP_OU      reduzir usando a regra 54 (element)
-    LOG_OP_E       reduzir usando a regra 54 (element)
-    REL_OP_BAIXA   reduzir usando a regra 54 (element)
-    REL_OP_ALTA    reduzir usando a regra 54 (element)
-    LIST_OP_BIN    reduzir usando a regra 54 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 54 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 54 (element)
-    FECHA_P        reduzir usando a regra 54 (element)
+    LIST_OP_BIN  reduzir usando a regra 35 (expList)
+    FECHA_P      reduzir usando a regra 35 (expList)
 
 
 Estado 158
 
-   37 expList: LIST_OP_UN expLogic •
-   40 expLogic: expLogic • LOG_OP_OU andLogic
+   50 negElement: LOG_OP_UN element •
 
-    LOG_OP_OU  deslocar, e ir ao estado 164
-
-    LIST_OP_BIN  reduzir usando a regra 37 (expList)
-    FECHA_P      reduzir usando a regra 37 (expList)
+    LOG_OP_OU      reduzir usando a regra 50 (negElement)
+    LOG_OP_E       reduzir usando a regra 50 (negElement)
+    REL_OP_BAIXA   reduzir usando a regra 50 (negElement)
+    REL_OP_ALTA    reduzir usando a regra 50 (negElement)
+    LIST_OP_BIN    reduzir usando a regra 50 (negElement)
+    ARIT_OP_BAIXA  reduzir usando a regra 50 (negElement)
+    ARIT_OP_ALTA   reduzir usando a regra 50 (negElement)
+    FECHA_P        reduzir usando a regra 50 (negElement)
 
 
 Estado 159
 
-   52 negElement: LOG_OP_UN element •
+   33 attribuition: ID ATRIB • expList
 
-    LOG_OP_OU      reduzir usando a regra 52 (negElement)
-    LOG_OP_E       reduzir usando a regra 52 (negElement)
-    REL_OP_BAIXA   reduzir usando a regra 52 (negElement)
-    REL_OP_ALTA    reduzir usando a regra 52 (negElement)
-    LIST_OP_BIN    reduzir usando a regra 52 (negElement)
-    ARIT_OP_BAIXA  reduzir usando a regra 52 (negElement)
-    ARIT_OP_ALTA   reduzir usando a regra 52 (negElement)
-    FECHA_P        reduzir usando a regra 52 (negElement)
+    LIST_OP_UN  deslocar, e ir ao estado 118
+    LOG_OP_UN   deslocar, e ir ao estado 119
+    CONST       deslocar, e ir ao estado 120
+    NIL         deslocar, e ir ao estado 121
+    ID          deslocar, e ir ao estado 156
+    ABRE_P      deslocar, e ir ao estado 123
+
+    expList     ir ao estado 187
+    expLogic    ir ao estado 125
+    andLogic    ir ao estado 126
+    expComp     ir ao estado 127
+    expRel      ir ao estado 128
+    expArit     ir ao estado 129
+    expMul      ir ao estado 130
+    negElement  ir ao estado 131
+    element     ir ao estado 132
 
 
 Estado 160
 
-   35 attribuition: ID ATRIB • expList
+   54 element: ID ABRE_P • arguments FECHA_P
+   55        | ID ABRE_P • FECHA_P
 
-    LIST_OP_UN  deslocar, e ir ao estado 119
-    LOG_OP_UN   deslocar, e ir ao estado 120
-    CONST       deslocar, e ir ao estado 121
-    NIL         deslocar, e ir ao estado 122
-    ID          deslocar, e ir ao estado 157
-    ABRE_P      deslocar, e ir ao estado 124
+    LIST_OP_UN  deslocar, e ir ao estado 133
+    LOG_OP_UN   deslocar, e ir ao estado 134
+    CONST       deslocar, e ir ao estado 135
+    NIL         deslocar, e ir ao estado 136
+    ID          deslocar, e ir ao estado 137
+    ABRE_P      deslocar, e ir ao estado 138
+    FECHA_P     deslocar, e ir ao estado 188
 
-    expList     ir ao estado 188
-    expLogic    ir ao estado 126
-    andLogic    ir ao estado 127
-    expComp     ir ao estado 128
-    expRel      ir ao estado 129
-    expArit     ir ao estado 130
-    expMul      ir ao estado 131
-    negElement  ir ao estado 132
-    element     ir ao estado 133
+    attribuition  ir ao estado 86
+    expList       ir ao estado 139
+    expLogic      ir ao estado 140
+    andLogic      ir ao estado 141
+    expComp       ir ao estado 142
+    expRel        ir ao estado 143
+    expArit       ir ao estado 144
+    expMul        ir ao estado 145
+    negElement    ir ao estado 146
+    element       ir ao estado 147
+    arguments     ir ao estado 189
 
 
 Estado 161
 
-   56 element: ID ABRE_P • arguments FECHA_P
-   57        | ID ABRE_P • FECHA_P
+   53 element: ABRE_P attribuition • FECHA_P
 
-    LIST_OP_UN  deslocar, e ir ao estado 134
-    LOG_OP_UN   deslocar, e ir ao estado 135
-    CONST       deslocar, e ir ao estado 136
-    NIL         deslocar, e ir ao estado 137
-    ID          deslocar, e ir ao estado 138
-    ABRE_P      deslocar, e ir ao estado 139
-    FECHA_P     deslocar, e ir ao estado 189
-
-    attribuition  ir ao estado 87
-    expList       ir ao estado 140
-    expLogic      ir ao estado 141
-    andLogic      ir ao estado 142
-    expComp       ir ao estado 143
-    expRel        ir ao estado 144
-    expArit       ir ao estado 145
-    expMul        ir ao estado 146
-    negElement    ir ao estado 147
-    element       ir ao estado 148
-    arguments     ir ao estado 190
+    FECHA_P  deslocar, e ir ao estado 190
 
 
 Estado 162
 
-   55 element: ABRE_P attribuition • FECHA_P
+   36 expList: expList LIST_OP_BIN • expLogic
 
-    FECHA_P  deslocar, e ir ao estado 191
+    LOG_OP_UN  deslocar, e ir ao estado 119
+    CONST      deslocar, e ir ao estado 120
+    NIL        deslocar, e ir ao estado 121
+    ID         deslocar, e ir ao estado 156
+    ABRE_P     deslocar, e ir ao estado 123
+
+    expLogic    ir ao estado 191
+    andLogic    ir ao estado 126
+    expComp     ir ao estado 127
+    expRel      ir ao estado 128
+    expArit     ir ao estado 129
+    expMul      ir ao estado 130
+    negElement  ir ao estado 131
+    element     ir ao estado 132
 
 
 Estado 163
 
-   38 expList: expList LIST_OP_BIN • expLogic
+   38 expLogic: expLogic LOG_OP_OU • andLogic
 
-    LOG_OP_UN  deslocar, e ir ao estado 120
-    CONST      deslocar, e ir ao estado 121
-    NIL        deslocar, e ir ao estado 122
-    ID         deslocar, e ir ao estado 157
-    ABRE_P     deslocar, e ir ao estado 124
+    LOG_OP_UN  deslocar, e ir ao estado 119
+    CONST      deslocar, e ir ao estado 120
+    NIL        deslocar, e ir ao estado 121
+    ID         deslocar, e ir ao estado 156
+    ABRE_P     deslocar, e ir ao estado 123
 
-    expLogic    ir ao estado 192
-    andLogic    ir ao estado 127
-    expComp     ir ao estado 128
-    expRel      ir ao estado 129
-    expArit     ir ao estado 130
-    expMul      ir ao estado 131
-    negElement  ir ao estado 132
-    element     ir ao estado 133
+    andLogic    ir ao estado 192
+    expComp     ir ao estado 127
+    expRel      ir ao estado 128
+    expArit     ir ao estado 129
+    expMul      ir ao estado 130
+    negElement  ir ao estado 131
+    element     ir ao estado 132
 
 
 Estado 164
 
-   40 expLogic: expLogic LOG_OP_OU • andLogic
+   40 andLogic: andLogic LOG_OP_E • expComp
 
-    LOG_OP_UN  deslocar, e ir ao estado 120
-    CONST      deslocar, e ir ao estado 121
-    NIL        deslocar, e ir ao estado 122
-    ID         deslocar, e ir ao estado 157
-    ABRE_P     deslocar, e ir ao estado 124
+    LOG_OP_UN  deslocar, e ir ao estado 119
+    CONST      deslocar, e ir ao estado 120
+    NIL        deslocar, e ir ao estado 121
+    ID         deslocar, e ir ao estado 156
+    ABRE_P     deslocar, e ir ao estado 123
 
-    andLogic    ir ao estado 193
-    expComp     ir ao estado 128
-    expRel      ir ao estado 129
-    expArit     ir ao estado 130
-    expMul      ir ao estado 131
-    negElement  ir ao estado 132
-    element     ir ao estado 133
+    expComp     ir ao estado 193
+    expRel      ir ao estado 128
+    expArit     ir ao estado 129
+    expMul      ir ao estado 130
+    negElement  ir ao estado 131
+    element     ir ao estado 132
 
 
 Estado 165
 
-   42 andLogic: andLogic LOG_OP_E • expComp
+   42 expComp: expComp REL_OP_BAIXA • expRel
 
-    LOG_OP_UN  deslocar, e ir ao estado 120
-    CONST      deslocar, e ir ao estado 121
-    NIL        deslocar, e ir ao estado 122
-    ID         deslocar, e ir ao estado 157
-    ABRE_P     deslocar, e ir ao estado 124
+    LOG_OP_UN  deslocar, e ir ao estado 119
+    CONST      deslocar, e ir ao estado 120
+    NIL        deslocar, e ir ao estado 121
+    ID         deslocar, e ir ao estado 156
+    ABRE_P     deslocar, e ir ao estado 123
 
-    expComp     ir ao estado 194
-    expRel      ir ao estado 129
-    expArit     ir ao estado 130
-    expMul      ir ao estado 131
-    negElement  ir ao estado 132
-    element     ir ao estado 133
+    expRel      ir ao estado 194
+    expArit     ir ao estado 129
+    expMul      ir ao estado 130
+    negElement  ir ao estado 131
+    element     ir ao estado 132
 
 
 Estado 166
 
-   44 expComp: expComp REL_OP_BAIXA • expRel
+   44 expRel: expRel REL_OP_ALTA • expArit
 
-    LOG_OP_UN  deslocar, e ir ao estado 120
-    CONST      deslocar, e ir ao estado 121
-    NIL        deslocar, e ir ao estado 122
-    ID         deslocar, e ir ao estado 157
-    ABRE_P     deslocar, e ir ao estado 124
+    LOG_OP_UN  deslocar, e ir ao estado 119
+    CONST      deslocar, e ir ao estado 120
+    NIL        deslocar, e ir ao estado 121
+    ID         deslocar, e ir ao estado 156
+    ABRE_P     deslocar, e ir ao estado 123
 
-    expRel      ir ao estado 195
-    expArit     ir ao estado 130
-    expMul      ir ao estado 131
-    negElement  ir ao estado 132
-    element     ir ao estado 133
+    expArit     ir ao estado 195
+    expMul      ir ao estado 130
+    negElement  ir ao estado 131
+    element     ir ao estado 132
 
 
 Estado 167
 
-   46 expRel: expRel REL_OP_ALTA • expArit
+   46 expArit: expArit ARIT_OP_BAIXA • expMul
 
-    LOG_OP_UN  deslocar, e ir ao estado 120
-    CONST      deslocar, e ir ao estado 121
-    NIL        deslocar, e ir ao estado 122
-    ID         deslocar, e ir ao estado 157
-    ABRE_P     deslocar, e ir ao estado 124
+    LOG_OP_UN  deslocar, e ir ao estado 119
+    CONST      deslocar, e ir ao estado 120
+    NIL        deslocar, e ir ao estado 121
+    ID         deslocar, e ir ao estado 156
+    ABRE_P     deslocar, e ir ao estado 123
 
-    expArit     ir ao estado 196
-    expMul      ir ao estado 131
-    negElement  ir ao estado 132
-    element     ir ao estado 133
+    expMul      ir ao estado 196
+    negElement  ir ao estado 131
+    element     ir ao estado 132
 
 
 Estado 168
 
-   48 expArit: expArit ARIT_OP_BAIXA • expMul
+   48 expMul: expMul ARIT_OP_ALTA • negElement
 
-    LOG_OP_UN  deslocar, e ir ao estado 120
-    CONST      deslocar, e ir ao estado 121
-    NIL        deslocar, e ir ao estado 122
-    ID         deslocar, e ir ao estado 157
-    ABRE_P     deslocar, e ir ao estado 124
+    LOG_OP_UN  deslocar, e ir ao estado 119
+    CONST      deslocar, e ir ao estado 120
+    NIL        deslocar, e ir ao estado 121
+    ID         deslocar, e ir ao estado 156
+    ABRE_P     deslocar, e ir ao estado 123
 
-    expMul      ir ao estado 197
-    negElement  ir ao estado 132
-    element     ir ao estado 133
+    negElement  ir ao estado 197
+    element     ir ao estado 132
 
 
 Estado 169
 
-   50 expMul: expMul ARIT_OP_ALTA • negElement
+   52 element: ID •
+   54        | ID • ABRE_P arguments FECHA_P
+   55        | ID • ABRE_P FECHA_P
 
-    LOG_OP_UN  deslocar, e ir ao estado 120
-    CONST      deslocar, e ir ao estado 121
-    NIL        deslocar, e ir ao estado 122
-    ID         deslocar, e ir ao estado 157
-    ABRE_P     deslocar, e ir ao estado 124
+    ABRE_P  deslocar, e ir ao estado 173
 
-    negElement  ir ao estado 198
-    element     ir ao estado 133
+    VIRG           reduzir usando a regra 52 (element)
+    LOG_OP_OU      reduzir usando a regra 52 (element)
+    LOG_OP_E       reduzir usando a regra 52 (element)
+    REL_OP_BAIXA   reduzir usando a regra 52 (element)
+    REL_OP_ALTA    reduzir usando a regra 52 (element)
+    LIST_OP_BIN    reduzir usando a regra 52 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 52 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 52 (element)
+    FECHA_P        reduzir usando a regra 52 (element)
 
 
 Estado 170
 
-   54 element: ID •
-   56        | ID • ABRE_P arguments FECHA_P
-   57        | ID • ABRE_P FECHA_P
+   35 expList: LIST_OP_UN expLogic •
+   38 expLogic: expLogic • LOG_OP_OU andLogic
 
-    ABRE_P  deslocar, e ir ao estado 174
+    LOG_OP_OU  deslocar, e ir ao estado 176
 
-    VIRG           reduzir usando a regra 54 (element)
-    LOG_OP_OU      reduzir usando a regra 54 (element)
-    LOG_OP_E       reduzir usando a regra 54 (element)
-    REL_OP_BAIXA   reduzir usando a regra 54 (element)
-    REL_OP_ALTA    reduzir usando a regra 54 (element)
-    LIST_OP_BIN    reduzir usando a regra 54 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 54 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 54 (element)
-    FECHA_P        reduzir usando a regra 54 (element)
+    VIRG         reduzir usando a regra 35 (expList)
+    LIST_OP_BIN  reduzir usando a regra 35 (expList)
+    FECHA_P      reduzir usando a regra 35 (expList)
 
 
 Estado 171
 
-   37 expList: LIST_OP_UN expLogic •
-   40 expLogic: expLogic • LOG_OP_OU andLogic
+   50 negElement: LOG_OP_UN element •
 
-    LOG_OP_OU  deslocar, e ir ao estado 177
-
-    VIRG         reduzir usando a regra 37 (expList)
-    LIST_OP_BIN  reduzir usando a regra 37 (expList)
-    FECHA_P      reduzir usando a regra 37 (expList)
+    VIRG           reduzir usando a regra 50 (negElement)
+    LOG_OP_OU      reduzir usando a regra 50 (negElement)
+    LOG_OP_E       reduzir usando a regra 50 (negElement)
+    REL_OP_BAIXA   reduzir usando a regra 50 (negElement)
+    REL_OP_ALTA    reduzir usando a regra 50 (negElement)
+    LIST_OP_BIN    reduzir usando a regra 50 (negElement)
+    ARIT_OP_BAIXA  reduzir usando a regra 50 (negElement)
+    ARIT_OP_ALTA   reduzir usando a regra 50 (negElement)
+    FECHA_P        reduzir usando a regra 50 (negElement)
 
 
 Estado 172
 
-   52 negElement: LOG_OP_UN element •
+   33 attribuition: ID ATRIB • expList
 
-    VIRG           reduzir usando a regra 52 (negElement)
-    LOG_OP_OU      reduzir usando a regra 52 (negElement)
-    LOG_OP_E       reduzir usando a regra 52 (negElement)
-    REL_OP_BAIXA   reduzir usando a regra 52 (negElement)
-    REL_OP_ALTA    reduzir usando a regra 52 (negElement)
-    LIST_OP_BIN    reduzir usando a regra 52 (negElement)
-    ARIT_OP_BAIXA  reduzir usando a regra 52 (negElement)
-    ARIT_OP_ALTA   reduzir usando a regra 52 (negElement)
-    FECHA_P        reduzir usando a regra 52 (negElement)
+    LIST_OP_UN  deslocar, e ir ao estado 133
+    LOG_OP_UN   deslocar, e ir ao estado 134
+    CONST       deslocar, e ir ao estado 135
+    NIL         deslocar, e ir ao estado 136
+    ID          deslocar, e ir ao estado 169
+    ABRE_P      deslocar, e ir ao estado 138
+
+    expList     ir ao estado 198
+    expLogic    ir ao estado 140
+    andLogic    ir ao estado 141
+    expComp     ir ao estado 142
+    expRel      ir ao estado 143
+    expArit     ir ao estado 144
+    expMul      ir ao estado 145
+    negElement  ir ao estado 146
+    element     ir ao estado 147
 
 
 Estado 173
 
-   35 attribuition: ID ATRIB • expList
+   54 element: ID ABRE_P • arguments FECHA_P
+   55        | ID ABRE_P • FECHA_P
 
-    LIST_OP_UN  deslocar, e ir ao estado 134
-    LOG_OP_UN   deslocar, e ir ao estado 135
-    CONST       deslocar, e ir ao estado 136
-    NIL         deslocar, e ir ao estado 137
-    ID          deslocar, e ir ao estado 170
-    ABRE_P      deslocar, e ir ao estado 139
+    LIST_OP_UN  deslocar, e ir ao estado 133
+    LOG_OP_UN   deslocar, e ir ao estado 134
+    CONST       deslocar, e ir ao estado 135
+    NIL         deslocar, e ir ao estado 136
+    ID          deslocar, e ir ao estado 137
+    ABRE_P      deslocar, e ir ao estado 138
+    FECHA_P     deslocar, e ir ao estado 199
 
-    expList     ir ao estado 199
-    expLogic    ir ao estado 141
-    andLogic    ir ao estado 142
-    expComp     ir ao estado 143
-    expRel      ir ao estado 144
-    expArit     ir ao estado 145
-    expMul      ir ao estado 146
-    negElement  ir ao estado 147
-    element     ir ao estado 148
+    attribuition  ir ao estado 86
+    expList       ir ao estado 139
+    expLogic      ir ao estado 140
+    andLogic      ir ao estado 141
+    expComp       ir ao estado 142
+    expRel        ir ao estado 143
+    expArit       ir ao estado 144
+    expMul        ir ao estado 145
+    negElement    ir ao estado 146
+    element       ir ao estado 147
+    arguments     ir ao estado 200
 
 
 Estado 174
 
-   56 element: ID ABRE_P • arguments FECHA_P
-   57        | ID ABRE_P • FECHA_P
+   53 element: ABRE_P attribuition • FECHA_P
 
-    LIST_OP_UN  deslocar, e ir ao estado 134
-    LOG_OP_UN   deslocar, e ir ao estado 135
-    CONST       deslocar, e ir ao estado 136
-    NIL         deslocar, e ir ao estado 137
-    ID          deslocar, e ir ao estado 138
-    ABRE_P      deslocar, e ir ao estado 139
-    FECHA_P     deslocar, e ir ao estado 200
-
-    attribuition  ir ao estado 87
-    expList       ir ao estado 140
-    expLogic      ir ao estado 141
-    andLogic      ir ao estado 142
-    expComp       ir ao estado 143
-    expRel        ir ao estado 144
-    expArit       ir ao estado 145
-    expMul        ir ao estado 146
-    negElement    ir ao estado 147
-    element       ir ao estado 148
-    arguments     ir ao estado 201
+    FECHA_P  deslocar, e ir ao estado 201
 
 
 Estado 175
 
-   55 element: ABRE_P attribuition • FECHA_P
+   36 expList: expList LIST_OP_BIN • expLogic
 
-    FECHA_P  deslocar, e ir ao estado 202
+    LOG_OP_UN  deslocar, e ir ao estado 134
+    CONST      deslocar, e ir ao estado 135
+    NIL        deslocar, e ir ao estado 136
+    ID         deslocar, e ir ao estado 169
+    ABRE_P     deslocar, e ir ao estado 138
+
+    expLogic    ir ao estado 202
+    andLogic    ir ao estado 141
+    expComp     ir ao estado 142
+    expRel      ir ao estado 143
+    expArit     ir ao estado 144
+    expMul      ir ao estado 145
+    negElement  ir ao estado 146
+    element     ir ao estado 147
 
 
 Estado 176
 
-   38 expList: expList LIST_OP_BIN • expLogic
+   38 expLogic: expLogic LOG_OP_OU • andLogic
 
-    LOG_OP_UN  deslocar, e ir ao estado 135
-    CONST      deslocar, e ir ao estado 136
-    NIL        deslocar, e ir ao estado 137
-    ID         deslocar, e ir ao estado 170
-    ABRE_P     deslocar, e ir ao estado 139
+    LOG_OP_UN  deslocar, e ir ao estado 134
+    CONST      deslocar, e ir ao estado 135
+    NIL        deslocar, e ir ao estado 136
+    ID         deslocar, e ir ao estado 169
+    ABRE_P     deslocar, e ir ao estado 138
 
-    expLogic    ir ao estado 203
-    andLogic    ir ao estado 142
-    expComp     ir ao estado 143
-    expRel      ir ao estado 144
-    expArit     ir ao estado 145
-    expMul      ir ao estado 146
-    negElement  ir ao estado 147
-    element     ir ao estado 148
+    andLogic    ir ao estado 203
+    expComp     ir ao estado 142
+    expRel      ir ao estado 143
+    expArit     ir ao estado 144
+    expMul      ir ao estado 145
+    negElement  ir ao estado 146
+    element     ir ao estado 147
 
 
 Estado 177
 
-   40 expLogic: expLogic LOG_OP_OU • andLogic
+   40 andLogic: andLogic LOG_OP_E • expComp
 
-    LOG_OP_UN  deslocar, e ir ao estado 135
-    CONST      deslocar, e ir ao estado 136
-    NIL        deslocar, e ir ao estado 137
-    ID         deslocar, e ir ao estado 170
-    ABRE_P     deslocar, e ir ao estado 139
+    LOG_OP_UN  deslocar, e ir ao estado 134
+    CONST      deslocar, e ir ao estado 135
+    NIL        deslocar, e ir ao estado 136
+    ID         deslocar, e ir ao estado 169
+    ABRE_P     deslocar, e ir ao estado 138
 
-    andLogic    ir ao estado 204
-    expComp     ir ao estado 143
-    expRel      ir ao estado 144
-    expArit     ir ao estado 145
-    expMul      ir ao estado 146
-    negElement  ir ao estado 147
-    element     ir ao estado 148
+    expComp     ir ao estado 204
+    expRel      ir ao estado 143
+    expArit     ir ao estado 144
+    expMul      ir ao estado 145
+    negElement  ir ao estado 146
+    element     ir ao estado 147
 
 
 Estado 178
 
-   42 andLogic: andLogic LOG_OP_E • expComp
+   42 expComp: expComp REL_OP_BAIXA • expRel
 
-    LOG_OP_UN  deslocar, e ir ao estado 135
-    CONST      deslocar, e ir ao estado 136
-    NIL        deslocar, e ir ao estado 137
-    ID         deslocar, e ir ao estado 170
-    ABRE_P     deslocar, e ir ao estado 139
+    LOG_OP_UN  deslocar, e ir ao estado 134
+    CONST      deslocar, e ir ao estado 135
+    NIL        deslocar, e ir ao estado 136
+    ID         deslocar, e ir ao estado 169
+    ABRE_P     deslocar, e ir ao estado 138
 
-    expComp     ir ao estado 205
-    expRel      ir ao estado 144
-    expArit     ir ao estado 145
-    expMul      ir ao estado 146
-    negElement  ir ao estado 147
-    element     ir ao estado 148
+    expRel      ir ao estado 205
+    expArit     ir ao estado 144
+    expMul      ir ao estado 145
+    negElement  ir ao estado 146
+    element     ir ao estado 147
 
 
 Estado 179
 
-   44 expComp: expComp REL_OP_BAIXA • expRel
+   44 expRel: expRel REL_OP_ALTA • expArit
 
-    LOG_OP_UN  deslocar, e ir ao estado 135
-    CONST      deslocar, e ir ao estado 136
-    NIL        deslocar, e ir ao estado 137
-    ID         deslocar, e ir ao estado 170
-    ABRE_P     deslocar, e ir ao estado 139
+    LOG_OP_UN  deslocar, e ir ao estado 134
+    CONST      deslocar, e ir ao estado 135
+    NIL        deslocar, e ir ao estado 136
+    ID         deslocar, e ir ao estado 169
+    ABRE_P     deslocar, e ir ao estado 138
 
-    expRel      ir ao estado 206
-    expArit     ir ao estado 145
-    expMul      ir ao estado 146
-    negElement  ir ao estado 147
-    element     ir ao estado 148
+    expArit     ir ao estado 206
+    expMul      ir ao estado 145
+    negElement  ir ao estado 146
+    element     ir ao estado 147
 
 
 Estado 180
 
-   46 expRel: expRel REL_OP_ALTA • expArit
+   46 expArit: expArit ARIT_OP_BAIXA • expMul
 
-    LOG_OP_UN  deslocar, e ir ao estado 135
-    CONST      deslocar, e ir ao estado 136
-    NIL        deslocar, e ir ao estado 137
-    ID         deslocar, e ir ao estado 170
-    ABRE_P     deslocar, e ir ao estado 139
+    LOG_OP_UN  deslocar, e ir ao estado 134
+    CONST      deslocar, e ir ao estado 135
+    NIL        deslocar, e ir ao estado 136
+    ID         deslocar, e ir ao estado 169
+    ABRE_P     deslocar, e ir ao estado 138
 
-    expArit     ir ao estado 207
-    expMul      ir ao estado 146
-    negElement  ir ao estado 147
-    element     ir ao estado 148
+    expMul      ir ao estado 207
+    negElement  ir ao estado 146
+    element     ir ao estado 147
 
 
 Estado 181
 
-   48 expArit: expArit ARIT_OP_BAIXA • expMul
+   48 expMul: expMul ARIT_OP_ALTA • negElement
 
-    LOG_OP_UN  deslocar, e ir ao estado 135
-    CONST      deslocar, e ir ao estado 136
-    NIL        deslocar, e ir ao estado 137
-    ID         deslocar, e ir ao estado 170
-    ABRE_P     deslocar, e ir ao estado 139
+    LOG_OP_UN  deslocar, e ir ao estado 134
+    CONST      deslocar, e ir ao estado 135
+    NIL        deslocar, e ir ao estado 136
+    ID         deslocar, e ir ao estado 169
+    ABRE_P     deslocar, e ir ao estado 138
 
-    expMul      ir ao estado 208
-    negElement  ir ao estado 147
-    element     ir ao estado 148
+    negElement  ir ao estado 208
+    element     ir ao estado 147
 
 
 Estado 182
 
-   50 expMul: expMul ARIT_OP_ALTA • negElement
-
-    LOG_OP_UN  deslocar, e ir ao estado 135
-    CONST      deslocar, e ir ao estado 136
-    NIL        deslocar, e ir ao estado 137
-    ID         deslocar, e ir ao estado 170
-    ABRE_P     deslocar, e ir ao estado 139
-
-    negElement  ir ao estado 209
-    element     ir ao estado 148
-
-
-Estado 183
-
    27 oneLineStmt: io PV •
 
-    FECHA_C     reduzir usando a regra 27 (oneLineStmt)
     IF          reduzir usando a regra 27 (oneLineStmt)
     ELSE        reduzir usando a regra 27 (oneLineStmt)
     FOR         reduzir usando a regra 27 (oneLineStmt)
@@ -3031,13 +2991,13 @@ Estado 183
     NIL         reduzir usando a regra 27 (oneLineStmt)
     ID          reduzir usando a regra 27 (oneLineStmt)
     ABRE_P      reduzir usando a regra 27 (oneLineStmt)
+    FECHA_C     reduzir usando a regra 27 (oneLineStmt)
 
 
-Estado 184
+Estado 183
 
    25 oneLineStmt: variable PV •
 
-    FECHA_C     reduzir usando a regra 25 (oneLineStmt)
     IF          reduzir usando a regra 25 (oneLineStmt)
     ELSE        reduzir usando a regra 25 (oneLineStmt)
     FOR         reduzir usando a regra 25 (oneLineStmt)
@@ -3051,13 +3011,13 @@ Estado 184
     NIL         reduzir usando a regra 25 (oneLineStmt)
     ID          reduzir usando a regra 25 (oneLineStmt)
     ABRE_P      reduzir usando a regra 25 (oneLineStmt)
+    FECHA_C     reduzir usando a regra 25 (oneLineStmt)
 
 
-Estado 185
+Estado 184
 
    26 oneLineStmt: attribuition PV •
 
-    FECHA_C     reduzir usando a regra 26 (oneLineStmt)
     IF          reduzir usando a regra 26 (oneLineStmt)
     ELSE        reduzir usando a regra 26 (oneLineStmt)
     FOR         reduzir usando a regra 26 (oneLineStmt)
@@ -3071,13 +3031,13 @@ Estado 185
     NIL         reduzir usando a regra 26 (oneLineStmt)
     ID          reduzir usando a regra 26 (oneLineStmt)
     ABRE_P      reduzir usando a regra 26 (oneLineStmt)
+    FECHA_C     reduzir usando a regra 26 (oneLineStmt)
 
 
-Estado 186
+Estado 185
 
    28 oneLineStmt: ret PV •
 
-    FECHA_C     reduzir usando a regra 28 (oneLineStmt)
     IF          reduzir usando a regra 28 (oneLineStmt)
     ELSE        reduzir usando a regra 28 (oneLineStmt)
     FOR         reduzir usando a regra 28 (oneLineStmt)
@@ -3091,85 +3051,61 @@ Estado 186
     NIL         reduzir usando a regra 28 (oneLineStmt)
     ID          reduzir usando a regra 28 (oneLineStmt)
     ABRE_P      reduzir usando a regra 28 (oneLineStmt)
+    FECHA_C     reduzir usando a regra 28 (oneLineStmt)
 
 
-Estado 187
+Estado 186
 
    12 moreStmt: moreStmt • stmt
    20 bracesStmt: ABRE_C moreStmt • FECHA_C
 
-    FECHA_C     deslocar, e ir ao estado 210
-    IF          deslocar, e ir ao estado 20
-    FOR         deslocar, e ir ao estado 21
-    RETURN      deslocar, e ir ao estado 22
-    TIPO        deslocar, e ir ao estado 118
-    ENTRADA     deslocar, e ir ao estado 23
-    SAIDA       deslocar, e ir ao estado 24
-    LIST_OP_UN  deslocar, e ir ao estado 25
-    LOG_OP_UN   deslocar, e ir ao estado 26
-    CONST       deslocar, e ir ao estado 27
-    NIL         deslocar, e ir ao estado 28
-    ID          deslocar, e ir ao estado 29
-    ABRE_P      deslocar, e ir ao estado 30
+    IF          deslocar, e ir ao estado 21
+    FOR         deslocar, e ir ao estado 22
+    RETURN      deslocar, e ir ao estado 23
+    TIPO        deslocar, e ir ao estado 117
+    ENTRADA     deslocar, e ir ao estado 24
+    SAIDA       deslocar, e ir ao estado 25
+    LIST_OP_UN  deslocar, e ir ao estado 26
+    LOG_OP_UN   deslocar, e ir ao estado 27
+    CONST       deslocar, e ir ao estado 28
+    NIL         deslocar, e ir ao estado 29
+    ID          deslocar, e ir ao estado 30
+    ABRE_P      deslocar, e ir ao estado 31
+    FECHA_C     deslocar, e ir ao estado 209
 
-    stmt          ir ao estado 66
-    multLineStmt  ir ao estado 33
-    conditional   ir ao estado 34
-    iteration     ir ao estado 35
-    oneLineStmt   ir ao estado 36
-    io            ir ao estado 37
-    in            ir ao estado 38
-    out           ir ao estado 39
-    variable      ir ao estado 40
-    attribuition  ir ao estado 41
-    expList       ir ao estado 42
-    expLogic      ir ao estado 43
-    andLogic      ir ao estado 44
-    expComp       ir ao estado 45
-    expRel        ir ao estado 46
-    expArit       ir ao estado 47
-    expMul        ir ao estado 48
-    negElement    ir ao estado 49
-    element       ir ao estado 50
-    ret           ir ao estado 51
+    stmt          ir ao estado 65
+    multLineStmt  ir ao estado 34
+    conditional   ir ao estado 35
+    iteration     ir ao estado 36
+    oneLineStmt   ir ao estado 37
+    io            ir ao estado 38
+    variable      ir ao estado 39
+    attribuition  ir ao estado 40
+    expList       ir ao estado 41
+    expLogic      ir ao estado 42
+    andLogic      ir ao estado 43
+    expComp       ir ao estado 44
+    expRel        ir ao estado 45
+    expArit       ir ao estado 46
+    expMul        ir ao estado 47
+    negElement    ir ao estado 48
+    element       ir ao estado 49
+    ret           ir ao estado 50
+
+
+Estado 187
+
+   33 attribuition: ID ATRIB expList •
+   36 expList: expList • LIST_OP_BIN expLogic
+
+    LIST_OP_BIN  deslocar, e ir ao estado 162
+
+    FECHA_P  reduzir usando a regra 33 (attribuition)
 
 
 Estado 188
 
-   35 attribuition: ID ATRIB expList •
-   38 expList: expList • LIST_OP_BIN expLogic
-
-    LIST_OP_BIN  deslocar, e ir ao estado 163
-
-    FECHA_P  reduzir usando a regra 35 (attribuition)
-
-
-Estado 189
-
-   57 element: ID ABRE_P FECHA_P •
-
-    LOG_OP_OU      reduzir usando a regra 57 (element)
-    LOG_OP_E       reduzir usando a regra 57 (element)
-    REL_OP_BAIXA   reduzir usando a regra 57 (element)
-    REL_OP_ALTA    reduzir usando a regra 57 (element)
-    LIST_OP_BIN    reduzir usando a regra 57 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 57 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 57 (element)
-    FECHA_P        reduzir usando a regra 57 (element)
-
-
-Estado 190
-
-   56 element: ID ABRE_P arguments • FECHA_P
-   60 arguments: arguments • VIRG attribuition
-
-    VIRG     deslocar, e ir ao estado 103
-    FECHA_P  deslocar, e ir ao estado 211
-
-
-Estado 191
-
-   55 element: ABRE_P attribuition FECHA_P •
+   55 element: ID ABRE_P FECHA_P •
 
     LOG_OP_OU      reduzir usando a regra 55 (element)
     LOG_OP_E       reduzir usando a regra 55 (element)
@@ -3181,139 +3117,138 @@ Estado 191
     FECHA_P        reduzir usando a regra 55 (element)
 
 
+Estado 189
+
+   54 element: ID ABRE_P arguments • FECHA_P
+   58 arguments: arguments • VIRG attribuition
+
+    VIRG     deslocar, e ir ao estado 102
+    FECHA_P  deslocar, e ir ao estado 210
+
+
+Estado 190
+
+   53 element: ABRE_P attribuition FECHA_P •
+
+    LOG_OP_OU      reduzir usando a regra 53 (element)
+    LOG_OP_E       reduzir usando a regra 53 (element)
+    REL_OP_BAIXA   reduzir usando a regra 53 (element)
+    REL_OP_ALTA    reduzir usando a regra 53 (element)
+    LIST_OP_BIN    reduzir usando a regra 53 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 53 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 53 (element)
+    FECHA_P        reduzir usando a regra 53 (element)
+
+
+Estado 191
+
+   36 expList: expList LIST_OP_BIN expLogic •
+   38 expLogic: expLogic • LOG_OP_OU andLogic
+
+    LOG_OP_OU  deslocar, e ir ao estado 163
+
+    LIST_OP_BIN  reduzir usando a regra 36 (expList)
+    FECHA_P      reduzir usando a regra 36 (expList)
+
+
 Estado 192
 
-   38 expList: expList LIST_OP_BIN expLogic •
-   40 expLogic: expLogic • LOG_OP_OU andLogic
+   38 expLogic: expLogic LOG_OP_OU andLogic •
+   40 andLogic: andLogic • LOG_OP_E expComp
 
-    LOG_OP_OU  deslocar, e ir ao estado 164
+    LOG_OP_E  deslocar, e ir ao estado 164
 
-    LIST_OP_BIN  reduzir usando a regra 38 (expList)
-    FECHA_P      reduzir usando a regra 38 (expList)
+    LOG_OP_OU    reduzir usando a regra 38 (expLogic)
+    LIST_OP_BIN  reduzir usando a regra 38 (expLogic)
+    FECHA_P      reduzir usando a regra 38 (expLogic)
 
 
 Estado 193
 
-   40 expLogic: expLogic LOG_OP_OU andLogic •
-   42 andLogic: andLogic • LOG_OP_E expComp
+   40 andLogic: andLogic LOG_OP_E expComp •
+   42 expComp: expComp • REL_OP_BAIXA expRel
 
-    LOG_OP_E  deslocar, e ir ao estado 165
+    REL_OP_BAIXA  deslocar, e ir ao estado 165
 
-    LOG_OP_OU    reduzir usando a regra 40 (expLogic)
-    LIST_OP_BIN  reduzir usando a regra 40 (expLogic)
-    FECHA_P      reduzir usando a regra 40 (expLogic)
+    LOG_OP_OU    reduzir usando a regra 40 (andLogic)
+    LOG_OP_E     reduzir usando a regra 40 (andLogic)
+    LIST_OP_BIN  reduzir usando a regra 40 (andLogic)
+    FECHA_P      reduzir usando a regra 40 (andLogic)
 
 
 Estado 194
 
-   42 andLogic: andLogic LOG_OP_E expComp •
-   44 expComp: expComp • REL_OP_BAIXA expRel
+   42 expComp: expComp REL_OP_BAIXA expRel •
+   44 expRel: expRel • REL_OP_ALTA expArit
 
-    REL_OP_BAIXA  deslocar, e ir ao estado 166
+    REL_OP_ALTA  deslocar, e ir ao estado 166
 
-    LOG_OP_OU    reduzir usando a regra 42 (andLogic)
-    LOG_OP_E     reduzir usando a regra 42 (andLogic)
-    LIST_OP_BIN  reduzir usando a regra 42 (andLogic)
-    FECHA_P      reduzir usando a regra 42 (andLogic)
+    LOG_OP_OU     reduzir usando a regra 42 (expComp)
+    LOG_OP_E      reduzir usando a regra 42 (expComp)
+    REL_OP_BAIXA  reduzir usando a regra 42 (expComp)
+    LIST_OP_BIN   reduzir usando a regra 42 (expComp)
+    FECHA_P       reduzir usando a regra 42 (expComp)
 
 
 Estado 195
 
-   44 expComp: expComp REL_OP_BAIXA expRel •
-   46 expRel: expRel • REL_OP_ALTA expArit
+   44 expRel: expRel REL_OP_ALTA expArit •
+   46 expArit: expArit • ARIT_OP_BAIXA expMul
 
-    REL_OP_ALTA  deslocar, e ir ao estado 167
+    ARIT_OP_BAIXA  deslocar, e ir ao estado 167
 
-    LOG_OP_OU     reduzir usando a regra 44 (expComp)
-    LOG_OP_E      reduzir usando a regra 44 (expComp)
-    REL_OP_BAIXA  reduzir usando a regra 44 (expComp)
-    LIST_OP_BIN   reduzir usando a regra 44 (expComp)
-    FECHA_P       reduzir usando a regra 44 (expComp)
+    LOG_OP_OU     reduzir usando a regra 44 (expRel)
+    LOG_OP_E      reduzir usando a regra 44 (expRel)
+    REL_OP_BAIXA  reduzir usando a regra 44 (expRel)
+    REL_OP_ALTA   reduzir usando a regra 44 (expRel)
+    LIST_OP_BIN   reduzir usando a regra 44 (expRel)
+    FECHA_P       reduzir usando a regra 44 (expRel)
 
 
 Estado 196
 
-   46 expRel: expRel REL_OP_ALTA expArit •
-   48 expArit: expArit • ARIT_OP_BAIXA expMul
+   46 expArit: expArit ARIT_OP_BAIXA expMul •
+   48 expMul: expMul • ARIT_OP_ALTA negElement
 
-    ARIT_OP_BAIXA  deslocar, e ir ao estado 168
+    ARIT_OP_ALTA  deslocar, e ir ao estado 168
 
-    LOG_OP_OU     reduzir usando a regra 46 (expRel)
-    LOG_OP_E      reduzir usando a regra 46 (expRel)
-    REL_OP_BAIXA  reduzir usando a regra 46 (expRel)
-    REL_OP_ALTA   reduzir usando a regra 46 (expRel)
-    LIST_OP_BIN   reduzir usando a regra 46 (expRel)
-    FECHA_P       reduzir usando a regra 46 (expRel)
+    LOG_OP_OU      reduzir usando a regra 46 (expArit)
+    LOG_OP_E       reduzir usando a regra 46 (expArit)
+    REL_OP_BAIXA   reduzir usando a regra 46 (expArit)
+    REL_OP_ALTA    reduzir usando a regra 46 (expArit)
+    LIST_OP_BIN    reduzir usando a regra 46 (expArit)
+    ARIT_OP_BAIXA  reduzir usando a regra 46 (expArit)
+    FECHA_P        reduzir usando a regra 46 (expArit)
 
 
 Estado 197
 
-   48 expArit: expArit ARIT_OP_BAIXA expMul •
-   50 expMul: expMul • ARIT_OP_ALTA negElement
+   48 expMul: expMul ARIT_OP_ALTA negElement •
 
-    ARIT_OP_ALTA  deslocar, e ir ao estado 169
-
-    LOG_OP_OU      reduzir usando a regra 48 (expArit)
-    LOG_OP_E       reduzir usando a regra 48 (expArit)
-    REL_OP_BAIXA   reduzir usando a regra 48 (expArit)
-    REL_OP_ALTA    reduzir usando a regra 48 (expArit)
-    LIST_OP_BIN    reduzir usando a regra 48 (expArit)
-    ARIT_OP_BAIXA  reduzir usando a regra 48 (expArit)
-    FECHA_P        reduzir usando a regra 48 (expArit)
+    LOG_OP_OU      reduzir usando a regra 48 (expMul)
+    LOG_OP_E       reduzir usando a regra 48 (expMul)
+    REL_OP_BAIXA   reduzir usando a regra 48 (expMul)
+    REL_OP_ALTA    reduzir usando a regra 48 (expMul)
+    LIST_OP_BIN    reduzir usando a regra 48 (expMul)
+    ARIT_OP_BAIXA  reduzir usando a regra 48 (expMul)
+    ARIT_OP_ALTA   reduzir usando a regra 48 (expMul)
+    FECHA_P        reduzir usando a regra 48 (expMul)
 
 
 Estado 198
 
-   50 expMul: expMul ARIT_OP_ALTA negElement •
+   33 attribuition: ID ATRIB expList •
+   36 expList: expList • LIST_OP_BIN expLogic
 
-    LOG_OP_OU      reduzir usando a regra 50 (expMul)
-    LOG_OP_E       reduzir usando a regra 50 (expMul)
-    REL_OP_BAIXA   reduzir usando a regra 50 (expMul)
-    REL_OP_ALTA    reduzir usando a regra 50 (expMul)
-    LIST_OP_BIN    reduzir usando a regra 50 (expMul)
-    ARIT_OP_BAIXA  reduzir usando a regra 50 (expMul)
-    ARIT_OP_ALTA   reduzir usando a regra 50 (expMul)
-    FECHA_P        reduzir usando a regra 50 (expMul)
+    LIST_OP_BIN  deslocar, e ir ao estado 175
+
+    VIRG     reduzir usando a regra 33 (attribuition)
+    FECHA_P  reduzir usando a regra 33 (attribuition)
 
 
 Estado 199
 
-   35 attribuition: ID ATRIB expList •
-   38 expList: expList • LIST_OP_BIN expLogic
-
-    LIST_OP_BIN  deslocar, e ir ao estado 176
-
-    VIRG     reduzir usando a regra 35 (attribuition)
-    FECHA_P  reduzir usando a regra 35 (attribuition)
-
-
-Estado 200
-
-   57 element: ID ABRE_P FECHA_P •
-
-    VIRG           reduzir usando a regra 57 (element)
-    LOG_OP_OU      reduzir usando a regra 57 (element)
-    LOG_OP_E       reduzir usando a regra 57 (element)
-    REL_OP_BAIXA   reduzir usando a regra 57 (element)
-    REL_OP_ALTA    reduzir usando a regra 57 (element)
-    LIST_OP_BIN    reduzir usando a regra 57 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 57 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 57 (element)
-    FECHA_P        reduzir usando a regra 57 (element)
-
-
-Estado 201
-
-   56 element: ID ABRE_P arguments • FECHA_P
-   60 arguments: arguments • VIRG attribuition
-
-    VIRG     deslocar, e ir ao estado 103
-    FECHA_P  deslocar, e ir ao estado 212
-
-
-Estado 202
-
-   55 element: ABRE_P attribuition FECHA_P •
+   55 element: ID ABRE_P FECHA_P •
 
     VIRG           reduzir usando a regra 55 (element)
     LOG_OP_OU      reduzir usando a regra 55 (element)
@@ -3326,113 +3261,136 @@ Estado 202
     FECHA_P        reduzir usando a regra 55 (element)
 
 
+Estado 200
+
+   54 element: ID ABRE_P arguments • FECHA_P
+   58 arguments: arguments • VIRG attribuition
+
+    VIRG     deslocar, e ir ao estado 102
+    FECHA_P  deslocar, e ir ao estado 211
+
+
+Estado 201
+
+   53 element: ABRE_P attribuition FECHA_P •
+
+    VIRG           reduzir usando a regra 53 (element)
+    LOG_OP_OU      reduzir usando a regra 53 (element)
+    LOG_OP_E       reduzir usando a regra 53 (element)
+    REL_OP_BAIXA   reduzir usando a regra 53 (element)
+    REL_OP_ALTA    reduzir usando a regra 53 (element)
+    LIST_OP_BIN    reduzir usando a regra 53 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 53 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 53 (element)
+    FECHA_P        reduzir usando a regra 53 (element)
+
+
+Estado 202
+
+   36 expList: expList LIST_OP_BIN expLogic •
+   38 expLogic: expLogic • LOG_OP_OU andLogic
+
+    LOG_OP_OU  deslocar, e ir ao estado 176
+
+    VIRG         reduzir usando a regra 36 (expList)
+    LIST_OP_BIN  reduzir usando a regra 36 (expList)
+    FECHA_P      reduzir usando a regra 36 (expList)
+
+
 Estado 203
 
-   38 expList: expList LIST_OP_BIN expLogic •
-   40 expLogic: expLogic • LOG_OP_OU andLogic
+   38 expLogic: expLogic LOG_OP_OU andLogic •
+   40 andLogic: andLogic • LOG_OP_E expComp
 
-    LOG_OP_OU  deslocar, e ir ao estado 177
+    LOG_OP_E  deslocar, e ir ao estado 177
 
-    VIRG         reduzir usando a regra 38 (expList)
-    LIST_OP_BIN  reduzir usando a regra 38 (expList)
-    FECHA_P      reduzir usando a regra 38 (expList)
+    VIRG         reduzir usando a regra 38 (expLogic)
+    LOG_OP_OU    reduzir usando a regra 38 (expLogic)
+    LIST_OP_BIN  reduzir usando a regra 38 (expLogic)
+    FECHA_P      reduzir usando a regra 38 (expLogic)
 
 
 Estado 204
 
-   40 expLogic: expLogic LOG_OP_OU andLogic •
-   42 andLogic: andLogic • LOG_OP_E expComp
+   40 andLogic: andLogic LOG_OP_E expComp •
+   42 expComp: expComp • REL_OP_BAIXA expRel
 
-    LOG_OP_E  deslocar, e ir ao estado 178
+    REL_OP_BAIXA  deslocar, e ir ao estado 178
 
-    VIRG         reduzir usando a regra 40 (expLogic)
-    LOG_OP_OU    reduzir usando a regra 40 (expLogic)
-    LIST_OP_BIN  reduzir usando a regra 40 (expLogic)
-    FECHA_P      reduzir usando a regra 40 (expLogic)
+    VIRG         reduzir usando a regra 40 (andLogic)
+    LOG_OP_OU    reduzir usando a regra 40 (andLogic)
+    LOG_OP_E     reduzir usando a regra 40 (andLogic)
+    LIST_OP_BIN  reduzir usando a regra 40 (andLogic)
+    FECHA_P      reduzir usando a regra 40 (andLogic)
 
 
 Estado 205
 
-   42 andLogic: andLogic LOG_OP_E expComp •
-   44 expComp: expComp • REL_OP_BAIXA expRel
+   42 expComp: expComp REL_OP_BAIXA expRel •
+   44 expRel: expRel • REL_OP_ALTA expArit
 
-    REL_OP_BAIXA  deslocar, e ir ao estado 179
+    REL_OP_ALTA  deslocar, e ir ao estado 179
 
-    VIRG         reduzir usando a regra 42 (andLogic)
-    LOG_OP_OU    reduzir usando a regra 42 (andLogic)
-    LOG_OP_E     reduzir usando a regra 42 (andLogic)
-    LIST_OP_BIN  reduzir usando a regra 42 (andLogic)
-    FECHA_P      reduzir usando a regra 42 (andLogic)
+    VIRG          reduzir usando a regra 42 (expComp)
+    LOG_OP_OU     reduzir usando a regra 42 (expComp)
+    LOG_OP_E      reduzir usando a regra 42 (expComp)
+    REL_OP_BAIXA  reduzir usando a regra 42 (expComp)
+    LIST_OP_BIN   reduzir usando a regra 42 (expComp)
+    FECHA_P       reduzir usando a regra 42 (expComp)
 
 
 Estado 206
 
-   44 expComp: expComp REL_OP_BAIXA expRel •
-   46 expRel: expRel • REL_OP_ALTA expArit
+   44 expRel: expRel REL_OP_ALTA expArit •
+   46 expArit: expArit • ARIT_OP_BAIXA expMul
 
-    REL_OP_ALTA  deslocar, e ir ao estado 180
+    ARIT_OP_BAIXA  deslocar, e ir ao estado 180
 
-    VIRG          reduzir usando a regra 44 (expComp)
-    LOG_OP_OU     reduzir usando a regra 44 (expComp)
-    LOG_OP_E      reduzir usando a regra 44 (expComp)
-    REL_OP_BAIXA  reduzir usando a regra 44 (expComp)
-    LIST_OP_BIN   reduzir usando a regra 44 (expComp)
-    FECHA_P       reduzir usando a regra 44 (expComp)
+    VIRG          reduzir usando a regra 44 (expRel)
+    LOG_OP_OU     reduzir usando a regra 44 (expRel)
+    LOG_OP_E      reduzir usando a regra 44 (expRel)
+    REL_OP_BAIXA  reduzir usando a regra 44 (expRel)
+    REL_OP_ALTA   reduzir usando a regra 44 (expRel)
+    LIST_OP_BIN   reduzir usando a regra 44 (expRel)
+    FECHA_P       reduzir usando a regra 44 (expRel)
 
 
 Estado 207
 
-   46 expRel: expRel REL_OP_ALTA expArit •
-   48 expArit: expArit • ARIT_OP_BAIXA expMul
+   46 expArit: expArit ARIT_OP_BAIXA expMul •
+   48 expMul: expMul • ARIT_OP_ALTA negElement
 
-    ARIT_OP_BAIXA  deslocar, e ir ao estado 181
+    ARIT_OP_ALTA  deslocar, e ir ao estado 181
 
-    VIRG          reduzir usando a regra 46 (expRel)
-    LOG_OP_OU     reduzir usando a regra 46 (expRel)
-    LOG_OP_E      reduzir usando a regra 46 (expRel)
-    REL_OP_BAIXA  reduzir usando a regra 46 (expRel)
-    REL_OP_ALTA   reduzir usando a regra 46 (expRel)
-    LIST_OP_BIN   reduzir usando a regra 46 (expRel)
-    FECHA_P       reduzir usando a regra 46 (expRel)
+    VIRG           reduzir usando a regra 46 (expArit)
+    LOG_OP_OU      reduzir usando a regra 46 (expArit)
+    LOG_OP_E       reduzir usando a regra 46 (expArit)
+    REL_OP_BAIXA   reduzir usando a regra 46 (expArit)
+    REL_OP_ALTA    reduzir usando a regra 46 (expArit)
+    LIST_OP_BIN    reduzir usando a regra 46 (expArit)
+    ARIT_OP_BAIXA  reduzir usando a regra 46 (expArit)
+    FECHA_P        reduzir usando a regra 46 (expArit)
 
 
 Estado 208
 
-   48 expArit: expArit ARIT_OP_BAIXA expMul •
-   50 expMul: expMul • ARIT_OP_ALTA negElement
+   48 expMul: expMul ARIT_OP_ALTA negElement •
 
-    ARIT_OP_ALTA  deslocar, e ir ao estado 182
-
-    VIRG           reduzir usando a regra 48 (expArit)
-    LOG_OP_OU      reduzir usando a regra 48 (expArit)
-    LOG_OP_E       reduzir usando a regra 48 (expArit)
-    REL_OP_BAIXA   reduzir usando a regra 48 (expArit)
-    REL_OP_ALTA    reduzir usando a regra 48 (expArit)
-    LIST_OP_BIN    reduzir usando a regra 48 (expArit)
-    ARIT_OP_BAIXA  reduzir usando a regra 48 (expArit)
-    FECHA_P        reduzir usando a regra 48 (expArit)
+    VIRG           reduzir usando a regra 48 (expMul)
+    LOG_OP_OU      reduzir usando a regra 48 (expMul)
+    LOG_OP_E       reduzir usando a regra 48 (expMul)
+    REL_OP_BAIXA   reduzir usando a regra 48 (expMul)
+    REL_OP_ALTA    reduzir usando a regra 48 (expMul)
+    LIST_OP_BIN    reduzir usando a regra 48 (expMul)
+    ARIT_OP_BAIXA  reduzir usando a regra 48 (expMul)
+    ARIT_OP_ALTA   reduzir usando a regra 48 (expMul)
+    FECHA_P        reduzir usando a regra 48 (expMul)
 
 
 Estado 209
 
-   50 expMul: expMul ARIT_OP_ALTA negElement •
-
-    VIRG           reduzir usando a regra 50 (expMul)
-    LOG_OP_OU      reduzir usando a regra 50 (expMul)
-    LOG_OP_E       reduzir usando a regra 50 (expMul)
-    REL_OP_BAIXA   reduzir usando a regra 50 (expMul)
-    REL_OP_ALTA    reduzir usando a regra 50 (expMul)
-    LIST_OP_BIN    reduzir usando a regra 50 (expMul)
-    ARIT_OP_BAIXA  reduzir usando a regra 50 (expMul)
-    ARIT_OP_ALTA   reduzir usando a regra 50 (expMul)
-    FECHA_P        reduzir usando a regra 50 (expMul)
-
-
-Estado 210
-
    20 bracesStmt: ABRE_C moreStmt FECHA_C •
 
-    FECHA_C     reduzir usando a regra 20 (bracesStmt)
     IF          reduzir usando a regra 20 (bracesStmt)
     FOR         reduzir usando a regra 20 (bracesStmt)
     RETURN      reduzir usando a regra 20 (bracesStmt)
@@ -3445,32 +3403,33 @@ Estado 210
     NIL         reduzir usando a regra 20 (bracesStmt)
     ID          reduzir usando a regra 20 (bracesStmt)
     ABRE_P      reduzir usando a regra 20 (bracesStmt)
+    FECHA_C     reduzir usando a regra 20 (bracesStmt)
+
+
+Estado 210
+
+   54 element: ID ABRE_P arguments FECHA_P •
+
+    LOG_OP_OU      reduzir usando a regra 54 (element)
+    LOG_OP_E       reduzir usando a regra 54 (element)
+    REL_OP_BAIXA   reduzir usando a regra 54 (element)
+    REL_OP_ALTA    reduzir usando a regra 54 (element)
+    LIST_OP_BIN    reduzir usando a regra 54 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 54 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 54 (element)
+    FECHA_P        reduzir usando a regra 54 (element)
 
 
 Estado 211
 
-   56 element: ID ABRE_P arguments FECHA_P •
+   54 element: ID ABRE_P arguments FECHA_P •
 
-    LOG_OP_OU      reduzir usando a regra 56 (element)
-    LOG_OP_E       reduzir usando a regra 56 (element)
-    REL_OP_BAIXA   reduzir usando a regra 56 (element)
-    REL_OP_ALTA    reduzir usando a regra 56 (element)
-    LIST_OP_BIN    reduzir usando a regra 56 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 56 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 56 (element)
-    FECHA_P        reduzir usando a regra 56 (element)
-
-
-Estado 212
-
-   56 element: ID ABRE_P arguments FECHA_P •
-
-    VIRG           reduzir usando a regra 56 (element)
-    LOG_OP_OU      reduzir usando a regra 56 (element)
-    LOG_OP_E       reduzir usando a regra 56 (element)
-    REL_OP_BAIXA   reduzir usando a regra 56 (element)
-    REL_OP_ALTA    reduzir usando a regra 56 (element)
-    LIST_OP_BIN    reduzir usando a regra 56 (element)
-    ARIT_OP_BAIXA  reduzir usando a regra 56 (element)
-    ARIT_OP_ALTA   reduzir usando a regra 56 (element)
-    FECHA_P        reduzir usando a regra 56 (element)
+    VIRG           reduzir usando a regra 54 (element)
+    LOG_OP_OU      reduzir usando a regra 54 (element)
+    LOG_OP_E       reduzir usando a regra 54 (element)
+    REL_OP_BAIXA   reduzir usando a regra 54 (element)
+    REL_OP_ALTA    reduzir usando a regra 54 (element)
+    LIST_OP_BIN    reduzir usando a regra 54 (element)
+    ARIT_OP_BAIXA  reduzir usando a regra 54 (element)
+    ARIT_OP_ALTA   reduzir usando a regra 54 (element)
+    FECHA_P        reduzir usando a regra 54 (element)
