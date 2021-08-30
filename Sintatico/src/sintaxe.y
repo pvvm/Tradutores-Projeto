@@ -2,10 +2,11 @@
 %define lr.type canonical-lr
 
 /*
-TODO:   VER A QUESTÃO DE APENAS OS ERROS MAIS EXTERNOS SEREM REPORTADOS
-        VOLTAR A VER A QUESTÃO DAS COLUNAS
-        RESOLVER O PROBLEMA DA STRING NÃO FECHADA
+TODO:   VER A QUESTÃO DE APENAS OS ERROS MAIS EXTERNOS SEREM REPORTADOS     (RESOLVIDO, SE DEUS QUISER)
+        VOLTAR A VER A QUESTÃO DAS COLUNAS                                  (QUASE RESOLVIDO, VER QUE STRING NÃO FECHADA RETORNA UMA COLUNA ANTES DO QUE DEVERIA)
+        RESOLVER O PROBLEMA DA STRING NÃO FECHADA                           (RESOLVIDO POR UMA GAMBIARRA NO FIM DO .l)
         RESOLVER O FREE DE MEMÓRIA EM EXEMPLOS COM ERRO
+        AJUSTAR ÁRVORE SINTATICA
         FAZER A TABELA DE SIMBOLOS
 */
 
@@ -17,10 +18,8 @@ TODO:   VER A QUESTÃO DE APENAS OS ERROS MAIS EXTERNOS SEREM REPORTADOS
 
 extern int yylex(void);
 extern int yylex_destroy(void);
-extern int yyval;
+extern char * yytext;
 extern FILE *yyin;
-extern int num_linha;
-extern int num_coluna;
 extern int num_erros_lexicos;
 int num_erros_sintaticos = 0;
 struct No * raiz;
@@ -58,8 +57,8 @@ struct No* montaNo(char *, struct No*, struct No* , struct No* , struct No*);
 %left REL_OP_ALTA
 %token <tok> LIST_OP_BIN
 %token <tok> LIST_OP_UN
-%token <tok> ARIT_OP_BAIXA
-%left ARIT_OP_BAIXA
+%token <tok> ARIT_OP_MAIS ARIT_OP_MENOS
+%left ARIT_OP_MAIS ARIT_OP_MENOS
 %token <tok> ARIT_OP_ALTA
 %left ARIT_OP_ALTA
 %token <tok> LOG_OP_UN
@@ -91,16 +90,19 @@ program:        declarations                {raiz = montaNo("program", $1, NULL,
                 ;
 
 declarations:   declarations declaration    {$$ = montaNo("declarations", $1, $2, NULL, NULL);}
+                //| error declaration         {$$ = montaNo("oneLineStmt", $2, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
                 | declaration               {$$ = montaNo("declarations", $1, NULL, NULL, NULL);}
                 ;
 
 declaration:    function                    {$$ = montaNo("declaration", $1, NULL, NULL, NULL);}
                 | varDecl PV                {$$ = montaNo("declaration", $1, NULL, NULL, NULL);}
-                | error                     {$$ = montaNo("declaration", NULL, NULL, NULL, NULL);}
+                | error PV                    {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
                 ;
 
 function:       varDecl ABRE_P parameters FECHA_P ABRE_C moreStmt FECHA_C       {$$ = montaNo("function", $1, $3, $6, NULL);}
+                | error ABRE_P parameters FECHA_P ABRE_C moreStmt FECHA_C       {$$ = montaNo("function",$3, $6, NULL, NULL);}
                 | varDecl ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                {$$ = montaNo("function", $1, $5, NULL, NULL);}
+                | error ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                {$$ = montaNo("function", $5, NULL, NULL, NULL);}
                 ;
 
 parameters:     parameters VIRG varDecl     {$$ = montaNo("parameters", $1, $3, NULL, NULL);}
@@ -121,6 +123,7 @@ multLineStmt:   conditional                 {$$ = montaNo("multLineStmt", $1, NU
 
 conditional:    IF ABRE_P attribuition FECHA_P bracesStmt                       {$$ = montaNo("conditional", $3, $5, NULL, NULL);}
                 | IF ABRE_P attribuition FECHA_P bracesStmt ELSE bracesStmt     {$$ = montaNo("conditional", $3, $5, $7, NULL);}
+                | IF ABRE_P error FECHA_P bracesStmt                 {$$ = montaNo("oneLineStmt", $5, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
                 ;
 
 bracesStmt:     ABRE_C moreStmt FECHA_C     {$$ = montaNo("bracesStmt", $2, NULL, NULL, NULL);}
@@ -138,11 +141,14 @@ oneLineStmt:    varDecl PV                  {$$ = montaNo("oneLineStmt", $1, NUL
                 | attribuition PV           {$$ = montaNo("oneLineStmt", $1, NULL, NULL, NULL);}
                 | io PV                     {$$ = montaNo("oneLineStmt", $1, NULL, NULL, NULL);}
                 | ret PV                    {$$ = montaNo("oneLineStmt", $1, NULL, NULL, NULL);}
+                | error                   {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}     //COM ESSE DETECTA O ERRO DA LINHA 13 DE TEST
                 ;
 
 io:             ENTRADA ABRE_P ID FECHA_P               {$$ = montaNo("in", NULL, NULL, NULL, NULL);}
-                |SAIDA ABRE_P attribuition FECHA_P      {$$ = montaNo("out", $3, NULL, NULL, NULL);}
+                | SAIDA ABRE_P attribuition FECHA_P     {$$ = montaNo("out", $3, NULL, NULL, NULL);}
                 | SAIDA ABRE_P STRING FECHA_P           {$$ = montaNo("out", NULL, NULL, NULL, NULL);}
+                | ENTRADA ABRE_P error FECHA_P                 {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
+                | SAIDA ABRE_P error FECHA_P                 {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
                 ;
 
 
@@ -150,13 +156,8 @@ varDecl:        TIPO ID                     {$$ = montaNo("varDecl", NULL, NULL,
                 | TIPO LIST ID              {$$ = montaNo("varDecl", NULL, NULL, NULL, NULL);}
                 ;
 
-attribuition:   ID ATRIB expList            {$$ = montaNo("attribuition", $3, NULL, NULL, NULL);}
-                | expList                   {$$ = montaNo("attribuition", $1, NULL, NULL, NULL);}
-                ;
-
-expList:        LIST_OP_UN expLogic                     {$$ = montaNo("expList", $2, NULL, NULL, NULL);}
-                | expList LIST_OP_BIN expLogic          {$$ = montaNo("expList", $1, $3, NULL, NULL);}
-                | expLogic                              {$$ = montaNo("expList", $1, NULL, NULL, NULL);}
+attribuition:   ID ATRIB expLogic            {$$ = montaNo("attribuition", $3, NULL, NULL, NULL);}
+                | expLogic                   {$$ = montaNo("attribuition", $1, NULL, NULL, NULL);}
                 ;
 
 expLogic:       expLogic LOG_OP_OU andLogic             {$$ = montaNo("expLogic", $1, $3, NULL, NULL);}
@@ -175,7 +176,8 @@ expRel:         expRel REL_OP_ALTA expArit              {$$ = montaNo("expRel", 
                 | expArit                               {$$ = montaNo("expRel", $1, NULL, NULL, NULL);}
                 ;
 
-expArit:        expArit ARIT_OP_BAIXA expMul            {$$ = montaNo("expArit", $1, $3, NULL, NULL);}
+expArit:        expArit ARIT_OP_MAIS expMul             {$$ = montaNo("expArit", $1, $3, NULL, NULL);}
+                | expArit ARIT_OP_MENOS expMul          {$$ = montaNo("expArit", $1, $3, NULL, NULL);}
                 | expMul                                {$$ = montaNo("expArit", $1, NULL, NULL, NULL);}
                 ;
 
@@ -183,8 +185,14 @@ expMul:         expMul ARIT_OP_ALTA negElement          {$$ = montaNo("expMul", 
                 | negElement                            {$$ = montaNo("expMul", $1, NULL, NULL, NULL);}
                 ;
 
-negElement:     LOG_OP_UN element                       {$$ = montaNo("negElement", $2, NULL, NULL, NULL);}
-                | element                               {$$ = montaNo("negElement", $1, NULL, NULL, NULL);}
+negElement:     LOG_OP_UN expList                       {$$ = montaNo("negElement", $2, NULL, NULL, NULL);}
+                | ARIT_OP_MENOS expList                 {$$ = montaNo("negElement", $2, NULL, NULL, NULL);}
+                | expList                               {$$ = montaNo("negElement", $1, NULL, NULL, NULL);}
+                ;
+
+expList:        LIST_OP_UN element                      {$$ = montaNo("expList", $2, NULL, NULL, NULL);}
+                | expList LIST_OP_BIN element           {$$ = montaNo("expList", $1, $3, NULL, NULL);}
+                | element                               {$$ = montaNo("expList", $1, NULL, NULL, NULL);}
                 ;
 
 element:        ID                                      {$$ = montaNo("element", NULL, NULL, NULL, NULL);}
@@ -194,6 +202,7 @@ element:        ID                                      {$$ = montaNo("element",
                 | CONST_INT                             {$$ = montaNo("element", NULL, NULL, NULL, NULL);}
                 | CONST_FLOAT                           {$$ = montaNo("element", NULL, NULL, NULL, NULL);}
                 | NIL                                   {$$ = montaNo("element", NULL, NULL, NULL, NULL);}
+                //| error                                 {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/} COM ESSE NAO DETECTA
                 ;
 
 arguments:      arguments VIRG attribuition             {$$ = montaNo("arguments", $1, $3, NULL, NULL);}
@@ -218,7 +227,7 @@ struct No* montaNo(char *nome, struct No *no_1, struct No *no_2, struct No *no_3
 }
 
 void yyerror(char *s) {
-    printf("ERRO sintático\nLinha: %d\tColuna: %d\n\n", num_linha, num_coluna);
+    printf("ERRO sintático\nLinha: %d\tColuna: %d\n\n", yylval.tok.linha, yylval.tok.coluna);
     ++num_erros_sintaticos;
 }
 

@@ -45,7 +45,7 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 32 "./src/sintaxe.y"
+#line 31 "./src/sintaxe.y"
 
     struct token {
         char lexema[50];
@@ -81,18 +81,19 @@ extern int yydebug;
     REL_OP_ALTA = 272,             /* REL_OP_ALTA  */
     LIST_OP_BIN = 273,             /* LIST_OP_BIN  */
     LIST_OP_UN = 274,              /* LIST_OP_UN  */
-    ARIT_OP_BAIXA = 275,           /* ARIT_OP_BAIXA  */
-    ARIT_OP_ALTA = 276,            /* ARIT_OP_ALTA  */
-    LOG_OP_UN = 277,               /* LOG_OP_UN  */
-    CONST_INT = 278,               /* CONST_INT  */
-    CONST_FLOAT = 279,             /* CONST_FLOAT  */
-    STRING = 280,                  /* STRING  */
-    NIL = 281,                     /* NIL  */
-    ID = 282,                      /* ID  */
-    ABRE_P = 283,                  /* ABRE_P  */
-    FECHA_P = 284,                 /* FECHA_P  */
-    ABRE_C = 285,                  /* ABRE_C  */
-    FECHA_C = 286                  /* FECHA_C  */
+    ARIT_OP_MAIS = 275,            /* ARIT_OP_MAIS  */
+    ARIT_OP_MENOS = 276,           /* ARIT_OP_MENOS  */
+    ARIT_OP_ALTA = 277,            /* ARIT_OP_ALTA  */
+    LOG_OP_UN = 278,               /* LOG_OP_UN  */
+    CONST_INT = 279,               /* CONST_INT  */
+    CONST_FLOAT = 280,             /* CONST_FLOAT  */
+    STRING = 281,                  /* STRING  */
+    NIL = 282,                     /* NIL  */
+    ID = 283,                      /* ID  */
+    ABRE_P = 284,                  /* ABRE_P  */
+    FECHA_P = 285,                 /* FECHA_P  */
+    ABRE_C = 286,                  /* ABRE_C  */
+    FECHA_C = 287                  /* FECHA_C  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -101,12 +102,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 40 "./src/sintaxe.y"
+#line 39 "./src/sintaxe.y"
 
     struct token tok;
     struct No* no;
 
-#line 110 "./src/sintaxe.tab.h"
+#line 111 "./src/sintaxe.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

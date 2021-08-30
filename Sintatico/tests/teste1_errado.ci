@@ -10,7 +10,7 @@ float calcula_imc(float list valores) {
 }
 
 int classifica_imc(float imc) {
-    if (0 < imc & imc < 25) {
+    if (0 < imc & && imc < 25) {
         writeln("De magro ate peso normal");
     } else {
         writeln/*aqui*/("Com sobrepeso ou com obesidade");
@@ -22,7 +22,7 @@ int main() {
     valores = NIL;
     float valor1;
 
-    writeln("Digite o seu peso em quilos: ");
+    writeln("Digite o seu peso em quilos: );
     read(valor1);
     valores = valor1 : valores;
 

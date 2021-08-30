@@ -3,7 +3,6 @@
 #include <string.h>
 #include "../lib/arvore.h"
 #include "sintaxe.tab.h"
-extern int yyval;
 
 int num_linha = 1;
 int num_coluna = 1;
@@ -29,7 +28,8 @@ CONST_INT       ({DIGITO}+)
 NIL             (NIL)
 STRING          \"[^\n"]*\"
 ARIT_OP_ALTA    [\*/]
-ARIT_OP_BAIXA   [\+\-]
+ARIT_OP_MAIS    [\+]
+ARIT_OP_MENOS   [\-]
 LOG_OP_OU       (\|\|)
 LOG_OP_E        (&&)
 LOG_OP_UN       (!)
@@ -63,8 +63,10 @@ IDENTIFICADOR   [a-zA-Z_][_a-zA-Z0-9]*
     /*   OPERACOES ARITMETICAS COM PRIORIDADES DIFERENTES   */
 {ARIT_OP_ALTA}          {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return ARIT_OP_ALTA;}
-{ARIT_OP_BAIXA}         {num_coluna = cria_token(yytext, num_linha, num_coluna);
-                        return ARIT_OP_BAIXA;}
+{ARIT_OP_MAIS}          {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return ARIT_OP_MAIS;}
+{ARIT_OP_MENOS}         {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return ARIT_OP_MENOS;}
 
 
     /*   OPERACOES LOGICAS   */
@@ -162,15 +164,17 @@ IDENTIFICADOR   [a-zA-Z_][_a-zA-Z0-9]*
                             ++num_erros_lexicos;
                             yyterminate();}
 \"[^"\n]*\n                 {printf("ERRO lexico: string nao fechada\nLinha: %d\tColuna: %d\n\n", num_linha, num_coluna);
-                            ++num_erros_lexicos; ++num_linha; num_coluna = 1;}
+                            ++num_erros_lexicos; ++num_linha; num_coluna = 1;
+                            return PV;}                     // GAMBIARRA (MELHORAR MAIS TARDE)
 .                           {printf("ERRO lexico elemento: %s\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
                             ++num_erros_lexicos; num_coluna += yyleng;}
 
 %%
 
 int cria_token(char *lexem, int linha, int coluna) {
+    //printf("%s %d %d\n\n", lexem, linha, coluna);
     strcpy(yylval.tok.lexema, lexem);
     yylval.tok.linha = linha;
     yylval.tok.coluna = coluna;
-    return (coluna);
+    return (coluna += yyleng);
 }
