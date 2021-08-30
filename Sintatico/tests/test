@@ -1,11 +1,13 @@
-int abcd;
+int list abcd;
 float dsldksld;
 int bmfb_lakla1;
-
 
 int als;
 
 int main() {
+    abcd = 123;
+abcd = 123.232;
+c = .123;   
     int a;
     read(a);
     read(askdksdk);

@@ -69,28 +69,30 @@ extern int yydebug;
     FOR = 260,                     /* FOR  */
     RETURN = 261,                  /* RETURN  */
     TIPO = 262,                    /* TIPO  */
-    ENTRADA = 263,                 /* ENTRADA  */
-    SAIDA = 264,                   /* SAIDA  */
-    VIRG = 265,                    /* VIRG  */
-    PV = 266,                      /* PV  */
-    ATRIB = 267,                   /* ATRIB  */
-    LOG_OP_OU = 268,               /* LOG_OP_OU  */
-    LOG_OP_E = 269,                /* LOG_OP_E  */
-    REL_OP_BAIXA = 270,            /* REL_OP_BAIXA  */
-    REL_OP_ALTA = 271,             /* REL_OP_ALTA  */
-    LIST_OP_BIN = 272,             /* LIST_OP_BIN  */
-    LIST_OP_UN = 273,              /* LIST_OP_UN  */
-    ARIT_OP_BAIXA = 274,           /* ARIT_OP_BAIXA  */
-    ARIT_OP_ALTA = 275,            /* ARIT_OP_ALTA  */
-    LOG_OP_UN = 276,               /* LOG_OP_UN  */
-    CONST = 277,                   /* CONST  */
-    STRING = 278,                  /* STRING  */
-    NIL = 279,                     /* NIL  */
-    ID = 280,                      /* ID  */
-    ABRE_P = 281,                  /* ABRE_P  */
-    FECHA_P = 282,                 /* FECHA_P  */
-    ABRE_C = 283,                  /* ABRE_C  */
-    FECHA_C = 284                  /* FECHA_C  */
+    LIST = 263,                    /* LIST  */
+    ENTRADA = 264,                 /* ENTRADA  */
+    SAIDA = 265,                   /* SAIDA  */
+    VIRG = 266,                    /* VIRG  */
+    PV = 267,                      /* PV  */
+    ATRIB = 268,                   /* ATRIB  */
+    LOG_OP_OU = 269,               /* LOG_OP_OU  */
+    LOG_OP_E = 270,                /* LOG_OP_E  */
+    REL_OP_BAIXA = 271,            /* REL_OP_BAIXA  */
+    REL_OP_ALTA = 272,             /* REL_OP_ALTA  */
+    LIST_OP_BIN = 273,             /* LIST_OP_BIN  */
+    LIST_OP_UN = 274,              /* LIST_OP_UN  */
+    ARIT_OP_BAIXA = 275,           /* ARIT_OP_BAIXA  */
+    ARIT_OP_ALTA = 276,            /* ARIT_OP_ALTA  */
+    LOG_OP_UN = 277,               /* LOG_OP_UN  */
+    CONST_INT = 278,               /* CONST_INT  */
+    CONST_FLOAT = 279,             /* CONST_FLOAT  */
+    STRING = 280,                  /* STRING  */
+    NIL = 281,                     /* NIL  */
+    ID = 282,                      /* ID  */
+    ABRE_P = 283,                  /* ABRE_P  */
+    FECHA_P = 284,                 /* FECHA_P  */
+    ABRE_C = 285,                  /* ABRE_C  */
+    FECHA_C = 286                  /* FECHA_C  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -104,7 +106,7 @@ union YYSTYPE
     struct token tok;
     struct No* no;
 
-#line 108 "./src/sintaxe.tab.h"
+#line 110 "./src/sintaxe.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

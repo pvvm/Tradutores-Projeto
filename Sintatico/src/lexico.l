@@ -23,8 +23,9 @@ int cria_token(char *, int, int);
 
 
 DIGITO          [0-9]
-TIPO            (int|float|"int list"|"float list")
-CONSTANTE       ({DIGITO}+|{DIGITO}*"."{DIGITO}+)
+TIPO            (int|float)
+CONST_FLOAT     ({DIGITO}*"."{DIGITO}+)
+CONST_INT       ({DIGITO}+)
 NIL             (NIL)
 STRING          \"[^\n"]*\"
 ARIT_OP_ALTA    [\*/]
@@ -45,11 +46,15 @@ IDENTIFICADOR   [a-zA-Z_][_a-zA-Z0-9]*
     /*   DECLARAÇÕES DE TIPO   */
 {TIPO}                  {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return TIPO;}
+"list"                  {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return LIST;}
 
 
     /*   CONSTANTES   */
-{CONSTANTE}             {num_coluna = cria_token(yytext, num_linha, num_coluna);
-                        return CONST;}
+{CONST_INT}             {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return CONST_INT;}
+{CONST_FLOAT}           {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return CONST_FLOAT;}                        
 {STRING}                {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return STRING;}
 {NIL}                   {num_coluna = cria_token(yytext, num_linha, num_coluna);

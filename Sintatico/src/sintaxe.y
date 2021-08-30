@@ -42,7 +42,7 @@ struct No* montaNo(char *, struct No*, struct No* , struct No* , struct No*);
     struct No* no;
 }
 
-%token <tok> IF ELSE FOR RETURN TIPO
+%token <tok> IF ELSE FOR RETURN TIPO LIST
 %token <tok> ENTRADA SAIDA
 %token <tok> VIRG
 %token <tok> PV
@@ -63,12 +63,12 @@ struct No* montaNo(char *, struct No*, struct No* , struct No* , struct No*);
 %token <tok> ARIT_OP_ALTA
 %left ARIT_OP_ALTA
 %token <tok> LOG_OP_UN
-%token <tok> CONST STRING NIL ID
+%token <tok> CONST_INT CONST_FLOAT STRING NIL ID
 %token <tok> ABRE_P FECHA_P ABRE_C FECHA_C
 %left ABRE_P FECHA_P
 
 %type <no> declarations declaration function parameters moreStmt stmt multLineStmt
-%type <no> conditional bracesStmt iteration expIte oneLineStmt io variable
+%type <no> conditional bracesStmt iteration expIte oneLineStmt io varDecl
 %type <no> attribuition expList expLogic andLogic expComp expRel expArit expMul
 %type <no> negElement element arguments ret
 
@@ -95,16 +95,16 @@ declarations:   declarations declaration    {$$ = montaNo("declarations", $1, $2
                 ;
 
 declaration:    function                    {$$ = montaNo("declaration", $1, NULL, NULL, NULL);}
-                | variable PV               {$$ = montaNo("declaration", $1, NULL, NULL, NULL);}
+                | varDecl PV                {$$ = montaNo("declaration", $1, NULL, NULL, NULL);}
                 | error                     {$$ = montaNo("declaration", NULL, NULL, NULL, NULL);}
                 ;
 
-function:       TIPO ID ABRE_P parameters FECHA_P ABRE_C moreStmt FECHA_C       {$$ = montaNo("function", $4, $7, NULL, NULL);}
-                | TIPO ID ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                {$$ = montaNo("function", $6, NULL, NULL, NULL);}
+function:       varDecl ABRE_P parameters FECHA_P ABRE_C moreStmt FECHA_C       {$$ = montaNo("function", $1, $3, $6, NULL);}
+                | varDecl ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                {$$ = montaNo("function", $1, $5, NULL, NULL);}
                 ;
 
-parameters:     parameters VIRG variable    {$$ = montaNo("parameters", $1, $3, NULL, NULL);}
-                | variable                  {$$ = montaNo("parameters", $1, NULL, NULL, NULL);}
+parameters:     parameters VIRG varDecl     {$$ = montaNo("parameters", $1, $3, NULL, NULL);}
+                | varDecl                   {$$ = montaNo("parameters", $1, NULL, NULL, NULL);}
                 ;
 
 moreStmt:       moreStmt stmt               {$$ = montaNo("moreStmt", $1, $2, NULL, NULL);}
@@ -134,7 +134,7 @@ expIte:         attribuition                {$$ = montaNo("expIte", $1, NULL, NU
                 | /* empty */               {$$ = NULL;}
                 ;
 
-oneLineStmt:    variable PV                 {$$ = montaNo("oneLineStmt", $1, NULL, NULL, NULL);}
+oneLineStmt:    varDecl PV                  {$$ = montaNo("oneLineStmt", $1, NULL, NULL, NULL);}
                 | attribuition PV           {$$ = montaNo("oneLineStmt", $1, NULL, NULL, NULL);}
                 | io PV                     {$$ = montaNo("oneLineStmt", $1, NULL, NULL, NULL);}
                 | ret PV                    {$$ = montaNo("oneLineStmt", $1, NULL, NULL, NULL);}
@@ -146,7 +146,8 @@ io:             ENTRADA ABRE_P ID FECHA_P               {$$ = montaNo("in", NULL
                 ;
 
 
-variable:       TIPO ID                     {$$ = montaNo("variable", NULL, NULL, NULL, NULL);}
+varDecl:        TIPO ID                     {$$ = montaNo("varDecl", NULL, NULL, NULL, NULL);}
+                | TIPO LIST ID              {$$ = montaNo("varDecl", NULL, NULL, NULL, NULL);}
                 ;
 
 attribuition:   ID ATRIB expList            {$$ = montaNo("attribuition", $3, NULL, NULL, NULL);}
@@ -190,7 +191,8 @@ element:        ID                                      {$$ = montaNo("element",
                 | ABRE_P attribuition FECHA_P           {$$ = montaNo("element", $2, NULL, NULL, NULL);}
                 | ID ABRE_P arguments FECHA_P           {$$ = montaNo("element", $3, NULL, NULL, NULL);}
                 | ID ABRE_P FECHA_P                     {$$ = montaNo("element", NULL, NULL, NULL, NULL);}
-                | CONST                                 {$$ = montaNo("element", NULL, NULL, NULL, NULL);}
+                | CONST_INT                             {$$ = montaNo("element", NULL, NULL, NULL, NULL);}
+                | CONST_FLOAT                           {$$ = montaNo("element", NULL, NULL, NULL, NULL);}
                 | NIL                                   {$$ = montaNo("element", NULL, NULL, NULL, NULL);}
                 ;
 
