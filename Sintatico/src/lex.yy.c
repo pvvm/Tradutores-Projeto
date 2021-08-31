@@ -509,6 +509,7 @@ char *yytext;
 #include <stdio.h>
 #include <string.h>
 #include "../lib/arvore.h"
+#include "../lib/lista.h"
 #include "sintaxe.tab.h"
 
 int num_linha = 1;
@@ -516,12 +517,13 @@ int num_coluna = 1;
 int erro_linha;
 int erro_coluna;
 int num_erros_lexicos = 0;
+int extern escopo;
 
 int cria_token(char *, int, int);
-#line 522 "src/lex.yy.c"
+#line 524 "src/lex.yy.c"
 
 #define YY_NO_INPUT 1
-#line 525 "src/lex.yy.c"
+#line 527 "src/lex.yy.c"
 
 #define INITIAL 0
 #define COMENTARIO_MULT 1
@@ -737,12 +739,12 @@ YY_DECL
 		}
 
 	{
-#line 44 "./src/lexico.l"
+#line 46 "./src/lexico.l"
 
 
-#line 47 "./src/lexico.l"
+#line 49 "./src/lexico.l"
     /*   DECLARAÇÕES DE TIPO   */
-#line 746 "src/lex.yy.c"
+#line 748 "src/lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -801,241 +803,243 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 48 "./src/lexico.l"
+#line 50 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return TIPO;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 50 "./src/lexico.l"
+#line 52 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return LIST;}
 	YY_BREAK
 /*   CONSTANTES   */
 case 3:
 YY_RULE_SETUP
-#line 55 "./src/lexico.l"
+#line 57 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return CONST_INT;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 57 "./src/lexico.l"
+#line 59 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return CONST_FLOAT;}                        
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 59 "./src/lexico.l"
+#line 61 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return STRING;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 61 "./src/lexico.l"
+#line 63 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return NIL;}
 	YY_BREAK
 /*   OPERACOES ARITMETICAS COM PRIORIDADES DIFERENTES   */
 case 7:
 YY_RULE_SETUP
-#line 65 "./src/lexico.l"
+#line 67 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return ARIT_OP_ALTA;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 67 "./src/lexico.l"
+#line 69 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return ARIT_OP_MAIS;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 69 "./src/lexico.l"
+#line 71 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return ARIT_OP_MENOS;}
 	YY_BREAK
 /*   OPERACOES LOGICAS   */
 case 10:
 YY_RULE_SETUP
-#line 74 "./src/lexico.l"
+#line 76 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return LOG_OP_OU;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 76 "./src/lexico.l"
+#line 78 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return LOG_OP_E;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 78 "./src/lexico.l"
+#line 80 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return LOG_OP_UN;}
 	YY_BREAK
 /*   OPERACOES RELACIONAIS COM PRIORIDADES DIFERENTES   */
 case 13:
 YY_RULE_SETUP
-#line 83 "./src/lexico.l"
+#line 85 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return REL_OP_ALTA;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 85 "./src/lexico.l"
+#line 87 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return REL_OP_BAIXA;}
 	YY_BREAK
 /*   OPERADORES LISTAS   */
 case 15:
 YY_RULE_SETUP
-#line 90 "./src/lexico.l"
+#line 92 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return LIST_OP_BIN;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 92 "./src/lexico.l"
+#line 94 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return LIST_OP_UN;}
 	YY_BREAK
 /*   FLUXO DE CONTROLE   */
 case 17:
 YY_RULE_SETUP
-#line 97 "./src/lexico.l"
+#line 99 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return IF;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 99 "./src/lexico.l"
+#line 101 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return ELSE;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 101 "./src/lexico.l"
+#line 103 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return FOR;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 103 "./src/lexico.l"
+#line 105 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return RETURN;}
 	YY_BREAK
 /*   ENTRADA E SAIDA   */
 case 21:
 YY_RULE_SETUP
-#line 108 "./src/lexico.l"
+#line 110 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return ENTRADA;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 110 "./src/lexico.l"
+#line 112 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return SAIDA;}                    
 	YY_BREAK
 /*   DELIMITADORES   */
 case 23:
 YY_RULE_SETUP
-#line 115 "./src/lexico.l"
+#line 117 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        ++escopo;
                         return ABRE_C;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 117 "./src/lexico.l"
+#line 120 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        --escopo;
                         return FECHA_C;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 119 "./src/lexico.l"
+#line 123 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return ABRE_P;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 121 "./src/lexico.l"
+#line 125 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return FECHA_P;}
 	YY_BREAK
 /*   IDENTIFICADORES   */
 case 27:
 YY_RULE_SETUP
-#line 126 "./src/lexico.l"
+#line 130 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return ID;}
 	YY_BREAK
 /*   ATRIBUICAO   */
 case 28:
 YY_RULE_SETUP
-#line 131 "./src/lexico.l"
+#line 135 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return ATRIB;}
 	YY_BREAK
 /*   VIRGULA   */
 case 29:
 YY_RULE_SETUP
-#line 136 "./src/lexico.l"
+#line 140 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return VIRG;}
 	YY_BREAK
 /*   PONTO E VIRGULA   */
 case 30:
 YY_RULE_SETUP
-#line 141 "./src/lexico.l"
+#line 145 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return PV;}
 	YY_BREAK
 /*   ESPACO EM BRANCO   */
 case 31:
 YY_RULE_SETUP
-#line 146 "./src/lexico.l"
+#line 150 "./src/lexico.l"
 num_coluna += yyleng;
 	YY_BREAK
 /*   NOVA LINHA   */
 case 32:
 /* rule 32 can match eol */
 YY_RULE_SETUP
-#line 150 "./src/lexico.l"
+#line 154 "./src/lexico.l"
 {++num_linha;  num_coluna = 1;}
 	YY_BREAK
 /*   COMENTARIO   */
 case 33:
 YY_RULE_SETUP
-#line 154 "./src/lexico.l"
+#line 158 "./src/lexico.l"
 {}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 155 "./src/lexico.l"
+#line 159 "./src/lexico.l"
 {erro_linha = num_linha;
                         erro_coluna = num_coluna;
                         BEGIN(COMENTARIO_MULT);}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 158 "./src/lexico.l"
+#line 162 "./src/lexico.l"
 {BEGIN(INITIAL);}
 	YY_BREAK
 case 36:
 /* rule 36 can match eol */
 YY_RULE_SETUP
-#line 159 "./src/lexico.l"
+#line 163 "./src/lexico.l"
 {++num_linha; num_coluna = 1;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 160 "./src/lexico.l"
+#line 164 "./src/lexico.l"
 {++num_coluna;}
 	YY_BREAK
 /*   ERROS   */
 case YY_STATE_EOF(COMENTARIO_MULT):
-#line 164 "./src/lexico.l"
+#line 168 "./src/lexico.l"
 {printf("ERRO lexico: comentario nao fechado\nLinha: %d\tColuna: %d\n\n", erro_linha, erro_coluna);
                             ++num_erros_lexicos;
                             yyterminate();}
@@ -1043,23 +1047,23 @@ case YY_STATE_EOF(COMENTARIO_MULT):
 case 38:
 /* rule 38 can match eol */
 YY_RULE_SETUP
-#line 167 "./src/lexico.l"
+#line 171 "./src/lexico.l"
 {printf("ERRO lexico: string nao fechada\nLinha: %d\tColuna: %d\n\n", num_linha, num_coluna);
                             ++num_erros_lexicos; ++num_linha; num_coluna = 1;
                             return PV;}                     // GAMBIARRA (MELHORAR MAIS TARDE)
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 170 "./src/lexico.l"
+#line 174 "./src/lexico.l"
 {printf("ERRO lexico elemento: %s\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
                             ++num_erros_lexicos; num_coluna += yyleng;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 173 "./src/lexico.l"
+#line 177 "./src/lexico.l"
 ECHO;
 	YY_BREAK
-#line 1063 "src/lex.yy.c"
+#line 1067 "src/lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2027,7 +2031,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 173 "./src/lexico.l"
+#line 177 "./src/lexico.l"
 
 
 int cria_token(char *lexem, int linha, int coluna) {

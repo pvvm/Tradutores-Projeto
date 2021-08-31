@@ -7,13 +7,14 @@ TODO:   VER A QUESTÃO DE APENAS OS ERROS MAIS EXTERNOS SEREM REPORTADOS     (RE
         RESOLVER O PROBLEMA DA STRING NÃO FECHADA                           (RESOLVIDO POR UMA GAMBIARRA NO FIM DO .l)
         RESOLVER O FREE DE MEMÓRIA EM EXEMPLOS COM ERRO
         AJUSTAR ÁRVORE SINTATICA
-        FAZER A TABELA DE SIMBOLOS
+        FAZER A TABELA DE SIMBOLOS                                          (CORRIGIR OS ESCOPOS)
 */
 
 %{
 #include <stdio.h>
 #include <string.h>
 #include "../lib/arvore.h"
+#include "../lib/lista.h"
 
 
 extern int yylex(void);
@@ -22,7 +23,9 @@ extern char * yytext;
 extern FILE *yyin;
 extern int num_erros_lexicos;
 int num_erros_sintaticos = 0;
+int escopo = 0;
 struct No * raiz;
+struct tabelaSimb* cabeca = NULL;
 
 void yyerror(char *);
 struct No* montaNo(char *, struct No*, struct No* , struct No* , struct No*);
@@ -83,9 +86,11 @@ program:        declarations                {raiz = montaNo("program", $1, NULL,
                                             if(num_erros_sintaticos == 0) {
                                                 printf("Sem erros sintaticos\n");
                                                 printaArvore(raiz, 0);
+                                                printaLista(cabeca);
                                             } else
                                                 printf("Foram encontrados %d erros sintaticos\n", num_erros_sintaticos);
-                                            desalocar(raiz);}
+                                            desalocar(raiz);
+                                            liberaLista(cabeca);}
                 | /* empty */
                 ;
 
@@ -99,7 +104,7 @@ declaration:    function                    {$$ = montaNo("declaration", $1, NUL
                 | error PV                    {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
                 ;
 
-function:       varDecl ABRE_P parameters FECHA_P ABRE_C moreStmt FECHA_C       {$$ = montaNo("function", $1, $3, $6, NULL);}
+function:       varDecl ABRE_P {escopo++;} parameters FECHA_P {escopo--;} ABRE_C moreStmt FECHA_C       {$$ = montaNo("function", $1, $4, $8, NULL);}
                 | error ABRE_P parameters FECHA_P ABRE_C moreStmt FECHA_C       {$$ = montaNo("function",$3, $6, NULL, NULL);}
                 | varDecl ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                {$$ = montaNo("function", $1, $5, NULL, NULL);}
                 | error ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                {$$ = montaNo("function", $5, NULL, NULL, NULL);}
@@ -152,8 +157,10 @@ io:             ENTRADA ABRE_P ID FECHA_P               {$$ = montaNo("in", NULL
                 ;
 
 
-varDecl:        TIPO ID                     {$$ = montaNo("varDecl", NULL, NULL, NULL, NULL);}
-                | TIPO LIST ID              {$$ = montaNo("varDecl", NULL, NULL, NULL, NULL);}
+varDecl:        TIPO ID                     {$$ = montaNo("varDecl", NULL, NULL, NULL, NULL);
+                                            push(&cabeca, $2.lexema, 0, $1.lexema, "", escopo, 0);}
+                | TIPO LIST ID              {$$ = montaNo("varDecl", NULL, NULL, NULL, NULL);
+                                            push(&cabeca, $3.lexema, 0, strcat($1.lexema, $2.lexema), "", escopo, 0);}
                 ;
 
 attribuition:   ID ATRIB expLogic            {$$ = montaNo("attribuition", $3, NULL, NULL, NULL);}
