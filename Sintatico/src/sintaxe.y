@@ -5,8 +5,8 @@
 TODO:   VER A QUESTÃO DE APENAS OS ERROS MAIS EXTERNOS SEREM REPORTADOS     (RESOLVIDO, SE DEUS QUISER)
         VOLTAR A VER A QUESTÃO DAS COLUNAS                                  (QUASE RESOLVIDO, VER QUE STRING NÃO FECHADA RETORNA UMA COLUNA ANTES DO QUE DEVERIA)
         RESOLVER O PROBLEMA DA STRING NÃO FECHADA                           (RESOLVIDO POR UMA GAMBIARRA NO FIM DO .l)
-        RESOLVER O FREE DE MEMÓRIA EM EXEMPLOS COM ERRO
-        AJUSTAR ÁRVORE SINTATICA
+        PARA AS FOLHAS DA ÁRVORE, CRIAR UM PONTEIRO QUE LIGA COM A TABELA
+        AJUSTAR ÁRVORE SINTATICA                                            (SÓ FALTA COLOCAR O ESCOPO NA ÁRVORE, DE ALGUMA FORMA)
         FAZER A TABELA DE SIMBOLOS                                          (FEITO)
 */
 
@@ -105,11 +105,11 @@ program:        declarations                            {raiz = montaNo("program
 
 declarations:   declarations declaration                {$$ = montaNo("declarations", $1, $2, NULL, NULL);}
                 //| error declaration                   {$$ = montaNo("oneLineStmt", $2, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
-                | declaration                           {$$ = montaNo("declarations", $1, NULL, NULL, NULL);}
+                | declaration                           {$$ = $1;}
                 ;
 
-declaration:    function                                {$$ = montaNo("declaration", $1, NULL, NULL, NULL);}
-                | varDecl PV                            {$$ = montaNo("declaration", $1, NULL, NULL, NULL);}
+declaration:    function                                {$$ = $1;}
+                | varDecl PV                            {$$ = $1;}
                 | error PV                              {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
                 ;
 
@@ -119,127 +119,138 @@ function:       funcDecl ABRE_P {pushEsc(&primeiro, escopo_max + 1);} parameters
                 | error ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                                          {$$ = montaNo("function", $5, NULL, NULL, NULL);}
                 ;
 
-funcDecl:       TIPO ID                                 {$$ = montaNo("funcDecl", NULL, NULL, NULL, NULL);
+funcDecl:       TIPO ID                                 {$$ = montaNo($1.lexema, NULL, NULL, NULL, NULL);
+                                                        $$->no1 = montaNo($2.lexema, NULL, NULL, NULL, NULL);
                                                         tmp = popEsc(&primeiro);
                                                         var_ja_decl += push(&cabeca, $2.lexema, "funcao", $1.lexema, "", tmp, $1.linha, $1.coluna);
                                                         pushEsc(&primeiro, tmp);}
-                | TIPO LIST ID                          {$$ = montaNo("funcDecl", NULL, NULL, NULL, NULL);
+                | TIPO LIST ID                          {$$ = montaNo(strcat($1.lexema, " list"), NULL, NULL, NULL, NULL);
+                                                        $$->no1 = montaNo($3.lexema, NULL, NULL, NULL, NULL);
                                                         tmp = popEsc(&primeiro);
-                                                        var_ja_decl += push(&cabeca, $3.lexema, "funcao", strcat($1.lexema, " list"), "", tmp, $1.linha, $1.coluna);
+                                                        var_ja_decl += push(&cabeca, $3.lexema, "funcao", $1.lexema, "", tmp, $1.linha, $1.coluna);
                                                         pushEsc(&primeiro, tmp);}
                 ;
 
 parameters:     parameters VIRG varDecl                 {$$ = montaNo("parameters", $1, $3, NULL, NULL);}
-                | varDecl                               {$$ = montaNo("parameters", $1, NULL, NULL, NULL);}
+                | varDecl                               {$$ = $1;}
                 ;
 
 moreStmt:       moreStmt stmt                           {$$ = montaNo("moreStmt", $1, $2, NULL, NULL);}
-                | stmt                                  {$$ = montaNo("moreStmt", $1, NULL, NULL, NULL);}
+                | stmt                                  {$$ = $1;}
                 ;
 
-stmt:           oneLineStmt                             {$$ = montaNo("stmt", $1, NULL, NULL, NULL);}
-                | multLineStmt                          {$$ = montaNo("stmt", $1, NULL, NULL, NULL);}
+stmt:           oneLineStmt                             {$$ = $1;}
+                | multLineStmt                          {$$ = $1;}
                 ;
 
-multLineStmt:   conditional                             {$$ = montaNo("multLineStmt", $1, NULL, NULL, NULL);}
-                | iteration                             {$$ = montaNo("multLineStmt", $1, NULL, NULL, NULL);}
+multLineStmt:   conditional                             {$$ = $1;}
+                | iteration                             {$$ = $1;}
                 ;
 
-conditional:    IF ABRE_P attribuition FECHA_P bracesStmt                       {$$ = montaNo("conditional", $3, $5, NULL, NULL);}
-                | IF ABRE_P attribuition FECHA_P bracesStmt ELSE bracesStmt     {$$ = montaNo("conditional", $3, $5, $7, NULL);}
+conditional:    IF ABRE_P attribuition FECHA_P bracesStmt                       {$$ = montaNo($1.lexema, $3, $5, NULL, NULL);}
+                | IF ABRE_P attribuition FECHA_P bracesStmt ELSE bracesStmt     {$$ = montaNo($1.lexema, $3, $5, $7, NULL);}
                 | IF ABRE_P error FECHA_P bracesStmt                            {$$ = montaNo("oneLineStmt", $5, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
                 ;
 
-bracesStmt:     ABRE_C moreStmt FECHA_C                 {$$ = montaNo("bracesStmt", $2, NULL, NULL, NULL);}
-                | oneLineStmt                           {$$ = montaNo("bracesStmt", $1, NULL, NULL, NULL);}
+bracesStmt:     ABRE_C moreStmt FECHA_C                 {$$ = $2;}
+                | oneLineStmt                           {$$ = $1;}
                 ;
 
-iteration:      FOR ABRE_P expIte PV expIte PV expIte FECHA_P bracesStmt        {$$ = montaNo("iteration", $3, $5, $7, $9);}
+iteration:      FOR ABRE_P expIte PV expIte PV expIte FECHA_P bracesStmt        {$$ = montaNo($1.lexema, $3, $5, $7, $9);}
                 ;
 
-expIte:         attribuition                            {$$ = montaNo("expIte", $1, NULL, NULL, NULL);}
+expIte:         attribuition                            {$$ = $1;}
                 | /* empty */                           {$$ = NULL;}
                 ;
 
-oneLineStmt:    varDecl PV                              {$$ = montaNo("oneLineStmt", $1, NULL, NULL, NULL);}
-                | attribuition PV                       {$$ = montaNo("oneLineStmt", $1, NULL, NULL, NULL);}
-                | io PV                                 {$$ = montaNo("oneLineStmt", $1, NULL, NULL, NULL);}
-                | ret PV                                {$$ = montaNo("oneLineStmt", $1, NULL, NULL, NULL);}
+oneLineStmt:    varDecl PV                              {$$ = $1;}
+                | attribuition PV                       {$$ = $1;}
+                | io PV                                 {$$ = $1;}
+                | ret PV                                {$$ = $1;}
                 | error                                 {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}     //COM ESSE DETECTA O ERRO DA LINHA 13 DE TEST
                 ;
 
-io:             ENTRADA ABRE_P ID FECHA_P               {$$ = montaNo("in", NULL, NULL, NULL, NULL);}
-                | SAIDA ABRE_P attribuition FECHA_P     {$$ = montaNo("out", $3, NULL, NULL, NULL);}
-                | SAIDA ABRE_P STRING FECHA_P           {$$ = montaNo("out", NULL, NULL, NULL, NULL);}
+io:             ENTRADA ABRE_P ID FECHA_P               {$$ = montaNo($1.lexema, NULL, NULL, NULL, NULL);
+                                                        $$->no1 = montaNo($3.lexema, NULL, NULL, NULL, NULL);}
+                | SAIDA ABRE_P attribuition FECHA_P     {$$ = montaNo($1.lexema, $3, NULL, NULL, NULL);}
+                | SAIDA ABRE_P STRING FECHA_P           {$$ = montaNo($1.lexema, NULL, NULL, NULL, NULL);
+                                                        $$->no1 = montaNo($3.lexema, NULL, NULL, NULL, NULL);}
                 | ENTRADA ABRE_P error FECHA_P          {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
                 | SAIDA ABRE_P error FECHA_P            {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
                 ;
 
 
-varDecl:        TIPO ID                                 {$$ = montaNo("varDecl", NULL, NULL, NULL, NULL);
+varDecl:        TIPO ID                                 {$$ = montaNo($1.lexema, NULL, NULL, NULL, NULL);
+                                                        $$->no1 = montaNo($2.lexema, NULL, NULL, NULL, NULL);
                                                         tmp = popEsc(&primeiro);
-                                                        var_ja_decl += push(&cabeca, $2.lexema, "variavel", $1.lexema, "", tmp, $1.linha, $1.coluna);
+                                                        char aux[50];
+                                                        strcpy(aux, $2.lexema);
+                                                        var_ja_decl += push(&cabeca, aux, "variavel", $1.lexema, "", tmp, $1.linha, $1.coluna);
                                                         pushEsc(&primeiro, tmp);}
-                | TIPO LIST ID                          {$$ = montaNo("varDecl", NULL, NULL, NULL, NULL);
+                | TIPO LIST ID                          {$$ = montaNo(strcat($1.lexema, " list"), NULL, NULL, NULL, NULL);
+                                                        $$->no1 = montaNo($3.lexema, NULL, NULL, NULL, NULL);
                                                         tmp = popEsc(&primeiro);
-                                                        var_ja_decl += push(&cabeca, $3.lexema, "variavel", strcat($1.lexema, " list"), "", tmp, $1.linha, $1.coluna);
+                                                        char aux[50];
+                                                        strcpy(aux, $3.lexema);
+                                                        var_ja_decl += push(&cabeca, aux, "variavel", $1.lexema, "", tmp, $1.linha, $1.coluna);
                                                         pushEsc(&primeiro, tmp);}
                 ;
 
-attribuition:   ID ATRIB expLogic                       {$$ = montaNo("attribuition", $3, NULL, NULL, NULL);}
-                | expLogic                              {$$ = montaNo("attribuition", $1, NULL, NULL, NULL);}
+attribuition:   ID ATRIB expLogic                       {$$ = montaNo($2.lexema, NULL, $3, NULL, NULL);
+                                                        $$->no1 = montaNo($1.lexema, NULL, NULL, NULL, NULL);}
+                | expLogic                              {$$ = $1;}
                 ;
 
-expLogic:       expLogic LOG_OP_OU andLogic             {$$ = montaNo("expLogic", $1, $3, NULL, NULL);}
-                | andLogic                              {$$ = montaNo("expLogic", $1, NULL, NULL, NULL);}
+expLogic:       expLogic LOG_OP_OU andLogic             {$$ = montaNo($2.lexema, $1, $3, NULL, NULL);}
+                | andLogic                              {$$ = $1;}
                 ;
 
-andLogic:       andLogic LOG_OP_E expComp               {$$ = montaNo("andLogic", $1, $3, NULL, NULL);}
-                | expComp                               {$$ = montaNo("andLogic", $1, NULL, NULL, NULL);}
+andLogic:       andLogic LOG_OP_E expComp               {$$ = montaNo($2.lexema, $1, $3, NULL, NULL);}
+                | expComp                               {$$ = $1;}
                 ;
 
-expComp:        expComp REL_OP_BAIXA expRel             {$$ = montaNo("expComp", $1, $3, NULL, NULL);}
-                | expRel                                {$$ = montaNo("expComp", $1, NULL, NULL, NULL);}
+expComp:        expComp REL_OP_BAIXA expRel             {$$ = montaNo($2.lexema, $1, $3, NULL, NULL);}
+                | expRel                                {$$ = $1;}
                 ;
 
-expRel:         expRel REL_OP_ALTA expArit              {$$ = montaNo("expRel", $1, $3, NULL, NULL);}
-                | expArit                               {$$ = montaNo("expRel", $1, NULL, NULL, NULL);}
+expRel:         expRel REL_OP_ALTA expArit              {$$ = montaNo($2.lexema, $1, $3, NULL, NULL);}
+                | expArit                               {$$ = $1;}
                 ;
 
-expArit:        expArit ARIT_OP_MAIS expMul             {$$ = montaNo("expArit", $1, $3, NULL, NULL);}
-                | expArit ARIT_OP_MENOS expMul          {$$ = montaNo("expArit", $1, $3, NULL, NULL);}
-                | expMul                                {$$ = montaNo("expArit", $1, NULL, NULL, NULL);}
+expArit:        expArit ARIT_OP_MAIS expMul             {$$ = montaNo($2.lexema, $1, $3, NULL, NULL);}
+                | expArit ARIT_OP_MENOS expMul          {$$ = montaNo($2.lexema, $1, $3, NULL, NULL);}
+                | expMul                                {$$ = $1;}
                 ;
 
-expMul:         expMul ARIT_OP_ALTA negElement          {$$ = montaNo("expMul", $1, $3, NULL, NULL);}
-                | negElement                            {$$ = montaNo("expMul", $1, NULL, NULL, NULL);}
+expMul:         expMul ARIT_OP_ALTA negElement          {$$ = montaNo($2.lexema, $1, $3, NULL, NULL);}
+                | negElement                            {$$ = $1;}
                 ;
 
-negElement:     LOG_OP_UN expList                       {$$ = montaNo("negElement", $2, NULL, NULL, NULL);}
-                | ARIT_OP_MENOS expList                 {$$ = montaNo("negElement", $2, NULL, NULL, NULL);}
-                | expList                               {$$ = montaNo("negElement", $1, NULL, NULL, NULL);}
+negElement:     LOG_OP_UN expList                       {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL);}
+                | ARIT_OP_MENOS expList                 {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL);}
+                | expList                               {$$ = $1;}
                 ;
 
-expList:        LIST_OP_UN element                      {$$ = montaNo("expList", $2, NULL, NULL, NULL);}
-                | expList LIST_OP_BIN element           {$$ = montaNo("expList", $1, $3, NULL, NULL);}
-                | element                               {$$ = montaNo("expList", $1, NULL, NULL, NULL);}
+expList:        LIST_OP_UN element                      {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL);}
+                | expList LIST_OP_BIN element           {$$ = montaNo($2.lexema, $1, $3, NULL, NULL);}
+                | element                               {$$ = $1;}
                 ;
 
-element:        ID                                      {$$ = montaNo("element", NULL, NULL, NULL, NULL);}
-                | ABRE_P attribuition FECHA_P           {$$ = montaNo("element", $2, NULL, NULL, NULL);}
-                | ID ABRE_P arguments FECHA_P           {$$ = montaNo("element", $3, NULL, NULL, NULL);}
-                | ID ABRE_P FECHA_P                     {$$ = montaNo("element", NULL, NULL, NULL, NULL);}
-                | CONST_INT                             {$$ = montaNo("element", NULL, NULL, NULL, NULL);}
-                | CONST_FLOAT                           {$$ = montaNo("element", NULL, NULL, NULL, NULL);}
-                | NIL                                   {$$ = montaNo("element", NULL, NULL, NULL, NULL);}
+element:        ID                                      {$$ = montaNo($1.lexema, NULL, NULL, NULL, NULL);}
+                | ABRE_P attribuition FECHA_P           {$$ = $2;}
+                | ID ABRE_P arguments FECHA_P           {/*printf("Funcao: ");*/ $$ = montaNo($1.lexema, $3, NULL, NULL, NULL);}
+                | ID ABRE_P FECHA_P                     {/*printf("Funcao: ");*/ $$ = montaNo($1.lexema, NULL, NULL, NULL, NULL);}
+                | CONST_INT                             {$$ = montaNo($1.lexema, NULL, NULL, NULL, NULL);}
+                | CONST_FLOAT                           {$$ = montaNo($1.lexema, NULL, NULL, NULL, NULL);}
+                | NIL                                   {$$ = montaNo("NIL", NULL, NULL, NULL, NULL);}
                 //| error                                 {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/} COM ESSE NAO DETECTA
                 ;
 
 arguments:      arguments VIRG attribuition             {$$ = montaNo("arguments", $1, $3, NULL, NULL);}
-                | attribuition                          {$$ = montaNo("arguments", $1, NULL, NULL, NULL);}
+                | attribuition                          {$$ = $1;}
                 ;
 
-ret:            RETURN attribuition                     {$$ = montaNo("ret", $2, NULL, NULL, NULL);}
+ret:            RETURN attribuition                     {$$ = montaNo("return", $2, NULL, NULL, NULL);}
                 ;
 
 %%

@@ -29,7 +29,7 @@ int printaArvore(struct No* no, int profund) {
     if(no == NULL)
         return --profund;
     for(int i = 0; i < profund; i++)
-        printf("  ");
+        printf("    ");
     printf("| %s\n", no->nome);
 
     profund = printaArvore(no->no1, ++profund);
