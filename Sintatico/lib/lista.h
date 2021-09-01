@@ -7,18 +7,19 @@
 
 typedef struct tabelaSimb {
     char simbolo[50];           // Simbolo que representa
-    int varOuFunc;              // 0 == var e 1 == func
+    char varOuFunc[15];              // 0 == var e 1 == func
     char tipo[15];              // Tipo
     char valor[50];             // Valor armazenado (se tiver)
     int escopo;                 // Escopo ao qual pertence
-    int escopoPai;              // Escopo pai do seu escopo
+    int linha;                  // Linha onde foi declarado
+    int coluna;                 // Coluna onde foi declarado
 
     struct tabelaSimb *prox;
 } tab;
 
 int procuraLista(struct tabelaSimb**, char *, int);
 
-void push(struct tabelaSimb**, char *, int, char *, char *, int, int);
+void push(struct tabelaSimb**, char *, char *, char *, char *, int, int, int);
 
 void printaLista(struct tabelaSimb *);
 

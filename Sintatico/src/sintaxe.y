@@ -1,5 +1,5 @@
 %define parse.trace
-%define lr.type canonical-lr
+%define lr.type canonical-lr;
 
 /*
 TODO:   VER A QUESTÃO DE APENAS OS ERROS MAIS EXTERNOS SEREM REPORTADOS     (RESOLVIDO, SE DEUS QUISER)
@@ -24,6 +24,7 @@ extern FILE *yyin;
 extern int num_erros_lexicos;
 int num_erros_sintaticos = 0;
 int escopo = 0;
+int varOuFunc = 0;
 struct No * raiz;
 struct tabelaSimb* cabeca = NULL;
 
@@ -69,7 +70,7 @@ struct No* montaNo(char *, struct No*, struct No* , struct No* , struct No*);
 %token <tok> ABRE_P FECHA_P ABRE_C FECHA_C
 %left ABRE_P FECHA_P
 
-%type <no> declarations declaration function parameters moreStmt stmt multLineStmt
+%type <no> declarations declaration function funcDecl parameters moreStmt stmt multLineStmt
 %type <no> conditional bracesStmt iteration expIte oneLineStmt io varDecl
 %type <no> attribuition expList expLogic andLogic expComp expRel expArit expMul
 %type <no> negElement element arguments ret
@@ -84,9 +85,12 @@ program:        declarations                {raiz = montaNo("program", $1, NULL,
                                             else
                                                 printf("Foram encontrados %d erros lexicos\n", num_erros_lexicos);
                                             if(num_erros_sintaticos == 0) {
-                                                printf("Sem erros sintaticos\n");
+                                                printf("Sem erros sintaticos\n\n");
+                                                printf("================================== ARVORE SINTATICA ABSTRADA =================================\n\n");
                                                 printaArvore(raiz, 0);
+                                                printf("\n\n====================================== TABELA DE SIMBOLOS =====================================\n\n");
                                                 printaLista(cabeca);
+                                                printf("\n\n");
                                             } else
                                                 printf("Foram encontrados %d erros sintaticos\n", num_erros_sintaticos);
                                             desalocar(raiz);
@@ -104,10 +108,16 @@ declaration:    function                    {$$ = montaNo("declaration", $1, NUL
                 | error PV                    {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
                 ;
 
-function:       varDecl ABRE_P {escopo++;} parameters FECHA_P {escopo--;} ABRE_C moreStmt FECHA_C       {$$ = montaNo("function", $1, $4, $8, NULL);}
-                | error ABRE_P parameters FECHA_P ABRE_C moreStmt FECHA_C       {$$ = montaNo("function",$3, $6, NULL, NULL);}
-                | varDecl ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                {$$ = montaNo("function", $1, $5, NULL, NULL);}
-                | error ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                {$$ = montaNo("function", $5, NULL, NULL, NULL);}
+function:       funcDecl ABRE_P {escopo++;} parameters FECHA_P {escopo--;} ABRE_C moreStmt FECHA_C       {$$ = montaNo("function", $1, $4, $8, NULL);}
+                | error ABRE_P parameters FECHA_P ABRE_C moreStmt FECHA_C                               {$$ = montaNo("function",$3, $6, NULL, NULL);}
+                | funcDecl ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                                        {$$ = montaNo("function", $1, $5, NULL, NULL);}
+                | error ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                                          {$$ = montaNo("function", $5, NULL, NULL, NULL);}
+                ;
+
+funcDecl:       TIPO ID                     {$$ = montaNo("varDecl", NULL, NULL, NULL, NULL);
+                                            push(&cabeca, $2.lexema, "funcao", $1.lexema, "", escopo, $1.linha, $1.coluna);}
+                | TIPO LIST ID              {$$ = montaNo("varDecl", NULL, NULL, NULL, NULL);
+                                            push(&cabeca, $3.lexema, "funcao", strcat($1.lexema, " list"), "", escopo, $1.linha, $1.coluna);}
                 ;
 
 parameters:     parameters VIRG varDecl     {$$ = montaNo("parameters", $1, $3, NULL, NULL);}
@@ -128,7 +138,7 @@ multLineStmt:   conditional                 {$$ = montaNo("multLineStmt", $1, NU
 
 conditional:    IF ABRE_P attribuition FECHA_P bracesStmt                       {$$ = montaNo("conditional", $3, $5, NULL, NULL);}
                 | IF ABRE_P attribuition FECHA_P bracesStmt ELSE bracesStmt     {$$ = montaNo("conditional", $3, $5, $7, NULL);}
-                | IF ABRE_P error FECHA_P bracesStmt                 {$$ = montaNo("oneLineStmt", $5, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
+                | IF ABRE_P error FECHA_P bracesStmt                            {$$ = montaNo("oneLineStmt", $5, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
                 ;
 
 bracesStmt:     ABRE_C moreStmt FECHA_C     {$$ = montaNo("bracesStmt", $2, NULL, NULL, NULL);}
@@ -146,21 +156,21 @@ oneLineStmt:    varDecl PV                  {$$ = montaNo("oneLineStmt", $1, NUL
                 | attribuition PV           {$$ = montaNo("oneLineStmt", $1, NULL, NULL, NULL);}
                 | io PV                     {$$ = montaNo("oneLineStmt", $1, NULL, NULL, NULL);}
                 | ret PV                    {$$ = montaNo("oneLineStmt", $1, NULL, NULL, NULL);}
-                | error                   {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}     //COM ESSE DETECTA O ERRO DA LINHA 13 DE TEST
+                | error                     {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}     //COM ESSE DETECTA O ERRO DA LINHA 13 DE TEST
                 ;
 
 io:             ENTRADA ABRE_P ID FECHA_P               {$$ = montaNo("in", NULL, NULL, NULL, NULL);}
                 | SAIDA ABRE_P attribuition FECHA_P     {$$ = montaNo("out", $3, NULL, NULL, NULL);}
                 | SAIDA ABRE_P STRING FECHA_P           {$$ = montaNo("out", NULL, NULL, NULL, NULL);}
-                | ENTRADA ABRE_P error FECHA_P                 {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
-                | SAIDA ABRE_P error FECHA_P                 {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
+                | ENTRADA ABRE_P error FECHA_P          {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
+                | SAIDA ABRE_P error FECHA_P            {$$ = montaNo("oneLineStmt", NULL, NULL, NULL, NULL);/*yyerrok; yyclearin;*/}
                 ;
 
 
 varDecl:        TIPO ID                     {$$ = montaNo("varDecl", NULL, NULL, NULL, NULL);
-                                            push(&cabeca, $2.lexema, 0, $1.lexema, "", escopo, 0);}
+                                            push(&cabeca, $2.lexema, "variavel", $1.lexema, "", escopo, $1.linha, $1.coluna);}
                 | TIPO LIST ID              {$$ = montaNo("varDecl", NULL, NULL, NULL, NULL);
-                                            push(&cabeca, $3.lexema, 0, strcat($1.lexema, $2.lexema), "", escopo, 0);}
+                                            push(&cabeca, $3.lexema, "variavel", strcat($1.lexema, " list"), "", escopo, $1.linha, $1.coluna);}
                 ;
 
 attribuition:   ID ATRIB expLogic            {$$ = montaNo("attribuition", $3, NULL, NULL, NULL);}
