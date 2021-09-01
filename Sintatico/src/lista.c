@@ -8,7 +8,7 @@ int procuraLista(struct tabelaSimb** prim, char *simbolo, int escopo) {
     return procuraLista(&(*prim)->prox, simbolo, escopo);
 }
 
-void push(struct tabelaSimb** ult, char *simbolo, char *varOuFunc, char *tipo, char *valor, int escopo, int linha, int coluna) {
+int push(struct tabelaSimb** ult, char *simbolo, char *varOuFunc, char *tipo, char *valor, int escopo, int linha, int coluna) {
     struct tabelaSimb **aux = ult;
     if(procuraLista(aux, simbolo, escopo)) {
         struct tabelaSimb *aux2 = *ult;
@@ -32,8 +32,11 @@ void push(struct tabelaSimb** ult, char *simbolo, char *varOuFunc, char *tipo, c
 
             aux2->prox = novo;
         }
-    } else
-        printf("Simbolo ja declarado na tabela nesse escopo\n");
+        return 0;
+    } else {
+        printf("Erro: simbolo ja declarado nesse escopo\nLinha:%d\nColuna:%d\n\n", linha, coluna);
+        return 1;
+    }
 }
 
 void printaLista(struct tabelaSimb *prim) {
@@ -51,4 +54,66 @@ int liberaLista(struct tabelaSimb *prim) {
     struct tabelaSimb * aux = prim->prox;
     free(prim);
     return liberaLista(aux);
+}
+
+// Operacoes da lista para o escopo
+
+void pushEsc(struct listaEscopo** prim, int escopo_atual) {
+    struct listaEscopo *aux = *prim;
+    struct listaEscopo* novo = (struct listaEscopo*) malloc (sizeof(struct listaEscopo));
+
+    novo->escopo = escopo_atual;
+    novo->prox = NULL;
+
+    if(*prim == NULL) {
+        *prim = novo;
+    } else {
+        while(aux->prox != NULL) {
+            if(aux->escopo == escopo_atual){
+                free(novo);
+                //printf("Escopo ja existente");
+                return;
+            }
+            aux = aux->prox;
+        }
+        aux->prox = novo;
+    }
+}
+
+int popEsc(struct listaEscopo** ult) {
+    if((*ult) == NULL)
+        return 0;
+    else if((*ult)->prox == NULL) {
+        int escopo = (*ult)->escopo;
+        free(*ult);
+        *ult = NULL;
+        return escopo;
+    }
+
+    struct listaEscopo *aux = *ult;
+
+    while(aux->prox->prox != NULL) {
+        aux = aux->prox;
+    }
+    int escopo = aux->prox->escopo;
+    free(aux->prox);
+    aux->prox = NULL;
+    return escopo;
+}
+
+int liberaEsc(struct listaEscopo *prim) {
+    if(prim == NULL) {
+        return 1;
+    }
+    struct listaEscopo * aux = prim->prox;
+    free(prim);
+    return liberaEsc(aux);
+}
+
+void printaEsc(struct listaEscopo *prim) {
+    while(prim != NULL) {
+        printf("%d\n", prim->escopo);
+        prim = prim->prox;
+    }
+    printf("\n");
 }

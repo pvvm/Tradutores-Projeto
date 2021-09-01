@@ -17,12 +17,29 @@ typedef struct tabelaSimb {
     struct tabelaSimb *prox;
 } tab;
 
+typedef struct listaEscopo {
+    int escopo;
+    struct listaEscopo *prox;
+} esc;
+
+
+// Operacoes da tabela de simbolos
+
 int procuraLista(struct tabelaSimb**, char *, int);
 
-void push(struct tabelaSimb**, char *, char *, char *, char *, int, int, int);
+int push(struct tabelaSimb**, char *, char *, char *, char *, int, int, int);
 
 void printaLista(struct tabelaSimb *);
 
 int liberaLista(struct tabelaSimb *);
+
+// Operacoes da lista para o escopo
+void pushEsc(struct listaEscopo**, int);
+
+int popEsc(struct listaEscopo**);
+
+int liberaEsc(struct listaEscopo *);
+
+void printaEsc(struct listaEscopo *);
 
 #endif

@@ -10,7 +10,9 @@ int num_coluna = 1;
 int erro_linha;
 int erro_coluna;
 int num_erros_lexicos = 0;
-int extern escopo;
+extern int escopo_max;
+extern int escopo_atual;
+extern struct listaEscopo* primeiro;
 
 int cria_token(char *, int, int);
 %}
@@ -114,10 +116,11 @@ IDENTIFICADOR   [a-zA-Z_][_a-zA-Z0-9]*
 
     /*   DELIMITADORES   */
 "{"                     {num_coluna = cria_token(yytext, num_linha, num_coluna);
-                        ++escopo;
+                        ++escopo_max;
+                        pushEsc(&primeiro, escopo_max);
                         return ABRE_C;}
 "}"                     {num_coluna = cria_token(yytext, num_linha, num_coluna);
-                        --escopo;
+                        escopo_atual = popEsc(&primeiro);
                         return FECHA_C;}
 "("                     {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return ABRE_P;}
