@@ -1,4 +1,4 @@
-floatus menor_numero(float list lista, int num) {
+floatam menor_numero(float list lista, int num) {
     int i;
     float numero = 9999.9.9;
     for(i = 0; i < num; i = i + 1) {
@@ -10,8 +10,8 @@ floatus menor_numero(float list lista, int num) {
     return numero;
 }
 
-inta main() {
-    writeln(Digite um numero inteiro positivo: ");
+int main() {
+    writeln("Digite um numero inteiro positivo: ");
     int num;
     read(num);
     if(num >>> 0) {
@@ -22,14 +22,14 @@ inta main() {
         float numero;
         float list lista;
 
-        for(i = 0\ i < num\ i = i + 1) {
+        for(i = 0) {
             read(numero);
             lista = numero : lista;
         }
 
-        write("O menor numero eh: );
+        write("O menor numero eh: ");
         writeln(menor_numero(lista, num));
         
     }
-    .return 0;
+    return 0;
 }
