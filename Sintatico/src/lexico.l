@@ -36,7 +36,7 @@ ARIT_OP_MAIS    [\+]
 ARIT_OP_MENOS   [\-]
 LOG_OP_OU       (\|\|)
 LOG_OP_E        (&&)
-LOG_OP_UN       (!)
+LOG_OP_NEG      (!)
 REL_OP_ALTA     (<=?|>=?)
 REL_OP_BAIXA    (==|!=)
 LIST_OP_BIN     (\:|\>\>|\<\<)
@@ -78,8 +78,8 @@ IDENTIFICADOR   [a-zA-Z_][_a-zA-Z0-9]*
                         return LOG_OP_OU;}
 {LOG_OP_E}              {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return LOG_OP_E;}
-{LOG_OP_UN}             {num_coluna = cria_token(yytext, num_linha, num_coluna);
-                        return LOG_OP_UN;}
+{LOG_OP_NEG}            {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return LOG_OP_NEG;}
 
 
     /*   OPERACOES RELACIONAIS COM PRIORIDADES DIFERENTES   */
@@ -172,7 +172,7 @@ IDENTIFICADOR   [a-zA-Z_][_a-zA-Z0-9]*
                             yyterminate();}
 \"[^"\n]*\n                 {printf("ERRO lexico: string nao fechada\nLinha: %d\tColuna: %d\n\n", num_linha, num_coluna);
                             ++num_erros_lexicos; ++num_linha; num_coluna = 1;
-                            return PV;}                     // GAMBIARRA (MELHORAR MAIS TARDE)
+                            return PV;}                     
 .                           {printf("ERRO lexico elemento: %s\nLinha: %d\tColuna: %d\n\n", yytext, num_linha, num_coluna);
                             ++num_erros_lexicos; num_coluna += yyleng;}
 

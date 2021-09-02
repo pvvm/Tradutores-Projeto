@@ -10,6 +10,7 @@ typedef struct tabelaSimb {
     char varOuFunc[15];              // 0 == var e 1 == func
     char tipo[15];              // Tipo
     char valor[50];             // Valor armazenado (se tiver)
+    int numArgs;
     int escopo;                 // Escopo ao qual pertence
     int linha;                  // Linha onde foi declarado
     int coluna;                 // Coluna onde foi declarado
@@ -30,6 +31,8 @@ int procuraLista(struct tabelaSimb**, char *, int);
 int push(struct tabelaSimb**, char *, char *, char *, char *, int, int, int);
 
 void printaLista(struct tabelaSimb *);
+
+void insereArg(struct tabelaSimb **, char *, int, int);
 
 int liberaLista(struct tabelaSimb *);
 

@@ -10,7 +10,6 @@ typedef struct No {
     struct No* no1;
     struct No* no2;
     struct No* no3;
-    struct No* no4;
 }no;
 
 struct No* novoNo(char *);

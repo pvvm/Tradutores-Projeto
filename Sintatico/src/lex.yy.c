@@ -876,7 +876,7 @@ case 12:
 YY_RULE_SETUP
 #line 82 "./src/lexico.l"
 {num_coluna = cria_token(yytext, num_linha, num_coluna);
-                        return LOG_OP_UN;}
+                        return LOG_OP_NEG;}
 	YY_BREAK
 /*   OPERACOES RELACIONAIS COM PRIORIDADES DIFERENTES   */
 case 13:
@@ -1053,7 +1053,7 @@ YY_RULE_SETUP
 #line 174 "./src/lexico.l"
 {printf("ERRO lexico: string nao fechada\nLinha: %d\tColuna: %d\n\n", num_linha, num_coluna);
                             ++num_erros_lexicos; ++num_linha; num_coluna = 1;
-                            return PV;}                     // GAMBIARRA (MELHORAR MAIS TARDE)
+                            return PV;}                     
 	YY_BREAK
 case 39:
 YY_RULE_SETUP

@@ -45,7 +45,7 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 39 "./src/sintaxe.y"
+#line 34 "./src/sintaxe.y"
 
     struct token {
         char lexema[50];
@@ -84,7 +84,7 @@ extern int yydebug;
     ARIT_OP_MAIS = 275,            /* ARIT_OP_MAIS  */
     ARIT_OP_MENOS = 276,           /* ARIT_OP_MENOS  */
     ARIT_OP_ALTA = 277,            /* ARIT_OP_ALTA  */
-    LOG_OP_UN = 278,               /* LOG_OP_UN  */
+    LOG_OP_NEG = 278,              /* LOG_OP_NEG  */
     CONST_INT = 279,               /* CONST_INT  */
     CONST_FLOAT = 280,             /* CONST_FLOAT  */
     STRING = 281,                  /* STRING  */
@@ -102,10 +102,10 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 47 "./src/sintaxe.y"
+#line 42 "./src/sintaxe.y"
 
     struct token tok;
-    struct No* no;
+    struct No* no;              // Estrutura do no
 
 #line 111 "./src/sintaxe.tab.h"
 

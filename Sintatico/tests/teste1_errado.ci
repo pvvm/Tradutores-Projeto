@@ -2,7 +2,7 @@ float calcula_imc(float list valores) {
     float peso;
     float altura;
     altura = ?valores;
-    valores = %valores;
+    valores = %valores
     peso = ?valores;
 
     return(peso / (altura * altura));
@@ -10,7 +10,7 @@ float calcula_imc(float list valores) {
 }
 
 int classifica_imc(float imc) {
-    if (0 < imc & && imc < 25) {
+    if (0 < imc && imc < 25) {
         writeln("De magro ate peso normal");
     } else {
         writeln/*aqui*/("Com sobrepeso ou com obesidade");
@@ -18,22 +18,22 @@ int classifica_imc(float imc) {
 }
 
 int main() {
-    float list valores;
+    floatang list valores;
     valores = NIL;
     float valor1;
 
-    writeln("Digite o seu peso em quilos: );
+    writeln("Digite o seu peso em quilos: ");
     read(valor1);
-    valores = valor1 : valores;
+    valores = valor1 : valores = 20;
 
     float valor2;
     writeln("Digite a sua altura em metros: ");
     read(valor2);
-    valores = valor2 : valores;
+    valores = 2101 = valor2 : valores;
 
     float imc;
     imc = calcula_imc(valores);
-    classifica_imc(imc);/* comentario sem fim
+    classifica_imc(imc);
 
     return 0;
 }
