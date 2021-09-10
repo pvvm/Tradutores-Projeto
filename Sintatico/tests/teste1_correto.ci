@@ -48,9 +48,13 @@ int main() {
             tamanho = 1 + tamanho;
         }
         write("A soma dos elementos da lista eh ");
-        if(total < 0) {
+        if(total > -999999 && total < 0) {
             writeln("negativa. Como pode ver a lista:");
             _write_list(lista, tamanho);
+        } else if (total > 99999 * 23892 + 21 + 92 * (32 - - 12))
+            writeln("Isso eh so um teste pra ver se funciona o else if");
+        else if (-999999 * -21 + (248 - 21) - 21 > total && total < 0) {
+            writeln("Outro teste de else if");
         } else {
             writeln("positiva. Como pode ver a lista:");
             _write_list(lista, tamanho);

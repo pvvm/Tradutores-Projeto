@@ -9,7 +9,7 @@ Make 4.3
 Kernel 5.11.0-25-generic
 
 Para compilar o tradutor, basta estar no diretório
-do projeto (17_0043665) e executar o comando:
+do projeto (17_0043665) e executar o seguinte comando:
 make
 
 Para executar o tradutor utilize o comando:
