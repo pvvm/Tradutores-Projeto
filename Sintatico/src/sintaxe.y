@@ -19,7 +19,6 @@ int var_ja_decl = 0;
 int escopo_max = 0;
 int escopo_atual = 0;
 int esc_aux;
-int tmp;
 int num_args = 0;
 char aux[50];
 struct No * raiz;
@@ -123,17 +122,13 @@ function:       funcDecl ABRE_P {pushEsc(&primeiro, escopo_max + 1);} parameters
 
 funcDecl:       TIPO ID                                 {$$ = NULL;
                                                         strcpy(aux, $2.lexema);
-                                                        tmp = popEsc(&primeiro);
                                                         // Inclui o termo na tabela de simbolos
-                                                        var_ja_decl += push(&cabeca, $2.lexema, "funcao", $1.lexema, "", tmp, $1.linha, $1.coluna);
-                                                        pushEsc(&primeiro, tmp);}
+                                                        var_ja_decl += push(&cabeca, $2.lexema, "funcao", $1.lexema, "", retUlt(&primeiro), $1.linha, $1.coluna);}
 
                 | TIPO LIST ID                          {$$ = NULL;
                                                         strcpy(aux, $3.lexema);
-                                                        tmp = popEsc(&primeiro);
                                                         // Inclui o termo na tabela de simbolos
-                                                        var_ja_decl += push(&cabeca, $3.lexema, "funcao", strcat($1.lexema, " list"), "", tmp, $1.linha, $1.coluna);
-                                                        pushEsc(&primeiro, tmp);}
+                                                        var_ja_decl += push(&cabeca, $3.lexema, "funcao", strcat($1.lexema, " list"), "", retUlt(&primeiro), $1.linha, $1.coluna);}
                 ;
 
 parameters:     parameters VIRG varDecl                 {$$ = $1; num_args++;}
@@ -190,30 +185,24 @@ io:             ENTRADA ABRE_P ID FECHA_P               {$$ = montaNo($1.lexema,
                 | SAIDA ABRE_P attribuition FECHA_P     {$$ = montaNo($1.lexema, $3, NULL, NULL, NULL, retUlt(&primeiro));}
                 | SAIDA ABRE_P STRING FECHA_P           {$$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro));
                                                         $$->no1 = montaNo($3.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro));
-                                                        tmp = popEsc(&primeiro);
                                                         // Inclui o termo na tabela de simbolos
-                                                        var_ja_decl += push(&cabeca, $3.lexema, "constante", "string", "", tmp, $3.linha, $3.coluna);
-                                                        pushEsc(&primeiro, tmp);}
+                                                        var_ja_decl += push(&cabeca, $3.lexema, "constante", "string", "", retUlt(&primeiro), $3.linha, $3.coluna);}
                 | ENTRADA ABRE_P error FECHA_P          {}
                 | SAIDA ABRE_P error FECHA_P            {}
                 ;
 
 
 varDecl:        TIPO ID                                 {$$ = NULL;
-                                                        tmp = popEsc(&primeiro);
                                                         char aux[50];
                                                         strcpy(aux, $2.lexema);
                                                         // Inclui o termo na tabela de simbolos
-                                                        var_ja_decl += push(&cabeca, aux, "variavel", $1.lexema, "", tmp, $1.linha, $1.coluna);
-                                                        pushEsc(&primeiro, tmp);}
+                                                        var_ja_decl += push(&cabeca, aux, "variavel", $1.lexema, "", retUlt(&primeiro), $1.linha, $1.coluna);}
 
                 | TIPO LIST ID                          {$$ = NULL;
-                                                        tmp = popEsc(&primeiro);
                                                         char aux[50];
                                                         strcpy(aux, $3.lexema);
                                                         // Inclui o termo na tabela de simbolos
-                                                        var_ja_decl += push(&cabeca, aux, "variavel", strcat($1.lexema, " list"), "", tmp, $1.linha, $1.coluna);
-                                                        pushEsc(&primeiro, tmp);}
+                                                        var_ja_decl += push(&cabeca, aux, "variavel", strcat($1.lexema, " list"), "", retUlt(&primeiro), $1.linha, $1.coluna);}
                 ;
 
 attribuition:   ID ATRIB expLogic                       {$$ = montaNo($2.lexema, NULL, $3, NULL, NULL, retUlt(&primeiro));
