@@ -1,5 +1,7 @@
 #include "../lib/lista.h"
 
+struct tabelaSimb* aux_ts =  NULL;
+
 /*
     Funcao que procura se a lista ja contem uma declaracao do mesmo simbolo no mesmo escopo
     Argumentos: o elemento atual da lista e o simbolo e escopo do novo elemento a ser adicionado
@@ -76,6 +78,20 @@ void insereArg(struct tabelaSimb **prim, char *simb, int escopo, int numArgs) {
         }
         aux = aux->prox;
     }
+}
+
+struct tabelaSimb* retSimb(struct tabelaSimb ** prim, char *simbolo, struct listaEscopo ** cabecaEsc){
+    if((*prim) == NULL) {
+        struct tabelaSimb* aux = aux_ts;
+        aux_ts = NULL;
+        //printf("Erro: %s nao foi declarado na tabela de simbolos\n\n", simbolo);
+        return aux;
+    }
+    if(!(strcmp(simbolo, (*prim)->simbolo)) && buscaEscopo(cabecaEsc, (*prim)->escopo)) {
+        aux_ts = *prim;
+    }
+
+    return retSimb(&(*prim)->prox, simbolo, cabecaEsc);
 }
 
 /*
@@ -185,4 +201,23 @@ int retUlt(struct listaEscopo** ult) {
         aux = aux->prox;
     }
     return aux->prox->escopo;
+}
+
+int buscaEscopo(struct listaEscopo** elemento, int escopo) {
+    if((*elemento) == NULL)
+        return 0;
+    else if((*elemento)->prox == NULL && escopo == (*elemento)->escopo) {
+        return 1;
+    }
+    
+    struct listaEscopo *aux = *elemento;
+
+    while(aux->prox->prox != NULL) {
+        if(aux->escopo == escopo)
+            return 1;
+        aux = aux->prox;
+    }
+    if(aux->prox->escopo == escopo || aux->escopo == escopo)
+            return 1;
+    return 0;
 }

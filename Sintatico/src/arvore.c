@@ -16,6 +16,7 @@ struct No* novoNo(char *nome) {
     no->no2 = NULL;
     no->no3 = NULL;
     no->lista = NULL;
+    no->simbolo = NULL;
 
     return no;
 }
@@ -63,6 +64,9 @@ int printaArvore(struct No* no) {
 
     for(int i = 0; i < profund; i++)
         printf("    ");
+    /*if(no->simbolo != NULL)
+        printf("%s escopo %d ", no->simbolo->simbolo, no->simbolo->escopo);*/
+    
     printf("| %s\n", no->nome);
 
     ++profund;
@@ -86,13 +90,14 @@ int printaArvore(struct No* no) {
     Funcao que auxilia na criacao de um novo no
     Argumentos: o nome do no e os filhos
 */
-struct No* montaNo(char *nome, struct No *no_1, struct No *no_2, struct No *no_3, struct listaNo *lista, int escopo) {
+struct No* montaNo(char *nome, struct No *no_1, struct No *no_2, struct No *no_3, struct listaNo *lista, int escopo, struct tabelaSimb *simbolo) {
     struct No* no = novoNo(nome);       // Cria o no
     no->escopo = escopo;
     no->no1 = no_1;                     // Conecta com os filhos
     no->no2 = no_2;
     no->no3 = no_3;
     no->lista = lista;
+    no->simbolo = simbolo;
     return no;
 }
 

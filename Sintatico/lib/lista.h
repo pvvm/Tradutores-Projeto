@@ -36,6 +36,8 @@ void insereArg(struct tabelaSimb **, char *, int, int);
 
 int liberaLista(struct tabelaSimb *);
 
+struct tabelaSimb* retSimb(struct tabelaSimb **, char *, struct listaEscopo **);
+
 // Operacoes da lista para o escopo
 void pushEsc(struct listaEscopo**, int);
 
@@ -46,5 +48,7 @@ int liberaEsc(struct listaEscopo *);
 void printaEsc(struct listaEscopo *);
 
 int retUlt(struct listaEscopo**);
+
+int buscaEscopo(struct listaEscopo**, int);
 
 #endif

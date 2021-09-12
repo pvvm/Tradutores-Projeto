@@ -82,7 +82,7 @@ void yyerror(char *);
 
 %%
 
-program:        declarations                            {raiz = montaNo("program", NULL, NULL, NULL, $1, retUlt(&primeiro));
+program:        declarations                            {raiz = montaNo("program", NULL, NULL, NULL, $1, retUlt(&primeiro), NULL);
                                                         if(num_erros_lexicos == 0)
                                                             printf("Sem erros lexicos\n");
                                                         else
@@ -114,10 +114,10 @@ declaration:    function                                {$$ = $1;}
 
                 
                 // Inclui na lista o escopo novo para definir o escopo de argumentos (apos isso, retira da lista)
-function:       funcDecl ABRE_P {pushEsc(&primeiro, escopo_max + 1);} parameters FECHA_P {insereArg(&cabeca, aux, 0, num_args); num_args = 0; popEsc(&primeiro);} ABRE_C moreStmt FECHA_C       {$$ = montaNo("function", $1, $4, NULL, $8, retUlt(&primeiro));}
-                | error ABRE_P {pushEsc(&primeiro, escopo_max + 1);} parameters FECHA_P {insereArg(&cabeca, aux, 0, num_args); num_args = 0; popEsc(&primeiro);} ABRE_C moreStmt FECHA_C        {$$ = montaNo("function",$4, NULL, NULL, $8, retUlt(&primeiro));}
-                | funcDecl ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                                       {$$ = montaNo("function", $1, NULL, NULL, $5, retUlt(&primeiro));}
-                | error ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                                          {$$ = montaNo("function", NULL, NULL, NULL, $5, retUlt(&primeiro));}
+function:       funcDecl ABRE_P {pushEsc(&primeiro, escopo_max + 1);} parameters FECHA_P {insereArg(&cabeca, aux, 0, num_args); num_args = 0; popEsc(&primeiro);} ABRE_C moreStmt FECHA_C       {$$ = montaNo("function", $1, $4, NULL, $8, retUlt(&primeiro), NULL);}
+                | error ABRE_P {pushEsc(&primeiro, escopo_max + 1);} parameters FECHA_P {insereArg(&cabeca, aux, 0, num_args); num_args = 0; popEsc(&primeiro);} ABRE_C moreStmt FECHA_C        {$$ = montaNo("function",$4, NULL, NULL, $8, retUlt(&primeiro), NULL);}
+                | funcDecl ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                                       {$$ = montaNo("function", $1, NULL, NULL, $5, retUlt(&primeiro), NULL);}
+                | error ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                                          {$$ = montaNo("function", NULL, NULL, NULL, $5, retUlt(&primeiro), NULL);}
                 ;
 
 funcDecl:       TIPO ID                                 {$$ = NULL;
@@ -153,20 +153,20 @@ stmt:           conditional                             {$$ = $1;}
 //                | iteration                             {$$ = $1;}
 //                ;
 
-conditional:    IF ABRE_P attribuition FECHA_P bracesStmt                       {$$ = montaNo($1.lexema, $3, $5, NULL, NULL, retUlt(&primeiro));}
-                | IF ABRE_P attribuition FECHA_P bracesStmt ELSE bracesStmt %prec ELSE     {$$ = montaNo($1.lexema, $3, $5, $7, NULL, retUlt(&primeiro));}
+conditional:    IF ABRE_P attribuition FECHA_P bracesStmt                       {$$ = montaNo($1.lexema, $3, $5, NULL, NULL, retUlt(&primeiro), NULL);}
+                | IF ABRE_P attribuition FECHA_P bracesStmt ELSE bracesStmt %prec ELSE     {$$ = montaNo($1.lexema, $3, $5, $7, NULL, retUlt(&primeiro), NULL);}
                 | IF ABRE_P error FECHA_P bracesStmt                            {}
                 ;
 
-bracesStmt:     ABRE_C moreStmt FECHA_C                 {$$ = montaNo("QUESTAO PARA RESOLVER", NULL, NULL, NULL, $2, retUlt(&primeiro));}
+bracesStmt:     ABRE_C moreStmt FECHA_C                 {$$ = montaNo("QUESTAO PARA RESOLVER", NULL, NULL, NULL, $2, retUlt(&primeiro), NULL);}
                 | stmt                                  {$$ = $1;}
                 ;
 
-iteration:      FOR ABRE_P iteArgs FECHA_P bracesStmt   {$$ = montaNo($1.lexema, $3, $5, NULL, NULL, retUlt(&primeiro));}
+iteration:      FOR ABRE_P iteArgs FECHA_P bracesStmt   {$$ = montaNo($1.lexema, $3, $5, NULL, NULL, retUlt(&primeiro), NULL);}
                 | FOR ABRE_P error {yyerrok;} FECHA_P bracesStmt   {}
                 ;
 
-iteArgs:        expIte PV expIte PV expIte              {$$ = montaNo("iteArgs", $1, $3, $5, NULL, retUlt(&primeiro));}
+iteArgs:        expIte PV expIte PV expIte              {$$ = montaNo("iteArgs", $1, $3, $5, NULL, retUlt(&primeiro), NULL);}
                 ;
 
 expIte:         attribuition                            {$$ = $1;}
@@ -180,13 +180,15 @@ expIte:         attribuition                            {$$ = $1;}
 //                | error                                 {}     //COM ESSE DETECTA O ERRO DA LINHA 13 DE TEST
 //                ;
 
-io:             ENTRADA ABRE_P ID FECHA_P               {$$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro));
-                                                        $$->no1 = montaNo($3.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro));}
-                | SAIDA ABRE_P attribuition FECHA_P     {$$ = montaNo($1.lexema, $3, NULL, NULL, NULL, retUlt(&primeiro));}
-                | SAIDA ABRE_P STRING FECHA_P           {$$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro));
-                                                        $$->no1 = montaNo($3.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro));
-                                                        // Inclui o termo na tabela de simbolos
-                                                        var_ja_decl += push(&cabeca, $3.lexema, "constante", "string", "", retUlt(&primeiro), $3.linha, $3.coluna);}
+io:             ENTRADA ABRE_P ID FECHA_P               {struct tabelaSimb *simb = retSimb(&cabeca, $3.lexema, &primeiro);
+                                                        $$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                        $$->no1 = montaNo($3.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);}
+                | SAIDA ABRE_P attribuition FECHA_P     {$$ = montaNo($1.lexema, $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
+                | SAIDA ABRE_P STRING FECHA_P           {// Inclui o termo na tabela de simbolos
+                                                        var_ja_decl += push(&cabeca, $3.lexema, "constante", "string", "", retUlt(&primeiro), $3.linha, $3.coluna);
+                                                        struct tabelaSimb *simb = retSimb(&cabeca, $3.lexema, &primeiro);
+                                                        $$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                        $$->no1 = montaNo($3.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);}
                 | ENTRADA ABRE_P error FECHA_P          {}
                 | SAIDA ABRE_P error FECHA_P            {}
                 ;
@@ -205,53 +207,57 @@ varDecl:        TIPO ID                                 {$$ = NULL;
                                                         var_ja_decl += push(&cabeca, aux, "variavel", strcat($1.lexema, " list"), "", retUlt(&primeiro), $1.linha, $1.coluna);}
                 ;
 
-attribuition:   ID ATRIB expLogic                       {$$ = montaNo($2.lexema, NULL, $3, NULL, NULL, retUlt(&primeiro));
-                                                        $$->no1 = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro));}
+attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb = retSimb(&cabeca, $1.lexema, &primeiro);
+                                                        $$ = montaNo($2.lexema, NULL, $3, NULL, NULL, retUlt(&primeiro), NULL);
+                                                        $$->no1 = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);}
                 | expLogic                              {$$ = $1;}
                 ;
 
-expLogic:       expLogic LOG_OP_OU andLogic             {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro));}
+expLogic:       expLogic LOG_OP_OU andLogic             {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);}
                 | andLogic                              {$$ = $1;}
                 ;
 
-andLogic:       andLogic LOG_OP_E expComp               {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro));}
+andLogic:       andLogic LOG_OP_E expComp               {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);}
                 | expComp                               {$$ = $1;}
                 ;
 
-expComp:        expComp REL_OP_BAIXA expRel             {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro));}
+expComp:        expComp REL_OP_BAIXA expRel             {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);}
                 | expRel                                {$$ = $1;}
                 ;
 
-expRel:         expRel REL_OP_ALTA expArit              {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro));}
+expRel:         expRel REL_OP_ALTA expArit              {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);}
                 | expArit                               {$$ = $1;}
                 ;
 
-expArit:        expArit ARIT_OP_MAIS expMul             {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro));}
-                | expArit ARIT_OP_MENOS expMul          {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro));}
+expArit:        expArit ARIT_OP_MAIS expMul             {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);}
+                | expArit ARIT_OP_MENOS expMul          {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);}
                 | expMul                                {$$ = $1;}
                 ;
 
-expMul:         expMul ARIT_OP_ALTA negElement          {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro));}
+expMul:         expMul ARIT_OP_ALTA negElement          {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);}
                 | negElement                            {$$ = $1;}
                 ;
 
-negElement:     LOG_OP_NEG expList                      {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro));}
-                | ARIT_OP_MENOS expList                 {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro));}
+negElement:     LOG_OP_NEG expList                      {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
+                | ARIT_OP_MENOS expList                 {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
                 | expList                               {$$ = $1;}
                 ;
 
-expList:        LIST_OP_UN element                      {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro));}
-                | expList LIST_OP_BIN element           {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro));}
+expList:        LIST_OP_UN element                      {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
+                | expList LIST_OP_BIN element           {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);}
                 | element                               {$$ = $1;}
                 ;
 
-element:        ID                                      {$$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro));}
+element:        ID                                      {struct tabelaSimb *simb = retSimb(&cabeca, $1.lexema, &primeiro);
+                                                        $$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);}
                 | ABRE_P attribuition FECHA_P           {$$ = $2;}
-                | ID ABRE_P arguments FECHA_P           {$$ = montaNo($1.lexema, NULL, NULL, NULL, $3, retUlt(&primeiro));}
-                | ID ABRE_P FECHA_P                     {$$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro));}
-                | CONST_INT                             {$$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro));}
-                | CONST_FLOAT                           {$$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro));}
-                | NIL                                   {$$ = montaNo("NIL", NULL, NULL, NULL, NULL, retUlt(&primeiro));}
+                | ID ABRE_P arguments FECHA_P           {struct tabelaSimb *simb = retSimb(&cabeca, $1.lexema, &primeiro);
+                                                        $$ = montaNo($1.lexema, NULL, NULL, NULL, $3, retUlt(&primeiro), simb);}
+                | ID ABRE_P FECHA_P                     {struct tabelaSimb *simb = retSimb(&cabeca, $1.lexema, &primeiro);
+                                                        $$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);}
+                | CONST_INT                             {$$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
+                | CONST_FLOAT                           {$$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
+                | NIL                                   {$$ = montaNo("NIL", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
                 ;
 
 arguments:      arguments VIRG attribuition             {$$ = novaListaNo(&$1, $3);}
@@ -259,7 +265,7 @@ arguments:      arguments VIRG attribuition             {$$ = novaListaNo(&$1, $
                                                         $$ = novaListaNo(&lista, $1);}
                 ;
 
-ret:            RETURN attribuition                     {$$ = montaNo("return", $2, NULL, NULL, NULL, retUlt(&primeiro));}
+ret:            RETURN attribuition                     {$$ = montaNo("return", $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
                 ;
 
 %%

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "lista.h"
 
 typedef struct No {
     char nome[500];
@@ -12,6 +13,7 @@ typedef struct No {
     struct No* no2;
     struct No* no3;
     struct listaNo* lista;
+    struct tabelaSimb* simbolo;
 }no;
 
 typedef struct listaNo {
@@ -25,7 +27,7 @@ void desalocar(struct No*);
 
 int printaArvore(struct No*);
 
-struct No* montaNo(char*, struct No*, struct No*, struct No*, struct listaNo*, int);
+struct No* montaNo(char*, struct No*, struct No*, struct No*, struct listaNo*, int, struct tabelaSimb*);
 
 struct listaNo* novaListaNo(struct listaNo**, struct No*);
 
