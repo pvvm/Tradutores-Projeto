@@ -54,9 +54,9 @@ int push(struct tabelaSimb** ult, char *simbolo, char *varOuFunc, char *tipo, ch
     Argumentos: o primeiro elemento da tabela
 */
 void printaLista(struct tabelaSimb *prim) {
-    printf("\tSimbolo\t    Var ou Func\t\t   Tipo\t  Num Arguments\t\t Escopo\t\t Linha\t         Coluna\n\n");
+    printf("\t\t\t\t\t    Simbolo\t Var/Func/Const\t\t   Tipo\t       Num Args\t\t Escopo\t\t  Linha\t         Coluna\n\n");
     while(prim != NULL) {
-        printf("%15s\t%15s\t%15s\t%15d\t%15d\t%15d\t%15d\n", prim->simbolo, prim->varOuFunc, prim->tipo, prim->numArgs, prim->escopo, prim->linha, prim->coluna);
+        printf("%51s\t%15s\t%15s\t%15d\t%15d\t%15d\t%15d\n", prim->simbolo, prim->varOuFunc, prim->tipo, prim->numArgs, prim->escopo, prim->linha, prim->coluna);
         prim = prim->prox;
     }
 }
@@ -169,4 +169,20 @@ void printaEsc(struct listaEscopo *prim) {
         prim = prim->prox;
     }
     printf("\n");
+}
+
+
+int retUlt(struct listaEscopo** ult) {
+    if((*ult) == NULL)
+        return 0;
+    else if((*ult)->prox == NULL) {
+        return (*ult)->escopo;
+    }
+    
+    struct listaEscopo *aux = *ult;
+
+    while(aux->prox->prox != NULL) {
+        aux = aux->prox;
+    }
+    return aux->prox->escopo;
 }

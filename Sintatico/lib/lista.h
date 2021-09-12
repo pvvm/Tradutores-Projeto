@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 typedef struct tabelaSimb {
-    char simbolo[50];           // Simbolo que representa
+    char simbolo[500];           // Simbolo que representa
     char varOuFunc[15];              // 0 == var e 1 == func
     char tipo[15];              // Tipo
     char valor[50];             // Valor armazenado (se tiver)
@@ -44,5 +44,7 @@ int popEsc(struct listaEscopo**);
 int liberaEsc(struct listaEscopo *);
 
 void printaEsc(struct listaEscopo *);
+
+int retUlt(struct listaEscopo**);
 
 #endif

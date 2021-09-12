@@ -1,5 +1,8 @@
 #include "../lib/arvore.h"
 
+int troca_escopo = -1;
+int profund = 0;
+
 /*
     Funcao que aloca o novo no
     Argumentos: o nome do no
@@ -8,7 +11,7 @@ struct No* novoNo(char *nome) {
     struct No* no = (struct No*) malloc (sizeof(struct No));
 
     strcpy(no->nome, nome);
-
+    no->escopo = 0;
     no->no1 = NULL;
     no->no2 = NULL;
     no->no3 = NULL;
@@ -47,21 +50,32 @@ void desalocar(struct No* no) {
     Funcao que imprime a arvore (pre-ordem)
     Argumentos: o no utilizado no momento e a profundidade do no
 */
-int printaArvore(struct No* no, int profund) {
+int printaArvore(struct No* no) {
     if(no == NULL)
         return --profund;
-        
+
+    if(no->escopo > troca_escopo) {
+        for(int i = 0; i < profund; i++)
+            printf("    ");
+        troca_escopo = no->escopo;
+        printf("---------- ESCOPO %d ----------\n", troca_escopo);
+    }
+
     for(int i = 0; i < profund; i++)
         printf("    ");
     printf("| %s\n", no->nome);
 
-    profund = printaArvore(no->no1, ++profund);
-    profund = printaArvore(no->no2, ++profund);
-    profund = printaArvore(no->no3, ++profund);
+    ++profund;
+    profund = printaArvore(no->no1);
+    ++profund;
+    profund = printaArvore(no->no2);
+    ++profund;
+    profund = printaArvore(no->no3);
 
     struct listaNo* aux = no->lista;
     while(aux != NULL) {
-        profund = printaArvore(aux->no, ++profund);
+        ++profund;
+        profund = printaArvore(aux->no);
         aux = aux->prox;
     }
 
@@ -72,8 +86,9 @@ int printaArvore(struct No* no, int profund) {
     Funcao que auxilia na criacao de um novo no
     Argumentos: o nome do no e os filhos
 */
-struct No* montaNo(char *nome, struct No *no_1, struct No *no_2, struct No *no_3, struct listaNo *lista) {
+struct No* montaNo(char *nome, struct No *no_1, struct No *no_2, struct No *no_3, struct listaNo *lista, int escopo) {
     struct No* no = novoNo(nome);       // Cria o no
+    no->escopo = escopo;
     no->no1 = no_1;                     // Conecta com os filhos
     no->no2 = no_2;
     no->no3 = no_3;

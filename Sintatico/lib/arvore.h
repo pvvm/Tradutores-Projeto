@@ -6,7 +6,8 @@
 #include <stdlib.h>
 
 typedef struct No {
-    char nome[50];
+    char nome[500];
+    int escopo;
     struct No* no1;
     struct No* no2;
     struct No* no3;
@@ -22,9 +23,9 @@ struct No* novoNo(char *);
 
 void desalocar(struct No*);
 
-int printaArvore(struct No*, int);
+int printaArvore(struct No*);
 
-struct No* montaNo(char*, struct No*, struct No*, struct No*, struct listaNo*);
+struct No* montaNo(char*, struct No*, struct No*, struct No*, struct listaNo*, int);
 
 struct listaNo* novaListaNo(struct listaNo**, struct No*);
 
