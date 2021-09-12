@@ -1,4 +1,5 @@
 // Funcao que imprime a lista
+int oi;
 
 int _write_list(int list lista, int tamanho) {
     int i;
@@ -15,7 +16,7 @@ int _write_list(int list lista, int tamanho) {
 // Funcao que soma e subtrai 5
 
 int soma(int a, int b) {
-    return a+b-5;
+    return a+b*5;
 }
 
 /*
@@ -25,10 +26,11 @@ int main() {
     writeln("Digite dois numeros: ");
     int a;
     int b;
+    int lista;
     read(a);
     read(b);
     int r;
-    r = soma(a, b);
+    r = soma(a, b, s, c, s);
 
     if(r > 0) {
         int list lista;
@@ -48,9 +50,13 @@ int main() {
             tamanho = 1 + tamanho;
         }
         write("A soma dos elementos da lista eh ");
-        if(total < 0) {
+        if(total > -999999 && total < 0 && sei_la == oi) {
             writeln("negativa. Como pode ver a lista:");
             _write_list(lista, tamanho);
+        } else if (total > 99999 * 23892 + 21 + 92 * (32 - - 12)) 
+            writeln("Isso eh so um teste pra ver se funciona o else if");
+        else if (-999999 * -21 + (248 - 21) - 21 > total && total < 0) {
+            writeln("Outro teste de else if");
         } else {
             writeln("positiva. Como pode ver a lista:");
             _write_list(lista, tamanho);
@@ -59,6 +65,6 @@ int main() {
     } else
         writeln("Nao eh possivel criar uma lista menor que 0");
     
-
+    lista = 5;
     return 0;
 }
