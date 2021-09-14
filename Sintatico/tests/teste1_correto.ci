@@ -27,9 +27,17 @@ int main() {
     int a;
     int b;
     int lista;
+    {
+        int testando;
+        testando = 1 + 3 - a + b;
+    }
     read(a);
     read(b);
     int r;
+    {
+        int testando2;
+        testando2 = r + 1;
+    }
     r = soma(a, b, s, c, s);
 
     if(r > 0) {
@@ -53,18 +61,18 @@ int main() {
         if(total > -999999 && total < 0 && sei_la == oi) {
             writeln("negativa. Como pode ver a lista:");
             _write_list(lista, tamanho);
-        } else if (total > 99999 * 23892 + 21 + 92 * (32 - - 12)) 
+        } else if (total > 99999 * 23892 + 21 + 92 * (32 - - 12)) {
             writeln("Isso eh so um teste pra ver se funciona o else if");
-        else if (-999999 * -21 + (248 - 21) - 21 > total && total < 0) {
+        } else if (-999999 * -21 + (248 - 21) - 21 > total && total < 0) {
             writeln("Outro teste de else if");
         } else {
             writeln("positiva. Como pode ver a lista:");
             _write_list(lista, tamanho);
         }
 
-    } else
-        writeln("Nao eh possivel criar uma lista menor que 0");
-    
+    } else 
+        writeln("AQUI");
     lista = 5;
+    oi = 50 - 20 + (1 && 1) * 20;
     return 0;
 }

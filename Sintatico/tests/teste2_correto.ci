@@ -1,6 +1,7 @@
 int sei_la;
 
 int fibonacci(int num) {
+    sei_la = 5;
     if(num == 0 || num == 1) {
         return 1;
     } else {
@@ -39,7 +40,10 @@ int main() {
         write(" posicao eh:");
         _write_list(lista, n);
 
+    } else {
+        write("Hoje nao!");
     }
+
     int sei_la;
     sei_la = 0;
 

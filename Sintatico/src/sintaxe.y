@@ -70,7 +70,7 @@ void yyerror(char *);
 %left ABRE_P FECHA_P
 
 %type <lista> declarations
-%type <no> declaration function funcDecl parameters 
+%type <no> declaration function funcDecl parameters block
 %type <lista> moreStmt
 %type <no> stmt conditional bracesStmt iteration expIte  io varDecl iteArgs
 %type <no> attribuition expList expLogic andLogic expComp expRel expArit expMul
@@ -135,9 +135,13 @@ parameters:     parameters VIRG varDecl                 {$$ = $1; num_args++;}
                 | varDecl                               {$$ = $1; num_args++;}
                 ;
 
-moreStmt:       moreStmt stmt                           {$$ = novaListaNo(&$1, $2);}
-                | stmt                                  {struct listaNo* lista = NULL;
+moreStmt:       moreStmt block                          {$$ = novaListaNo(&$1, $2);}
+                | block                                 {struct listaNo* lista = NULL;
                                                         $$ = novaListaNo(&lista, $1);}
+                ;
+
+block:          stmt                                    {$$ = $1;}                          
+                | ABRE_C moreStmt FECHA_C               {$$ = montaNo("block", NULL, NULL, NULL, $2, retUlt(&primeiro), NULL);}
                 ;
 
 stmt:           conditional                             {$$ = $1;}
@@ -153,16 +157,18 @@ stmt:           conditional                             {$$ = $1;}
 //                | iteration                             {$$ = $1;}
 //                ;
 
-conditional:    IF ABRE_P attribuition FECHA_P bracesStmt                       {$$ = montaNo($1.lexema, $3, $5, NULL, NULL, retUlt(&primeiro), NULL);}
-                | IF ABRE_P attribuition FECHA_P bracesStmt ELSE bracesStmt %prec ELSE     {$$ = montaNo($1.lexema, $3, $5, $7, NULL, retUlt(&primeiro), NULL);}
-                | IF ABRE_P error FECHA_P bracesStmt                            {}
+conditional:    IF ABRE_P attribuition FECHA_P bracesStmt                                   {$$ = montaNo($1.lexema, NULL, $5, NULL, NULL, retUlt(&primeiro), NULL);
+                                                                                            $$->no1 = montaNo("condArg", $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
+                | IF ABRE_P attribuition FECHA_P bracesStmt ELSE bracesStmt %prec ELSE      {$$ = montaNo($1.lexema, NULL, $5, $7, NULL, retUlt(&primeiro), NULL);
+                                                                                            $$->no1 = montaNo("condArg", $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
+                | IF ABRE_P error FECHA_P bracesStmt                                        {}
                 ;
 
-bracesStmt:     ABRE_C moreStmt FECHA_C                 {$$ = montaNo("QUESTAO PARA RESOLVER", NULL, NULL, NULL, $2, retUlt(&primeiro), NULL);}
-                | stmt                                  {$$ = $1;}
+bracesStmt:     ABRE_C moreStmt FECHA_C                 {$$ = montaNo("statements", NULL, NULL, NULL, $2, retUlt(&primeiro), NULL);}
+                | stmt                                  {$$ = montaNo("statements", $1, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
                 ;
 
-iteration:      FOR ABRE_P iteArgs FECHA_P bracesStmt   {$$ = montaNo($1.lexema, $3, $5, NULL, NULL, retUlt(&primeiro), NULL);}
+iteration:      FOR ABRE_P iteArgs FECHA_P bracesStmt              {$$ = montaNo($1.lexema, $3, $5, NULL, NULL, retUlt(&primeiro), NULL);}
                 | FOR ABRE_P error {yyerrok;} FECHA_P bracesStmt   {}
                 ;
 
@@ -195,16 +201,12 @@ io:             ENTRADA ABRE_P ID FECHA_P               {struct tabelaSimb *simb
 
 
 varDecl:        TIPO ID                                 {$$ = NULL;
-                                                        char aux[50];
-                                                        strcpy(aux, $2.lexema);
                                                         // Inclui o termo na tabela de simbolos
-                                                        var_ja_decl += push(&cabeca, aux, "variavel", $1.lexema, "", retUlt(&primeiro), $1.linha, $1.coluna);}
+                                                        var_ja_decl += push(&cabeca, $2.lexema, "variavel", $1.lexema, "", retUlt(&primeiro), $1.linha, $1.coluna);}
 
                 | TIPO LIST ID                          {$$ = NULL;
-                                                        char aux[50];
-                                                        strcpy(aux, $3.lexema);
                                                         // Inclui o termo na tabela de simbolos
-                                                        var_ja_decl += push(&cabeca, aux, "variavel", strcat($1.lexema, " list"), "", retUlt(&primeiro), $1.linha, $1.coluna);}
+                                                        var_ja_decl += push(&cabeca, $3.lexema, "variavel", strcat($1.lexema, " list"), "", retUlt(&primeiro), $1.linha, $1.coluna);}
                 ;
 
 attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb = retSimb(&cabeca, $1.lexema, &primeiro);
