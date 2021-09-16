@@ -1,11 +1,12 @@
 #include "../lib/arvore.h"
 
-int troca_escopo = -1;
-int profund = 0;
+int troca_escopo = -1;  // Inteiro que guarda o maior escopo atual
+int profund = 0;        // Inteiro que guarda a profundidade da arvore
 
 /*
     Funcao que aloca o novo no
     Argumentos: o nome do no
+    Retorno: um ponteiro para o novo no
 */
 struct No* novoNo(char *nome) {
     struct No* no = (struct No*) malloc (sizeof(struct No));
@@ -30,10 +31,12 @@ void desalocar(struct No* no) {
     if(no == NULL)
         return;
 
+    // Responsavel por desalocar os nos filhos
     desalocar(no->no1);
     desalocar(no->no2);
     desalocar(no->no3);
 
+    // Responsavel por desalocar a lista de nos
     struct listaNo* aux = no->lista;
     struct listaNo* aux2;
     while(aux != NULL) {
@@ -50,11 +53,13 @@ void desalocar(struct No* no) {
 /*
     Funcao que imprime a arvore (pre-ordem)
     Argumentos: o no utilizado no momento e a profundidade do no
+    Retorno: o inteiro para a profundidade atual da arvore
 */
 int printaArvore(struct No* no) {
     if(no == NULL)
         return --profund;
 
+    // Responsavel por imprimir o escopo caso ele mude
     if(no->escopo > troca_escopo) {
         for(int i = 0; i < profund; i++)
             printf("    ");
@@ -69,6 +74,7 @@ int printaArvore(struct No* no) {
     
     printf("| %s\n", no->nome);
 
+    // Responsavel por imprimir o nos filhos
     ++profund;
     profund = printaArvore(no->no1);
     ++profund;
@@ -76,6 +82,7 @@ int printaArvore(struct No* no) {
     ++profund;
     profund = printaArvore(no->no3);
 
+    // Responsavel por imprimir a lista de nos, caso exista
     struct listaNo* aux = no->lista;
     while(aux != NULL) {
         ++profund;
@@ -88,7 +95,8 @@ int printaArvore(struct No* no) {
 
 /*
     Funcao que auxilia na criacao de um novo no
-    Argumentos: o nome do no e os filhos
+    Argumentos: o nome do no, ponteiros para os filhos e a lista de nos, escopo e ponteiro para a tabela de simbolos
+    Retorna: ponteiro para o novo no
 */
 struct No* montaNo(char *nome, struct No *no_1, struct No *no_2, struct No *no_3, struct listaNo *lista, int escopo, struct tabelaSimb *simbolo) {
     struct No* no = novoNo(nome);       // Cria o no
@@ -101,7 +109,11 @@ struct No* montaNo(char *nome, struct No *no_1, struct No *no_2, struct No *no_3
     return no;
 }
 
-
+/*
+    Funcao que auxilia adiciona um novo no filho a lista
+    Argumentos: a lista que contem os nos e o no filho
+    Retorna: ponteiro para a lista
+*/
 struct listaNo* novaListaNo(struct listaNo** pai, struct No* filho) {
     struct listaNo* aux = *pai;
     struct listaNo* elem = (struct listaNo*) malloc (sizeof(struct listaNo));

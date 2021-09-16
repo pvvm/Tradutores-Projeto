@@ -115,6 +115,7 @@ IDENTIFICADOR   [a-zA-Z_][_a-zA-Z0-9]*
 
 
     /*   DELIMITADORES   */
+    /* O escopo eh definido pelo abre e fecha chaves */
 "{"                     {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         ++escopo_max;
                         pushEsc(&primeiro, escopo_max);

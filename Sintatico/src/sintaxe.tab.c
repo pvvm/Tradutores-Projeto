@@ -67,7 +67,7 @@
 
 
 /* First part of user prologue.  */
-#line 5 "./src/sintaxe.y"
+#line 4 "./src/sintaxe.y"
 
 #include <stdio.h>
 #include <string.h>
@@ -91,7 +91,7 @@ struct No * raiz;
 struct tabelaSimb* cabeca = NULL;
 struct listaEscopo* primeiro = NULL;
 
-void yyerror(char *);
+void yyerror(const char *);
 
 #line 97 "./src/sintaxe.tab.c"
 
@@ -379,7 +379,7 @@ typedef int yy_state_fast_t;
 
 #define YY_ASSERT(E) ((void) (0 && (E)))
 
-#if !defined yyoverflow
+#if 1
 
 /* The parser invokes alloca or malloc; define the necessary symbols.  */
 
@@ -444,7 +444,7 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 #   endif
 #  endif
 # endif
-#endif /* !defined yyoverflow */
+#endif /* 1 */
 
 #if (! defined yyoverflow \
      && (! defined __cplusplus \
@@ -570,22 +570,22 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    85,    85,   102,   105,   106,   110,   111,   112,   117,
-     117,   117,   118,   118,   118,   119,   120,   123,   128,   134,
-     135,   138,   139,   143,   144,   147,   148,   149,   150,   151,
-     152,   153,   160,   162,   164,   167,   168,   171,   172,   172,
-     175,   178,   179,   189,   192,   193,   198,   199,   203,   207,
-     212,   215,   218,   219,   222,   223,   226,   227,   230,   231,
-     234,   235,   236,   239,   240,   243,   244,   245,   248,   249,
-     250,   253,   255,   256,   258,   260,   261,   262,   265,   266,
-     270
+       0,    84,    84,   102,   107,   108,   112,   113,   114,   118,
+     118,   118,   119,   119,   119,   120,   121,   124,   130,   135,
+     136,   139,   140,   144,   145,   148,   149,   150,   151,   152,
+     153,   154,   157,   159,   161,   164,   165,   168,   169,   169,
+     172,   175,   176,   182,   186,   188,   194,   195,   199,   203,
+     207,   210,   213,   214,   217,   218,   221,   222,   225,   226,
+     229,   230,   231,   234,   235,   238,   239,   240,   243,   244,
+     245,   250,   253,   255,   258,   261,   262,   263,   266,   267,
+     271
 };
 #endif
 
 /** Accessing symbol of state STATE.  */
 #define YY_ACCESSING_SYMBOL(State) YY_CAST (yysymbol_kind_t, yystos[State])
 
-#if YYDEBUG || 0
+#if 1
 /* The user-facing name of the symbol whose (internal) number is
    YYSYMBOL.  No bounds checking.  */
 static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
@@ -1541,8 +1541,275 @@ int yydebug;
 #endif
 
 
+/* Context of a parse error.  */
+typedef struct
+{
+  yy_state_t *yyssp;
+  yysymbol_kind_t yytoken;
+} yypcontext_t;
+
+/* Put in YYARG at most YYARGN of the expected tokens given the
+   current YYCTX, and return the number of tokens stored in YYARG.  If
+   YYARG is null, return the number of expected tokens (guaranteed to
+   be less than YYNTOKENS).  Return YYENOMEM on memory exhaustion.
+   Return 0 if there are more than YYARGN expected tokens, yet fill
+   YYARG up to YYARGN. */
+static int
+yypcontext_expected_tokens (const yypcontext_t *yyctx,
+                            yysymbol_kind_t yyarg[], int yyargn)
+{
+  /* Actual size of YYARG. */
+  int yycount = 0;
+  int yyn = yypact[+*yyctx->yyssp];
+  if (!yypact_value_is_default (yyn))
+    {
+      /* Start YYX at -YYN if negative to avoid negative indexes in
+         YYCHECK.  In other words, skip the first -YYN actions for
+         this state because they are default actions.  */
+      int yyxbegin = yyn < 0 ? -yyn : 0;
+      /* Stay within bounds of both yycheck and yytname.  */
+      int yychecklim = YYLAST - yyn + 1;
+      int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
+      int yyx;
+      for (yyx = yyxbegin; yyx < yyxend; ++yyx)
+        if (yycheck[yyx + yyn] == yyx && yyx != YYSYMBOL_YYerror
+            && !yytable_value_is_error (yytable[yyx + yyn]))
+          {
+            if (!yyarg)
+              ++yycount;
+            else if (yycount == yyargn)
+              return 0;
+            else
+              yyarg[yycount++] = YY_CAST (yysymbol_kind_t, yyx);
+          }
+    }
+  if (yyarg && yycount == 0 && 0 < yyargn)
+    yyarg[0] = YYSYMBOL_YYEMPTY;
+  return yycount;
+}
 
 
+
+
+#ifndef yystrlen
+# if defined __GLIBC__ && defined _STRING_H
+#  define yystrlen(S) (YY_CAST (YYPTRDIFF_T, strlen (S)))
+# else
+/* Return the length of YYSTR.  */
+static YYPTRDIFF_T
+yystrlen (const char *yystr)
+{
+  YYPTRDIFF_T yylen;
+  for (yylen = 0; yystr[yylen]; yylen++)
+    continue;
+  return yylen;
+}
+# endif
+#endif
+
+#ifndef yystpcpy
+# if defined __GLIBC__ && defined _STRING_H && defined _GNU_SOURCE
+#  define yystpcpy stpcpy
+# else
+/* Copy YYSRC to YYDEST, returning the address of the terminating '\0' in
+   YYDEST.  */
+static char *
+yystpcpy (char *yydest, const char *yysrc)
+{
+  char *yyd = yydest;
+  const char *yys = yysrc;
+
+  while ((*yyd++ = *yys++) != '\0')
+    continue;
+
+  return yyd - 1;
+}
+# endif
+#endif
+
+#ifndef yytnamerr
+/* Copy to YYRES the contents of YYSTR after stripping away unnecessary
+   quotes and backslashes, so that it's suitable for yyerror.  The
+   heuristic is that double-quoting is unnecessary unless the string
+   contains an apostrophe, a comma, or backslash (other than
+   backslash-backslash).  YYSTR is taken from yytname.  If YYRES is
+   null, do not copy; instead, return the length of what the result
+   would have been.  */
+static YYPTRDIFF_T
+yytnamerr (char *yyres, const char *yystr)
+{
+  if (*yystr == '"')
+    {
+      YYPTRDIFF_T yyn = 0;
+      char const *yyp = yystr;
+      for (;;)
+        switch (*++yyp)
+          {
+          case '\'':
+          case ',':
+            goto do_not_strip_quotes;
+
+          case '\\':
+            if (*++yyp != '\\')
+              goto do_not_strip_quotes;
+            else
+              goto append;
+
+          append:
+          default:
+            if (yyres)
+              yyres[yyn] = *yyp;
+            yyn++;
+            break;
+
+          case '"':
+            if (yyres)
+              yyres[yyn] = '\0';
+            return yyn;
+          }
+    do_not_strip_quotes: ;
+    }
+
+  if (yyres)
+    return yystpcpy (yyres, yystr) - yyres;
+  else
+    return yystrlen (yystr);
+}
+#endif
+
+
+static int
+yy_syntax_error_arguments (const yypcontext_t *yyctx,
+                           yysymbol_kind_t yyarg[], int yyargn)
+{
+  /* Actual size of YYARG. */
+  int yycount = 0;
+  /* There are many possibilities here to consider:
+     - If this state is a consistent state with a default action, then
+       the only way this function was invoked is if the default action
+       is an error action.  In that case, don't check for expected
+       tokens because there are none.
+     - The only way there can be no lookahead present (in yychar) is if
+       this state is a consistent state with a default action.  Thus,
+       detecting the absence of a lookahead is sufficient to determine
+       that there is no unexpected or expected token to report.  In that
+       case, just report a simple "syntax error".
+     - Don't assume there isn't a lookahead just because this state is a
+       consistent state with a default action.  There might have been a
+       previous inconsistent state, consistent state with a non-default
+       action, or user semantic action that manipulated yychar.
+     - Of course, the expected token list depends on states to have
+       correct lookahead information, and it depends on the parser not
+       to perform extra reductions after fetching a lookahead from the
+       scanner and before detecting a syntax error.  Thus, state merging
+       (from LALR or IELR) and default reductions corrupt the expected
+       token list.  However, the list is correct for canonical LR with
+       one exception: it will still contain any token that will not be
+       accepted due to an error action in a later state.
+  */
+  if (yyctx->yytoken != YYSYMBOL_YYEMPTY)
+    {
+      int yyn;
+      if (yyarg)
+        yyarg[yycount] = yyctx->yytoken;
+      ++yycount;
+      yyn = yypcontext_expected_tokens (yyctx,
+                                        yyarg ? yyarg + 1 : yyarg, yyargn - 1);
+      if (yyn == YYENOMEM)
+        return YYENOMEM;
+      else
+        yycount += yyn;
+    }
+  return yycount;
+}
+
+/* Copy into *YYMSG, which is of size *YYMSG_ALLOC, an error message
+   about the unexpected token YYTOKEN for the state stack whose top is
+   YYSSP.
+
+   Return 0 if *YYMSG was successfully written.  Return -1 if *YYMSG is
+   not large enough to hold the message.  In that case, also set
+   *YYMSG_ALLOC to the required number of bytes.  Return YYENOMEM if the
+   required number of bytes is too large to store.  */
+static int
+yysyntax_error (YYPTRDIFF_T *yymsg_alloc, char **yymsg,
+                const yypcontext_t *yyctx)
+{
+  enum { YYARGS_MAX = 5 };
+  /* Internationalized format string. */
+  const char *yyformat = YY_NULLPTR;
+  /* Arguments of yyformat: reported tokens (one for the "unexpected",
+     one per "expected"). */
+  yysymbol_kind_t yyarg[YYARGS_MAX];
+  /* Cumulated lengths of YYARG.  */
+  YYPTRDIFF_T yysize = 0;
+
+  /* Actual size of YYARG. */
+  int yycount = yy_syntax_error_arguments (yyctx, yyarg, YYARGS_MAX);
+  if (yycount == YYENOMEM)
+    return YYENOMEM;
+
+  switch (yycount)
+    {
+#define YYCASE_(N, S)                       \
+      case N:                               \
+        yyformat = S;                       \
+        break
+    default: /* Avoid compiler warnings. */
+      YYCASE_(0, YY_("syntax error"));
+      YYCASE_(1, YY_("syntax error, unexpected %s"));
+      YYCASE_(2, YY_("syntax error, unexpected %s, expecting %s"));
+      YYCASE_(3, YY_("syntax error, unexpected %s, expecting %s or %s"));
+      YYCASE_(4, YY_("syntax error, unexpected %s, expecting %s or %s or %s"));
+      YYCASE_(5, YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s"));
+#undef YYCASE_
+    }
+
+  /* Compute error message size.  Don't count the "%s"s, but reserve
+     room for the terminator.  */
+  yysize = yystrlen (yyformat) - 2 * yycount + 1;
+  {
+    int yyi;
+    for (yyi = 0; yyi < yycount; ++yyi)
+      {
+        YYPTRDIFF_T yysize1
+          = yysize + yytnamerr (YY_NULLPTR, yytname[yyarg[yyi]]);
+        if (yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM)
+          yysize = yysize1;
+        else
+          return YYENOMEM;
+      }
+  }
+
+  if (*yymsg_alloc < yysize)
+    {
+      *yymsg_alloc = 2 * yysize;
+      if (! (yysize <= *yymsg_alloc
+             && *yymsg_alloc <= YYSTACK_ALLOC_MAXIMUM))
+        *yymsg_alloc = YYSTACK_ALLOC_MAXIMUM;
+      return -1;
+    }
+
+  /* Avoid sprintf, as that infringes on the user's name space.
+     Don't have undefined behavior even if the translation
+     produced a string with the wrong number of "%s"s.  */
+  {
+    char *yyp = *yymsg;
+    int yyi = 0;
+    while ((*yyp = *yyformat) != '\0')
+      if (*yyp == '%' && yyformat[1] == 's' && yyi < yycount)
+        {
+          yyp += yytnamerr (yyp, yytname[yyarg[yyi++]]);
+          yyformat += 2;
+        }
+      else
+        {
+          ++yyp;
+          ++yyformat;
+        }
+  }
+  return 0;
+}
 
 
 /*-----------------------------------------------.
@@ -1611,7 +1878,10 @@ yyparse (void)
      action routines.  */
   YYSTYPE yyval;
 
-
+  /* Buffer for error messages, and its allocated size.  */
+  char yymsgbuf[128];
+  char *yymsg = yymsgbuf;
+  YYPTRDIFF_T yymsg_alloc = sizeof yymsgbuf;
 
 #define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N))
 
@@ -1820,13 +2090,14 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: declarations  */
-#line 85 "./src/sintaxe.y"
+#line 84 "./src/sintaxe.y"
                                                         {raiz = montaNo("program", NULL, NULL, NULL, (yyvsp[0].lista), retUlt(&primeiro), NULL);
                                                         if(num_erros_lexicos == 0)
                                                             printf("Sem erros lexicos\n");
                                                         else
                                                             printf("Foram encontrados %d erros lexicos\n", num_erros_lexicos);
-                                                        if(num_erros_sintaticos == 0 && num_erros_lexicos == 0 && var_ja_decl == 0) {
+                                                        // Caso nao hajam erros lexicos e sintaticos, imprime a arvore
+                                                        if(num_erros_sintaticos == 0 && num_erros_lexicos == 0/* && var_ja_decl == 0*/) {
                                                             printf("Sem erros sintaticos\n\n");
                                                             printf("========================================================== ARVORE SINTATICA ABSTRADA =========================================================\n\n");
                                                             printaArvore(raiz);
@@ -1838,499 +2109,498 @@ yyreduce:
                                                         printaLista(cabeca);
                                                         liberaLista(cabeca);
                                                         liberaEsc(primeiro);}
-#line 1842 "./src/sintaxe.tab.c"
+#line 2113 "./src/sintaxe.tab.c"
     break;
 
   case 4: /* declarations: declarations declaration  */
-#line 105 "./src/sintaxe.y"
+#line 107 "./src/sintaxe.y"
                                                         {(yyval.lista) = novaListaNo(&(yyvsp[-1].lista), (yyvsp[0].no));}
-#line 1848 "./src/sintaxe.tab.c"
+#line 2119 "./src/sintaxe.tab.c"
     break;
 
   case 5: /* declarations: declaration  */
-#line 106 "./src/sintaxe.y"
+#line 108 "./src/sintaxe.y"
                                                         {struct listaNo* lista = NULL;
                                                         (yyval.lista) = novaListaNo(&lista, (yyvsp[0].no));}
-#line 1855 "./src/sintaxe.tab.c"
+#line 2126 "./src/sintaxe.tab.c"
     break;
 
   case 6: /* declaration: function  */
-#line 110 "./src/sintaxe.y"
+#line 112 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[0].no);}
-#line 1861 "./src/sintaxe.tab.c"
+#line 2132 "./src/sintaxe.tab.c"
     break;
 
   case 7: /* declaration: varDecl PV  */
-#line 111 "./src/sintaxe.y"
+#line 113 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[-1].no);}
-#line 1867 "./src/sintaxe.tab.c"
+#line 2138 "./src/sintaxe.tab.c"
     break;
 
   case 8: /* declaration: error PV  */
-#line 112 "./src/sintaxe.y"
+#line 114 "./src/sintaxe.y"
                                                         {}
-#line 1873 "./src/sintaxe.tab.c"
+#line 2144 "./src/sintaxe.tab.c"
     break;
 
   case 9: /* $@1: %empty  */
-#line 117 "./src/sintaxe.y"
+#line 118 "./src/sintaxe.y"
                                 {pushEsc(&primeiro, escopo_max + 1);}
-#line 1879 "./src/sintaxe.tab.c"
+#line 2150 "./src/sintaxe.tab.c"
     break;
 
   case 10: /* $@2: %empty  */
-#line 117 "./src/sintaxe.y"
+#line 118 "./src/sintaxe.y"
                                                                                          {insereArg(&cabeca, aux, 0, num_args); num_args = 0; popEsc(&primeiro);}
-#line 1885 "./src/sintaxe.tab.c"
+#line 2156 "./src/sintaxe.tab.c"
     break;
 
   case 11: /* function: funcDecl ABRE_P $@1 parameters FECHA_P $@2 ABRE_C moreStmt FECHA_C  */
-#line 117 "./src/sintaxe.y"
+#line 118 "./src/sintaxe.y"
                                                                                                                                                                                                 {(yyval.no) = montaNo("function", (yyvsp[-8].no), (yyvsp[-5].no), NULL, (yyvsp[-1].lista), retUlt(&primeiro), NULL);}
-#line 1891 "./src/sintaxe.tab.c"
+#line 2162 "./src/sintaxe.tab.c"
     break;
 
   case 12: /* $@3: %empty  */
-#line 118 "./src/sintaxe.y"
+#line 119 "./src/sintaxe.y"
                                {pushEsc(&primeiro, escopo_max + 1);}
-#line 1897 "./src/sintaxe.tab.c"
+#line 2168 "./src/sintaxe.tab.c"
     break;
 
   case 13: /* $@4: %empty  */
-#line 118 "./src/sintaxe.y"
+#line 119 "./src/sintaxe.y"
                                                                                         {insereArg(&cabeca, aux, 0, num_args); num_args = 0; popEsc(&primeiro);}
-#line 1903 "./src/sintaxe.tab.c"
+#line 2174 "./src/sintaxe.tab.c"
     break;
 
   case 14: /* function: error ABRE_P $@3 parameters FECHA_P $@4 ABRE_C moreStmt FECHA_C  */
-#line 118 "./src/sintaxe.y"
+#line 119 "./src/sintaxe.y"
                                                                                                                                                                                                 {(yyval.no) = montaNo("function",(yyvsp[-5].no), NULL, NULL, (yyvsp[-1].lista), retUlt(&primeiro), NULL);}
-#line 1909 "./src/sintaxe.tab.c"
+#line 2180 "./src/sintaxe.tab.c"
     break;
 
   case 15: /* function: funcDecl ABRE_P FECHA_P ABRE_C moreStmt FECHA_C  */
-#line 119 "./src/sintaxe.y"
+#line 120 "./src/sintaxe.y"
                                                                                                         {(yyval.no) = montaNo("function", (yyvsp[-5].no), NULL, NULL, (yyvsp[-1].lista), retUlt(&primeiro), NULL);}
-#line 1915 "./src/sintaxe.tab.c"
+#line 2186 "./src/sintaxe.tab.c"
     break;
 
   case 16: /* function: error ABRE_P FECHA_P ABRE_C moreStmt FECHA_C  */
-#line 120 "./src/sintaxe.y"
+#line 121 "./src/sintaxe.y"
                                                                                                         {(yyval.no) = montaNo("function", NULL, NULL, NULL, (yyvsp[-1].lista), retUlt(&primeiro), NULL);}
-#line 1921 "./src/sintaxe.tab.c"
+#line 2192 "./src/sintaxe.tab.c"
     break;
 
   case 17: /* funcDecl: TIPO ID  */
-#line 123 "./src/sintaxe.y"
+#line 124 "./src/sintaxe.y"
                                                         {(yyval.no) = NULL;
+                                                        // Variavel aux necessaria para inserir o numero de argumentos na tabela
                                                         strcpy(aux, (yyvsp[0].tok).lexema);
                                                         // Inclui o termo na tabela de simbolos
                                                         var_ja_decl += push(&cabeca, (yyvsp[0].tok).lexema, "funcao", (yyvsp[-1].tok).lexema, "", retUlt(&primeiro), (yyvsp[-1].tok).linha, (yyvsp[-1].tok).coluna);}
-#line 1930 "./src/sintaxe.tab.c"
+#line 2202 "./src/sintaxe.tab.c"
     break;
 
   case 18: /* funcDecl: TIPO LIST ID  */
-#line 128 "./src/sintaxe.y"
+#line 130 "./src/sintaxe.y"
                                                         {(yyval.no) = NULL;
                                                         strcpy(aux, (yyvsp[0].tok).lexema);
-                                                        // Inclui o termo na tabela de simbolos
                                                         var_ja_decl += push(&cabeca, (yyvsp[0].tok).lexema, "funcao", strcat((yyvsp[-2].tok).lexema, " list"), "", retUlt(&primeiro), (yyvsp[-2].tok).linha, (yyvsp[-2].tok).coluna);}
-#line 1939 "./src/sintaxe.tab.c"
+#line 2210 "./src/sintaxe.tab.c"
     break;
 
   case 19: /* parameters: parameters VIRG varDecl  */
-#line 134 "./src/sintaxe.y"
+#line 135 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[-2].no); num_args++;}
-#line 1945 "./src/sintaxe.tab.c"
+#line 2216 "./src/sintaxe.tab.c"
     break;
 
   case 20: /* parameters: varDecl  */
-#line 135 "./src/sintaxe.y"
+#line 136 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[0].no); num_args++;}
-#line 1951 "./src/sintaxe.tab.c"
+#line 2222 "./src/sintaxe.tab.c"
     break;
 
   case 21: /* moreStmt: moreStmt block  */
-#line 138 "./src/sintaxe.y"
+#line 139 "./src/sintaxe.y"
                                                         {(yyval.lista) = novaListaNo(&(yyvsp[-1].lista), (yyvsp[0].no));}
-#line 1957 "./src/sintaxe.tab.c"
+#line 2228 "./src/sintaxe.tab.c"
     break;
 
   case 22: /* moreStmt: block  */
-#line 139 "./src/sintaxe.y"
+#line 140 "./src/sintaxe.y"
                                                         {struct listaNo* lista = NULL;
                                                         (yyval.lista) = novaListaNo(&lista, (yyvsp[0].no));}
-#line 1964 "./src/sintaxe.tab.c"
+#line 2235 "./src/sintaxe.tab.c"
     break;
 
   case 23: /* block: stmt  */
-#line 143 "./src/sintaxe.y"
+#line 144 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[0].no);}
-#line 1970 "./src/sintaxe.tab.c"
+#line 2241 "./src/sintaxe.tab.c"
     break;
 
   case 24: /* block: ABRE_C moreStmt FECHA_C  */
-#line 144 "./src/sintaxe.y"
+#line 145 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo("block", NULL, NULL, NULL, (yyvsp[-1].lista), retUlt(&primeiro), NULL);}
-#line 1976 "./src/sintaxe.tab.c"
+#line 2247 "./src/sintaxe.tab.c"
     break;
 
   case 25: /* stmt: conditional  */
-#line 147 "./src/sintaxe.y"
+#line 148 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[0].no);}
-#line 1982 "./src/sintaxe.tab.c"
+#line 2253 "./src/sintaxe.tab.c"
     break;
 
   case 26: /* stmt: iteration  */
-#line 148 "./src/sintaxe.y"
+#line 149 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[0].no);}
-#line 1988 "./src/sintaxe.tab.c"
+#line 2259 "./src/sintaxe.tab.c"
     break;
 
   case 27: /* stmt: varDecl PV  */
-#line 149 "./src/sintaxe.y"
+#line 150 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[-1].no);}
-#line 1994 "./src/sintaxe.tab.c"
+#line 2265 "./src/sintaxe.tab.c"
     break;
 
   case 28: /* stmt: attribuition PV  */
-#line 150 "./src/sintaxe.y"
+#line 151 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[-1].no);}
-#line 2000 "./src/sintaxe.tab.c"
+#line 2271 "./src/sintaxe.tab.c"
     break;
 
   case 29: /* stmt: io PV  */
-#line 151 "./src/sintaxe.y"
+#line 152 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[-1].no);}
-#line 2006 "./src/sintaxe.tab.c"
+#line 2277 "./src/sintaxe.tab.c"
     break;
 
   case 30: /* stmt: ret PV  */
-#line 152 "./src/sintaxe.y"
+#line 153 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[-1].no);}
-#line 2012 "./src/sintaxe.tab.c"
+#line 2283 "./src/sintaxe.tab.c"
     break;
 
   case 31: /* stmt: error  */
-#line 153 "./src/sintaxe.y"
+#line 154 "./src/sintaxe.y"
                                                         {}
-#line 2018 "./src/sintaxe.tab.c"
+#line 2289 "./src/sintaxe.tab.c"
     break;
 
   case 32: /* conditional: IF ABRE_P attribuition FECHA_P bracesStmt  */
-#line 160 "./src/sintaxe.y"
+#line 157 "./src/sintaxe.y"
                                                                                             {(yyval.no) = montaNo((yyvsp[-4].tok).lexema, NULL, (yyvsp[0].no), NULL, NULL, retUlt(&primeiro), NULL);
                                                                                             (yyval.no)->no1 = montaNo("condArg", (yyvsp[-2].no), NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2025 "./src/sintaxe.tab.c"
+#line 2296 "./src/sintaxe.tab.c"
     break;
 
   case 33: /* conditional: IF ABRE_P attribuition FECHA_P bracesStmt ELSE bracesStmt  */
-#line 162 "./src/sintaxe.y"
+#line 159 "./src/sintaxe.y"
                                                                                             {(yyval.no) = montaNo((yyvsp[-6].tok).lexema, NULL, (yyvsp[-2].no), (yyvsp[0].no), NULL, retUlt(&primeiro), NULL);
                                                                                             (yyval.no)->no1 = montaNo("condArg", (yyvsp[-4].no), NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2032 "./src/sintaxe.tab.c"
+#line 2303 "./src/sintaxe.tab.c"
     break;
 
   case 34: /* conditional: IF ABRE_P error FECHA_P bracesStmt  */
-#line 164 "./src/sintaxe.y"
+#line 161 "./src/sintaxe.y"
                                                                                             {}
-#line 2038 "./src/sintaxe.tab.c"
+#line 2309 "./src/sintaxe.tab.c"
     break;
 
   case 35: /* bracesStmt: ABRE_C moreStmt FECHA_C  */
-#line 167 "./src/sintaxe.y"
+#line 164 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo("statements", NULL, NULL, NULL, (yyvsp[-1].lista), retUlt(&primeiro), NULL);}
-#line 2044 "./src/sintaxe.tab.c"
+#line 2315 "./src/sintaxe.tab.c"
     break;
 
   case 36: /* bracesStmt: stmt  */
-#line 168 "./src/sintaxe.y"
+#line 165 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo("statements", (yyvsp[0].no), NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2050 "./src/sintaxe.tab.c"
+#line 2321 "./src/sintaxe.tab.c"
     break;
 
   case 37: /* iteration: FOR ABRE_P iteArgs FECHA_P bracesStmt  */
-#line 171 "./src/sintaxe.y"
+#line 168 "./src/sintaxe.y"
                                                                    {(yyval.no) = montaNo((yyvsp[-4].tok).lexema, (yyvsp[-2].no), (yyvsp[0].no), NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2056 "./src/sintaxe.tab.c"
+#line 2327 "./src/sintaxe.tab.c"
     break;
 
   case 38: /* $@5: %empty  */
-#line 172 "./src/sintaxe.y"
+#line 169 "./src/sintaxe.y"
                                    {yyerrok;}
-#line 2062 "./src/sintaxe.tab.c"
+#line 2333 "./src/sintaxe.tab.c"
     break;
 
   case 39: /* iteration: FOR ABRE_P error $@5 FECHA_P bracesStmt  */
-#line 172 "./src/sintaxe.y"
+#line 169 "./src/sintaxe.y"
                                                                    {}
-#line 2068 "./src/sintaxe.tab.c"
+#line 2339 "./src/sintaxe.tab.c"
     break;
 
   case 40: /* iteArgs: expIte PV expIte PV expIte  */
-#line 175 "./src/sintaxe.y"
+#line 172 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo("iteArgs", (yyvsp[-4].no), (yyvsp[-2].no), (yyvsp[0].no), NULL, retUlt(&primeiro), NULL);}
-#line 2074 "./src/sintaxe.tab.c"
+#line 2345 "./src/sintaxe.tab.c"
     break;
 
   case 41: /* expIte: attribuition  */
-#line 178 "./src/sintaxe.y"
+#line 175 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[0].no);}
-#line 2080 "./src/sintaxe.tab.c"
+#line 2351 "./src/sintaxe.tab.c"
     break;
 
   case 42: /* expIte: %empty  */
-#line 179 "./src/sintaxe.y"
+#line 176 "./src/sintaxe.y"
                                                         {(yyval.no) = NULL;}
-#line 2086 "./src/sintaxe.tab.c"
+#line 2357 "./src/sintaxe.tab.c"
     break;
 
   case 43: /* io: ENTRADA ABRE_P ID FECHA_P  */
-#line 189 "./src/sintaxe.y"
+#line 182 "./src/sintaxe.y"
                                                         {struct tabelaSimb *simb = retSimb(&cabeca, (yyvsp[-1].tok).lexema, &primeiro);
                                                         (yyval.no) = montaNo((yyvsp[-3].tok).lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                         (yyval.no)->no1 = montaNo((yyvsp[-1].tok).lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);}
-#line 2094 "./src/sintaxe.tab.c"
+#line 2365 "./src/sintaxe.tab.c"
     break;
 
   case 44: /* io: SAIDA ABRE_P attribuition FECHA_P  */
-#line 192 "./src/sintaxe.y"
+#line 186 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo((yyvsp[-3].tok).lexema, (yyvsp[-1].no), NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2100 "./src/sintaxe.tab.c"
+#line 2371 "./src/sintaxe.tab.c"
     break;
 
   case 45: /* io: SAIDA ABRE_P STRING FECHA_P  */
-#line 193 "./src/sintaxe.y"
-                                                        {// Inclui o termo na tabela de simbolos
+#line 188 "./src/sintaxe.y"
+                                                        {// Inclui a string na tabela de simbolos
                                                         var_ja_decl += push(&cabeca, (yyvsp[-1].tok).lexema, "constante", "string", "", retUlt(&primeiro), (yyvsp[-1].tok).linha, (yyvsp[-1].tok).coluna);
                                                         struct tabelaSimb *simb = retSimb(&cabeca, (yyvsp[-1].tok).lexema, &primeiro);
                                                         (yyval.no) = montaNo((yyvsp[-3].tok).lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                         (yyval.no)->no1 = montaNo((yyvsp[-1].tok).lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);}
-#line 2110 "./src/sintaxe.tab.c"
+#line 2381 "./src/sintaxe.tab.c"
     break;
 
   case 46: /* io: ENTRADA ABRE_P error FECHA_P  */
-#line 198 "./src/sintaxe.y"
+#line 194 "./src/sintaxe.y"
                                                         {}
-#line 2116 "./src/sintaxe.tab.c"
+#line 2387 "./src/sintaxe.tab.c"
     break;
 
   case 47: /* io: SAIDA ABRE_P error FECHA_P  */
-#line 199 "./src/sintaxe.y"
+#line 195 "./src/sintaxe.y"
                                                         {}
-#line 2122 "./src/sintaxe.tab.c"
+#line 2393 "./src/sintaxe.tab.c"
     break;
 
   case 48: /* varDecl: TIPO ID  */
-#line 203 "./src/sintaxe.y"
+#line 199 "./src/sintaxe.y"
                                                         {(yyval.no) = NULL;
                                                         // Inclui o termo na tabela de simbolos
                                                         var_ja_decl += push(&cabeca, (yyvsp[0].tok).lexema, "variavel", (yyvsp[-1].tok).lexema, "", retUlt(&primeiro), (yyvsp[-1].tok).linha, (yyvsp[-1].tok).coluna);}
-#line 2130 "./src/sintaxe.tab.c"
+#line 2401 "./src/sintaxe.tab.c"
     break;
 
   case 49: /* varDecl: TIPO LIST ID  */
-#line 207 "./src/sintaxe.y"
+#line 203 "./src/sintaxe.y"
                                                         {(yyval.no) = NULL;
-                                                        // Inclui o termo na tabela de simbolos
                                                         var_ja_decl += push(&cabeca, (yyvsp[0].tok).lexema, "variavel", strcat((yyvsp[-2].tok).lexema, " list"), "", retUlt(&primeiro), (yyvsp[-2].tok).linha, (yyvsp[-2].tok).coluna);}
-#line 2138 "./src/sintaxe.tab.c"
+#line 2408 "./src/sintaxe.tab.c"
     break;
 
   case 50: /* attribuition: ID ATRIB expLogic  */
-#line 212 "./src/sintaxe.y"
+#line 207 "./src/sintaxe.y"
                                                         {struct tabelaSimb *simb = retSimb(&cabeca, (yyvsp[-2].tok).lexema, &primeiro);
                                                         (yyval.no) = montaNo((yyvsp[-1].tok).lexema, NULL, (yyvsp[0].no), NULL, NULL, retUlt(&primeiro), NULL);
                                                         (yyval.no)->no1 = montaNo((yyvsp[-2].tok).lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);}
-#line 2146 "./src/sintaxe.tab.c"
+#line 2416 "./src/sintaxe.tab.c"
     break;
 
   case 51: /* attribuition: expLogic  */
-#line 215 "./src/sintaxe.y"
+#line 210 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[0].no);}
-#line 2152 "./src/sintaxe.tab.c"
+#line 2422 "./src/sintaxe.tab.c"
     break;
 
   case 52: /* expLogic: expLogic LOG_OP_OU andLogic  */
-#line 218 "./src/sintaxe.y"
+#line 213 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo((yyvsp[-1].tok).lexema, (yyvsp[-2].no), (yyvsp[0].no), NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2158 "./src/sintaxe.tab.c"
+#line 2428 "./src/sintaxe.tab.c"
     break;
 
   case 53: /* expLogic: andLogic  */
-#line 219 "./src/sintaxe.y"
+#line 214 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[0].no);}
-#line 2164 "./src/sintaxe.tab.c"
+#line 2434 "./src/sintaxe.tab.c"
     break;
 
   case 54: /* andLogic: andLogic LOG_OP_E expComp  */
-#line 222 "./src/sintaxe.y"
+#line 217 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo((yyvsp[-1].tok).lexema, (yyvsp[-2].no), (yyvsp[0].no), NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2170 "./src/sintaxe.tab.c"
+#line 2440 "./src/sintaxe.tab.c"
     break;
 
   case 55: /* andLogic: expComp  */
-#line 223 "./src/sintaxe.y"
+#line 218 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[0].no);}
-#line 2176 "./src/sintaxe.tab.c"
+#line 2446 "./src/sintaxe.tab.c"
     break;
 
   case 56: /* expComp: expComp REL_OP_BAIXA expRel  */
-#line 226 "./src/sintaxe.y"
+#line 221 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo((yyvsp[-1].tok).lexema, (yyvsp[-2].no), (yyvsp[0].no), NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2182 "./src/sintaxe.tab.c"
+#line 2452 "./src/sintaxe.tab.c"
     break;
 
   case 57: /* expComp: expRel  */
-#line 227 "./src/sintaxe.y"
+#line 222 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[0].no);}
-#line 2188 "./src/sintaxe.tab.c"
+#line 2458 "./src/sintaxe.tab.c"
     break;
 
   case 58: /* expRel: expRel REL_OP_ALTA expArit  */
-#line 230 "./src/sintaxe.y"
+#line 225 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo((yyvsp[-1].tok).lexema, (yyvsp[-2].no), (yyvsp[0].no), NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2194 "./src/sintaxe.tab.c"
+#line 2464 "./src/sintaxe.tab.c"
     break;
 
   case 59: /* expRel: expArit  */
-#line 231 "./src/sintaxe.y"
+#line 226 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[0].no);}
-#line 2200 "./src/sintaxe.tab.c"
+#line 2470 "./src/sintaxe.tab.c"
     break;
 
   case 60: /* expArit: expArit ARIT_OP_MAIS expMul  */
-#line 234 "./src/sintaxe.y"
+#line 229 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo((yyvsp[-1].tok).lexema, (yyvsp[-2].no), (yyvsp[0].no), NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2206 "./src/sintaxe.tab.c"
+#line 2476 "./src/sintaxe.tab.c"
     break;
 
   case 61: /* expArit: expArit ARIT_OP_MENOS expMul  */
-#line 235 "./src/sintaxe.y"
+#line 230 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo((yyvsp[-1].tok).lexema, (yyvsp[-2].no), (yyvsp[0].no), NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2212 "./src/sintaxe.tab.c"
+#line 2482 "./src/sintaxe.tab.c"
     break;
 
   case 62: /* expArit: expMul  */
-#line 236 "./src/sintaxe.y"
+#line 231 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[0].no);}
-#line 2218 "./src/sintaxe.tab.c"
+#line 2488 "./src/sintaxe.tab.c"
     break;
 
   case 63: /* expMul: expMul ARIT_OP_ALTA negElement  */
-#line 239 "./src/sintaxe.y"
+#line 234 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo((yyvsp[-1].tok).lexema, (yyvsp[-2].no), (yyvsp[0].no), NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2224 "./src/sintaxe.tab.c"
+#line 2494 "./src/sintaxe.tab.c"
     break;
 
   case 64: /* expMul: negElement  */
-#line 240 "./src/sintaxe.y"
+#line 235 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[0].no);}
-#line 2230 "./src/sintaxe.tab.c"
+#line 2500 "./src/sintaxe.tab.c"
     break;
 
   case 65: /* negElement: LOG_OP_NEG expList  */
-#line 243 "./src/sintaxe.y"
+#line 238 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo((yyvsp[-1].tok).lexema, (yyvsp[0].no), NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2236 "./src/sintaxe.tab.c"
+#line 2506 "./src/sintaxe.tab.c"
     break;
 
   case 66: /* negElement: ARIT_OP_MENOS expList  */
-#line 244 "./src/sintaxe.y"
+#line 239 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo((yyvsp[-1].tok).lexema, (yyvsp[0].no), NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2242 "./src/sintaxe.tab.c"
+#line 2512 "./src/sintaxe.tab.c"
     break;
 
   case 67: /* negElement: expList  */
-#line 245 "./src/sintaxe.y"
+#line 240 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[0].no);}
-#line 2248 "./src/sintaxe.tab.c"
+#line 2518 "./src/sintaxe.tab.c"
     break;
 
   case 68: /* expList: LIST_OP_UN element  */
-#line 248 "./src/sintaxe.y"
+#line 243 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo((yyvsp[-1].tok).lexema, (yyvsp[0].no), NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2254 "./src/sintaxe.tab.c"
+#line 2524 "./src/sintaxe.tab.c"
     break;
 
   case 69: /* expList: expList LIST_OP_BIN element  */
-#line 249 "./src/sintaxe.y"
+#line 244 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo((yyvsp[-1].tok).lexema, (yyvsp[-2].no), (yyvsp[0].no), NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2260 "./src/sintaxe.tab.c"
+#line 2530 "./src/sintaxe.tab.c"
     break;
 
   case 70: /* expList: element  */
-#line 250 "./src/sintaxe.y"
+#line 245 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[0].no);}
-#line 2266 "./src/sintaxe.tab.c"
+#line 2536 "./src/sintaxe.tab.c"
     break;
 
   case 71: /* element: ID  */
-#line 253 "./src/sintaxe.y"
+#line 250 "./src/sintaxe.y"
                                                         {struct tabelaSimb *simb = retSimb(&cabeca, (yyvsp[0].tok).lexema, &primeiro);
                                                         (yyval.no) = montaNo((yyvsp[0].tok).lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);}
-#line 2273 "./src/sintaxe.tab.c"
+#line 2543 "./src/sintaxe.tab.c"
     break;
 
   case 72: /* element: ABRE_P attribuition FECHA_P  */
-#line 255 "./src/sintaxe.y"
+#line 253 "./src/sintaxe.y"
                                                         {(yyval.no) = (yyvsp[-1].no);}
-#line 2279 "./src/sintaxe.tab.c"
+#line 2549 "./src/sintaxe.tab.c"
     break;
 
   case 73: /* element: ID ABRE_P arguments FECHA_P  */
-#line 256 "./src/sintaxe.y"
+#line 255 "./src/sintaxe.y"
                                                         {struct tabelaSimb *simb = retSimb(&cabeca, (yyvsp[-3].tok).lexema, &primeiro);
                                                         (yyval.no) = montaNo((yyvsp[-3].tok).lexema, NULL, NULL, NULL, (yyvsp[-1].lista), retUlt(&primeiro), simb);}
-#line 2286 "./src/sintaxe.tab.c"
+#line 2556 "./src/sintaxe.tab.c"
     break;
 
   case 74: /* element: ID ABRE_P FECHA_P  */
 #line 258 "./src/sintaxe.y"
                                                         {struct tabelaSimb *simb = retSimb(&cabeca, (yyvsp[-2].tok).lexema, &primeiro);
                                                         (yyval.no) = montaNo((yyvsp[-2].tok).lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);}
-#line 2293 "./src/sintaxe.tab.c"
+#line 2563 "./src/sintaxe.tab.c"
     break;
 
   case 75: /* element: CONST_INT  */
-#line 260 "./src/sintaxe.y"
+#line 261 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo((yyvsp[0].tok).lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2299 "./src/sintaxe.tab.c"
+#line 2569 "./src/sintaxe.tab.c"
     break;
 
   case 76: /* element: CONST_FLOAT  */
-#line 261 "./src/sintaxe.y"
+#line 262 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo((yyvsp[0].tok).lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2305 "./src/sintaxe.tab.c"
+#line 2575 "./src/sintaxe.tab.c"
     break;
 
   case 77: /* element: NIL  */
-#line 262 "./src/sintaxe.y"
+#line 263 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo("NIL", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2311 "./src/sintaxe.tab.c"
+#line 2581 "./src/sintaxe.tab.c"
     break;
 
   case 78: /* arguments: arguments VIRG attribuition  */
-#line 265 "./src/sintaxe.y"
+#line 266 "./src/sintaxe.y"
                                                         {(yyval.lista) = novaListaNo(&(yyvsp[-2].lista), (yyvsp[0].no));}
-#line 2317 "./src/sintaxe.tab.c"
+#line 2587 "./src/sintaxe.tab.c"
     break;
 
   case 79: /* arguments: attribuition  */
-#line 266 "./src/sintaxe.y"
+#line 267 "./src/sintaxe.y"
                                                         {struct listaNo* lista = NULL;
                                                         (yyval.lista) = novaListaNo(&lista, (yyvsp[0].no));}
-#line 2324 "./src/sintaxe.tab.c"
+#line 2594 "./src/sintaxe.tab.c"
     break;
 
   case 80: /* ret: RETURN attribuition  */
-#line 270 "./src/sintaxe.y"
+#line 271 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo("return", (yyvsp[0].no), NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-#line 2330 "./src/sintaxe.tab.c"
+#line 2600 "./src/sintaxe.tab.c"
     break;
 
 
-#line 2334 "./src/sintaxe.tab.c"
+#line 2604 "./src/sintaxe.tab.c"
 
       default: break;
     }
@@ -2377,7 +2647,37 @@ yyerrlab:
   if (!yyerrstatus)
     {
       ++yynerrs;
-      yyerror (YY_("syntax error"));
+      {
+        yypcontext_t yyctx
+          = {yyssp, yytoken};
+        char const *yymsgp = YY_("syntax error");
+        int yysyntax_error_status;
+        yysyntax_error_status = yysyntax_error (&yymsg_alloc, &yymsg, &yyctx);
+        if (yysyntax_error_status == 0)
+          yymsgp = yymsg;
+        else if (yysyntax_error_status == -1)
+          {
+            if (yymsg != yymsgbuf)
+              YYSTACK_FREE (yymsg);
+            yymsg = YY_CAST (char *,
+                             YYSTACK_ALLOC (YY_CAST (YYSIZE_T, yymsg_alloc)));
+            if (yymsg)
+              {
+                yysyntax_error_status
+                  = yysyntax_error (&yymsg_alloc, &yymsg, &yyctx);
+                yymsgp = yymsg;
+              }
+            else
+              {
+                yymsg = yymsgbuf;
+                yymsg_alloc = sizeof yymsgbuf;
+                yysyntax_error_status = YYENOMEM;
+              }
+          }
+        yyerror (yymsgp);
+        if (yysyntax_error_status == YYENOMEM)
+          goto yyexhaustedlab;
+      }
     }
 
   if (yyerrstatus == 3)
@@ -2483,7 +2783,7 @@ yyabortlab:
   goto yyreturn;
 
 
-#if !defined yyoverflow
+#if 1
 /*-------------------------------------------------.
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
@@ -2520,19 +2820,20 @@ yyreturn:
   if (yyss != yyssa)
     YYSTACK_FREE (yyss);
 #endif
-
+  if (yymsg != yymsgbuf)
+    YYSTACK_FREE (yymsg);
   return yyresult;
 }
 
-#line 273 "./src/sintaxe.y"
+#line 274 "./src/sintaxe.y"
 
 
 
 /*
     Funcao que imprime onde ocorreu o erro sintatico
 */
-void yyerror(char *s) {
-    printf("ERRO sintático\nLinha: %d\tColuna: %d\n\n", yylval.tok.linha, yylval.tok.coluna);
+void yyerror(const char *s) {
+    printf("ERRO: %s\nLinha: %d\tColuna: %d\n\n", s, yylval.tok.linha, yylval.tok.coluna);
     ++num_erros_sintaticos;
 }
 
