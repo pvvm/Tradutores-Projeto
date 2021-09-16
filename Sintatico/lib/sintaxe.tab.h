@@ -39,13 +39,13 @@
 # define YY_YY_SRC_SINTAXE_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 1
+# define YYDEBUG 0
 #endif
 #if YYDEBUG
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 34 "./src/sintaxe.y"
+#line 31 "./src/sintaxe.y"
 
     struct token {
         char lexema[50];
@@ -102,12 +102,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 42 "./src/sintaxe.y"
+#line 39 "./src/sintaxe.y"
 
     struct token tok;
     struct No* no;              // Estrutura do no
+    struct listaNo* lista;      // Estrutura de lista de nos
 
-#line 111 "./src/sintaxe.tab.h"
+#line 112 "./src/sintaxe.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

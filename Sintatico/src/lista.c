@@ -5,6 +5,7 @@ struct tabelaSimb* aux_ts =  NULL;
 /*
     Funcao que procura se a lista ja contem uma declaracao do mesmo simbolo no mesmo escopo
     Argumentos: o elemento atual da lista e o simbolo e escopo do novo elemento a ser adicionado
+    Retorno: 1 se nao encontrar uma entrada de mesmo simbolo e escopo, se sim 0
 */
 int procuraLista(struct tabelaSimb** prim, char *simbolo, int escopo) {
     if((*prim) == NULL)
@@ -17,7 +18,8 @@ int procuraLista(struct tabelaSimb** prim, char *simbolo, int escopo) {
 
 /*
     Funcao que adiciona o novo simbolo no fim da lista (fica melhor ordenado na hora de imprimir)
-    Argumentos: o elemento atual e o simbolo, se eh variavel ou funcao, tipo, valor, escopo, linha e coluna do novo elemento
+    Argumentos: o elemento atual e o simbolo, se eh variavel, funcao ou constante, tipo, valor, escopo, linha e coluna do novo elemento
+    Retorno: 0 se foi adicionado o simbolo na tabela e 1 se nao
 */
 int push(struct tabelaSimb** ult, char *simbolo, char *varOuFunc, char *tipo, char *valor, int escopo, int linha, int coluna) {
     struct tabelaSimb **aux = ult;
@@ -46,7 +48,7 @@ int push(struct tabelaSimb** ult, char *simbolo, char *varOuFunc, char *tipo, ch
         }
         return 0;
     } else {        // Caso o simbolo ja tenha sido declarado
-        printf("Erro: simbolo ja declarado nesse escopo\nLinha:%d\nColuna:%d\n\n", linha, coluna);
+        //printf("Erro: simbolo ja declarado nesse escopo\nLinha:%d\nColuna:%d\n\n", linha, coluna);
         return 1;
     }
 }
@@ -64,7 +66,7 @@ void printaLista(struct tabelaSimb *prim) {
 }
 
 /*
-    Funcao que insere o numero de argumentos que uma funcao ja listada na tabela de simbolos possui
+    Funcao que insere o numero de argumentos de uma funcao ja listada na tabela de simbolos
     Argumentos: o primeiro elemento da tabela, o simbolo e escopo que identificam o elemento e o numero de argumentos
 */
 void insereArg(struct tabelaSimb **prim, char *simb, int escopo, int numArgs) {
@@ -80,6 +82,11 @@ void insereArg(struct tabelaSimb **prim, char *simb, int escopo, int numArgs) {
     }
 }
 
+/*
+    Funcao que retorna a entrada da tabela que tem o simbolo e o escopo atual
+    Argumentos: o primeiro elemento da tabela, o simbolo e o primeio elemento da lista de escopo
+    Retorno: a entrada da tabela
+*/
 struct tabelaSimb* retSimb(struct tabelaSimb ** prim, char *simbolo, struct listaEscopo ** cabecaEsc){
     if((*prim) == NULL) {
         struct tabelaSimb* aux = aux_ts;
@@ -97,6 +104,7 @@ struct tabelaSimb* retSimb(struct tabelaSimb ** prim, char *simbolo, struct list
 /*
     Desaloca a memoria utilizada pela tabela de simbolos
     Argumentos: o elemento atual da lista
+    Retorno: 1 caso tenha sido liberado tudo
 */
 int liberaLista(struct tabelaSimb *prim) {
     if(prim == NULL) {
@@ -106,6 +114,7 @@ int liberaLista(struct tabelaSimb *prim) {
     free(prim);
     return liberaLista(aux);
 }
+
 
 // Operacoes da lista para o escopo
 
@@ -139,6 +148,7 @@ void pushEsc(struct listaEscopo** prim, int escopo_atual) {
 /*
     Retira o ultimo elemento da lista
     Argumentos: o primeiro elemento da lista
+    Retorno: o escopo retirado
 */
 int popEsc(struct listaEscopo** ult) {
     if((*ult) == NULL)
@@ -165,6 +175,7 @@ int popEsc(struct listaEscopo** ult) {
 /*
     Desaloca a memoria utilizada na lista de escopos
     Argumentos: elemento atual da lista
+    Retorno: 1 caso tenha sido liberado tudo
 */
 int liberaEsc(struct listaEscopo *prim) {
     if(prim == NULL) {
@@ -187,7 +198,10 @@ void printaEsc(struct listaEscopo *prim) {
     printf("\n");
 }
 
-
+/*
+    Funcao que retorna o escopo do fim da lista (o atual)
+    Argumentos: primeiro elemento da lista de escopo
+*/
 int retUlt(struct listaEscopo** ult) {
     if((*ult) == NULL)
         return 0;
@@ -203,6 +217,11 @@ int retUlt(struct listaEscopo** ult) {
     return aux->prox->escopo;
 }
 
+/*
+    Funcao que busca se o escopo existe na lista
+    Argumentos: primeiro elemento da lista de escopo e o escopo procurado
+    Retorno: 1 se encontrou o escopo, caso nao, 0
+*/
 int buscaEscopo(struct listaEscopo** elemento, int escopo) {
     if((*elemento) == NULL)
         return 0;
