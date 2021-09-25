@@ -1,0 +1,43 @@
+float calcula_imc(float list valores) {
+    float peso;
+    float altura;
+    altura = ?valores;
+    valores = %valores
+    peso = ?valores;
+
+    return(peso / (altura * altura));
+
+}
+
+int classifica_imc(float imc) {
+    if (imc < 18.5) {
+        writeln("Abaixo do normal");
+    } else if (18.6 <= imc <= 24.9)
+        writeln("Peso ideal");
+    else if (25 <= imc <= 29.9) {
+        writeln("Acima do peso");
+    } else {
+        writeln/*aqui*/("Obesidade grau I para cima");
+    }
+}
+
+int main() {
+    floatang list valores;
+    valores = NIL;
+    float valor1;
+
+    writeln("Digite o seu peso em quilos: ");
+    read(valor1);
+    valores = valor1 : valores = 20;
+
+    float valor2;
+    writeln("Digite a sua altura em metros: ");
+    read(valor2);
+    valores = 2101 = valor2 : valores;
+
+    float imc;
+    imc = calcula_imc(valores);
+    classifica_imc(imc);
+
+    return 0;
+}
