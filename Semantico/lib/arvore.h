@@ -30,8 +30,9 @@ int printaArvore(struct No*);
 
 struct No* montaNo(char*, struct No*, struct No*, struct No*, struct listaNo*, int, struct tabelaSimb*);
 
-struct listaNo* novaListaNo(struct listaNo**, struct No*);
+struct No* castNo(char*, struct No*, struct No*, int, int, int, int*);
 
+struct listaNo* novaListaNo(struct listaNo**, struct No*);
 
 
 #endif

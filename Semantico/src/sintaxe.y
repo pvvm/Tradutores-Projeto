@@ -250,12 +250,14 @@ expArit:        expArit ARIT_OP_MAIS expMul             {$$ = montaNo($2.lexema,
                 | expMul                                {$$ = $1;}
                 ;
 
-expMul:         expMul ARIT_OP_ALTA negElement          {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);}
+expMul:         expMul ARIT_OP_ALTA negElement          {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);}
                 | negElement                            {$$ = $1;}
                 ;
 
-negElement:     LOG_OP_NEG expList                      {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-                | ARIT_OP_MENOS expList                 {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
+negElement:     LOG_OP_NEG expList                      {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                        strcpy($$->tipo, $2->tipo);}
+                | ARIT_OP_MENOS expList                 {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                        strcpy($$->tipo, $2->tipo);}
                 | expList                               {$$ = $1;}
                 ;
 

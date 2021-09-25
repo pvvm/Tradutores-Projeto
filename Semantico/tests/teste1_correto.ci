@@ -72,6 +72,10 @@ int main() {
     } else 
         writeln("AQUI");
     
+    float teste1;
+    int teste2;
+    a = teste1 * teste2 * 9.9 * (2);
+
     //oi = 2 + oi +e_eu_sei_la(lista, tamanho);
     
     lista = 5;
