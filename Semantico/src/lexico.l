@@ -39,8 +39,8 @@ LOG_OP_E        (&&)
 LOG_OP_NEG      (!)
 REL_OP_ALTA     (<=?|>=?)
 REL_OP_BAIXA    (==|!=)
-LIST_OP_BIN     (\:|\>\>|\<\<)
-LIST_OP_UN      (\?|\!|\%)
+LIST_OP_BIN     (\>\>|\<\<)
+LIST_OP_UN      (\!|\%)
 ENTRADA         (read)
 SAIDA           (write|writeln)
 IDENTIFICADOR   [a-zA-Z_][_a-zA-Z0-9]*
@@ -94,6 +94,10 @@ IDENTIFICADOR   [a-zA-Z_][_a-zA-Z0-9]*
                         return LIST_OP_BIN;}
 {LIST_OP_UN}            {num_coluna = cria_token(yytext, num_linha, num_coluna);
                         return LIST_OP_UN;}
+"?"                     {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return LIST_OP_HEADER;}
+":"                     {num_coluna = cria_token(yytext, num_linha, num_coluna);
+                        return LIST_OP_CONSTRUTOR;}
 
 
     /*   FLUXO DE CONTROLE   */

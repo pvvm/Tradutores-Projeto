@@ -10,6 +10,7 @@ TODO:
         Return
         Variáveis e funcoes redeclaradas
         Existência da main                              FEITO
+        Ver se a função de >> e << é unária
 */
 
 %{
@@ -68,8 +69,9 @@ void yyerror(const char *);
 %left REL_OP_BAIXA
 %token <tok> REL_OP_ALTA
 %left REL_OP_ALTA
-%token <tok> LIST_OP_BIN
-%token <tok> LIST_OP_UN
+%token <tok> LIST_OP_BIN LIST_OP_CONSTRUTOR
+%token <tok> LIST_OP_UN LIST_OP_HEADER
+%right LIST_OP_BIN LIST_OP_CONSTRUTOR LIST_OP_UN LIST_OP_HEADER
 %token <tok> ARIT_OP_MAIS ARIT_OP_MENOS
 %left ARIT_OP_MAIS ARIT_OP_MENOS
 %token <tok> ARIT_OP_ALTA
@@ -101,13 +103,13 @@ program:        declarations                            {raiz = montaNo("program
                                                         }
                                                         
                                                         // Caso nao hajam erros lexicos, sintaticos e semanticos, imprime a arvore
-                                                        if(num_erros_sintaticos == 0 && num_erros_lexicos == 0 && num_erros_semanticos == 0) {
+                                                        if(num_erros_sintaticos == 0 && num_erros_lexicos == 0/* && num_erros_semanticos == 0*/) {
                                                             printf("Sem erros lexicos\n");
                                                             printf("Sem erros sintaticos\n");
                                                             printf("Sem erros semanticos\n\n");
                                                             printf("========================================================== ARVORE SINTATICA ABSTRADA =========================================================\n\n");
                                                             printaArvore(raiz);
-                                                            desalocar(raiz);
+                                                            //desalocar(raiz);      // Ver se tem problema tirar o desalocar daqui
                                                             printf("\n\n");
                                                         } else {
                                                             printf("Foram encontrados %d erros lexicos\n", num_erros_lexicos);
@@ -117,6 +119,7 @@ program:        declarations                            {raiz = montaNo("program
                                                         printf("\n\n================================================================== TABELA DE SIMBOLOS =================================================================\n\n");
                                                         printaLista(cabeca);
                                                         liberaLista(cabeca);
+                                                        desalocar(raiz);
                                                         liberaEsc(primeiro);}
                 | /* empty */
                 ;
@@ -224,29 +227,54 @@ varDecl:        TIPO ID                                 {$$ = NULL;
                 ;
 
 attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb = retSimb(&cabeca, $1.lexema, &primeiro);
-                                                        $$ = montaNo($2.lexema, NULL, $3, NULL, NULL, retUlt(&primeiro), NULL);
-                                                        $$->no1 = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);}
+                                                        $$ = montaNo($2.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                        $$->no1 = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);
+                                                        //printf("%s e %s\n", simb->tipo, $3->tipo);
+                                                        if((!strcmp($3->tipo, "int") && !strcmp($$->no1->simbolo->tipo, "float")) || (!strcmp($3->tipo, "float") && !strcmp($$->no1->simbolo->tipo, "int"))) {
+                                                            char aux[15];
+                                                            strcpy(aux, "(");
+                                                            strcat(aux, simb->tipo);
+                                                            strcat(aux, ")");
+                                                            struct No* no = montaNo(aux, $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                            $$->no2 = no;
+                                                        } else if(!strcmp($3->tipo, "int list")){
+                                                            if(strcmp($$->no1->simbolo->tipo, "int list")) {
+                                                                printf("Erro semantico: tipo errado na operacao %s\nLinha:%d\nColuna:%d\n\n", $2.lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                                ++num_erros_semanticos;
+                                                            }
+                                                            $$->no2 = $3;
+                                                        } else if(!strcmp($3->tipo, "float list")){
+                                                            if(strcmp($$->no1->simbolo->tipo, "float list")) {
+                                                                printf("Erro semantico: tipo errado na operacao %s\nLinha:%d\nColuna:%d\n\n", $2.lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                                ++num_erros_semanticos;
+                                                            }
+                                                            $$->no2 = $3;
+                                                        } else {
+                                                            //printf("Erro semantico: tipo errado na operacao %s\nLinha:%d\nColuna:%d\n\n", $2.lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                            //++num_erros_semanticos;
+                                                            $$->no2 = $3;
+                                                        }}
                 | expLogic                              {$$ = $1;}
                 ;
 
-expLogic:       expLogic LOG_OP_OU andLogic             {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);}
+expLogic:       expLogic LOG_OP_OU andLogic             {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);}
                 | andLogic                              {$$ = $1;}
                 ;
 
-andLogic:       andLogic LOG_OP_E expComp               {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);}
+andLogic:       andLogic LOG_OP_E expComp               {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);}
                 | expComp                               {$$ = $1;}
                 ;
 
-expComp:        expComp REL_OP_BAIXA expRel             {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);}
+expComp:        expComp REL_OP_BAIXA expRel             {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);}
                 | expRel                                {$$ = $1;}
                 ;
 
-expRel:         expRel REL_OP_ALTA expArit              {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);}
+expRel:         expRel REL_OP_ALTA expArit              {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);}
                 | expArit                               {$$ = $1;}
                 ;
 
-expArit:        expArit ARIT_OP_MAIS expMul             {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);}
-                | expArit ARIT_OP_MENOS expMul          {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);}
+expArit:        expArit ARIT_OP_MAIS expMul             {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);}
+                | expArit ARIT_OP_MENOS expMul          {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);}
                 | expMul                                {$$ = $1;}
                 ;
 
@@ -261,8 +289,26 @@ negElement:     LOG_OP_NEG expList                      {$$ = montaNo($1.lexema,
                 | expList                               {$$ = $1;}
                 ;
 
-expList:        LIST_OP_UN element                      {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-                | expList LIST_OP_BIN element           {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);}
+expList:        LIST_OP_UN element                      {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                        strcpy($$->tipo, $2->tipo);}
+                | LIST_OP_HEADER element                {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                        char* aux = strtok($2->tipo, " ");
+                                                        strcpy($$->tipo, aux);}
+
+                | expList LIST_OP_BIN element           {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);
+                                                        char aux[15];
+                                                        strcpy(aux, $1->simbolo->tipo);
+                                                        strcat(aux, " list");
+                                                        strcpy($$->tipo, aux);
+                                                        if(strcmp($1->simbolo->varOuFunc, "funcao")) {
+                                                            printf("Erro semantico: termo a esquerda nao eh funcao\nLinha:%d\nColuna:%d\n\n", yylval.tok.linha, yylval.tok.coluna);
+                                                            ++num_erros_semanticos;
+                                                        } else if($1->simbolo->numArgs != 1) {
+                                                            printf("Erro semantico: funcao nao eh unaria\nLinha:%d\nColuna:%d\n\n", yylval.tok.linha, yylval.tok.coluna);
+                                                            ++num_erros_semanticos;
+                                                        }}
+                | expList LIST_OP_CONSTRUTOR element    {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);
+                                                        strcpy($$->tipo, $3->tipo);}
                 | element                               {$$ = $1;}
                 ;
 

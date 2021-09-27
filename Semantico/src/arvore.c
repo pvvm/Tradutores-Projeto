@@ -132,13 +132,12 @@ struct No* castNo(char* lexema, struct No* esqNo, struct No* dirNo, int escopo, 
             return no;
         }
     } else {
-        printf("%s e %s\n", esqNo->tipo, dirNo->tipo);
-        printf("Erro semantico: tipo errado operacao %s\nLinha:%d\nColuna:%d\n\n", lexema, linha, coluna);
-        struct No* no = montaNo(lexema, esqNo, dirNo, NULL, NULL, escopo, NULL);         // o vazamento de memoria em erro deve estar aqui
+        //printf("%s e %s\n", esqNo->tipo, dirNo->tipo);
+        printf("Erro semantico: tipo errado na operacao %s\nLinha:%d\nColuna:%d\n\n", lexema, linha, coluna);
+        struct No* no = montaNo(lexema, esqNo, dirNo, NULL, NULL, escopo, NULL);         // comentar essa e a proxima caso deseje nao passar o tipo errado
         strcpy(no->tipo, esqNo->tipo);
+        ++(*num_erros_semanticos);
         return no;
-        ++num_erros_semanticos;
-
     }
 }
 
