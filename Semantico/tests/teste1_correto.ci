@@ -19,6 +19,10 @@ int soma(int a, int b) {
     return a+b*5;
 }
 
+/*float soma() {
+    return 1.0;
+}*/
+
 /*
 Testando comentario multilinha
 */
@@ -38,7 +42,7 @@ int main() {
         int testando2;
         testando2 = r + 1;
     }
-    r = soma(a, b/*, s, c, s*/);
+    r = soma(a, b, s, c, s);
 
     if(r > 0) {
         int list lista;
@@ -58,7 +62,7 @@ int main() {
             tamanho = 1 + tamanho;
         }
         write("A soma dos elementos da lista eh ");
-        if(total > -999999 && total < 0/* && sei_la == oi*/) {
+        if(total > -999999 && total < 0 && sei_la == oi) {
             writeln("negativa. Como pode ver a lista:");
             _write_list(lista, tamanho);
         } else if (total > 99999 * 23892 + 21 + 92 * (32 - - 12)) {
@@ -85,5 +89,11 @@ int main() {
     float list w;
     t = w;
     a = b + ?t;
+    int i;
+    int oi;
+    float v;
+
+    i = v * soma(a, b);
+
     return 0;
 }

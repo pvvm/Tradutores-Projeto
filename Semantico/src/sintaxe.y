@@ -4,13 +4,14 @@
 /*
 TODO: 
     ERROS:
-        Tipos errados
+        Tipos errados                                   QUASE LA
         Numero de argumentos em chamada de funcao
+        Tipos de argumentos na chamada?
         Variáveis e funcoes não declaradas              FEITO
-        Return
-        Variáveis e funcoes redeclaradas
+        Return                                          APARENTEMENTE É DA GERAÇÃO DE CÓDIGO
+        Variáveis e funcoes redeclaradas                FEITO
         Existência da main                              FEITO
-        Ver se a função de >> e << é unária
+        Ver se a função de >> e << é unária             FEITO
 */
 
 %{
