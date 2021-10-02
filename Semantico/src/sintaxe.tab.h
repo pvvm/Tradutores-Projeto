@@ -45,7 +45,7 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 42 "./src/sintaxe.y"
+#line 44 "./src/sintaxe.y"
 
     struct token {
         char lexema[50];
@@ -80,20 +80,22 @@ extern int yydebug;
     REL_OP_BAIXA = 271,            /* REL_OP_BAIXA  */
     REL_OP_ALTA = 272,             /* REL_OP_ALTA  */
     LIST_OP_BIN = 273,             /* LIST_OP_BIN  */
-    LIST_OP_UN = 274,              /* LIST_OP_UN  */
-    ARIT_OP_MAIS = 275,            /* ARIT_OP_MAIS  */
-    ARIT_OP_MENOS = 276,           /* ARIT_OP_MENOS  */
-    ARIT_OP_ALTA = 277,            /* ARIT_OP_ALTA  */
-    LOG_OP_NEG = 278,              /* LOG_OP_NEG  */
-    CONST_INT = 279,               /* CONST_INT  */
-    CONST_FLOAT = 280,             /* CONST_FLOAT  */
-    STRING = 281,                  /* STRING  */
-    NIL = 282,                     /* NIL  */
-    ID = 283,                      /* ID  */
-    ABRE_P = 284,                  /* ABRE_P  */
-    FECHA_P = 285,                 /* FECHA_P  */
-    ABRE_C = 286,                  /* ABRE_C  */
-    FECHA_C = 287                  /* FECHA_C  */
+    LIST_OP_CONSTRUTOR = 274,      /* LIST_OP_CONSTRUTOR  */
+    LIST_OP_UN = 275,              /* LIST_OP_UN  */
+    LIST_OP_HEADER = 276,          /* LIST_OP_HEADER  */
+    ARIT_OP_MAIS = 277,            /* ARIT_OP_MAIS  */
+    ARIT_OP_MENOS = 278,           /* ARIT_OP_MENOS  */
+    ARIT_OP_ALTA = 279,            /* ARIT_OP_ALTA  */
+    LOG_OP_NEG = 280,              /* LOG_OP_NEG  */
+    CONST_INT = 281,               /* CONST_INT  */
+    CONST_FLOAT = 282,             /* CONST_FLOAT  */
+    STRING = 283,                  /* STRING  */
+    NIL = 284,                     /* NIL  */
+    ID = 285,                      /* ID  */
+    ABRE_P = 286,                  /* ABRE_P  */
+    FECHA_P = 287,                 /* FECHA_P  */
+    ABRE_C = 288,                  /* ABRE_C  */
+    FECHA_C = 289                  /* FECHA_C  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -102,13 +104,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 50 "./src/sintaxe.y"
+#line 52 "./src/sintaxe.y"
 
     struct token tok;
     struct No* no;              // Estrutura do no
     struct listaNo* lista;      // Estrutura de lista de nos
 
-#line 112 "./src/sintaxe.tab.h"
+#line 114 "./src/sintaxe.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

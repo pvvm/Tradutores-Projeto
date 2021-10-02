@@ -4,7 +4,7 @@ int oi;
 int _write_list(int list lista, int tamanho) {
     int i;
     int header;
-    for(i = 0; i < tamanho; i = i + 1) {
+    for(i = 0.0; i < tamanho; i = i + 1) {
         header = ?lista;    // Testando comentario
         lista = %lista;
         write(header);
@@ -19,6 +19,10 @@ int soma(int a, int b) {
     return a+b*5;
 }
 
+/*float soma() {
+    return 1.0;
+}*/
+
 /*
 Testando comentario multilinha
 */
@@ -29,7 +33,7 @@ int main() {
     int lista;
     {
         int testando;
-        testando = 1 + 3 - a + b;
+        testando = 1 + 3.0 - a + b;
     }
     read(a);
     read(b);
@@ -38,7 +42,7 @@ int main() {
         int testando2;
         testando2 = r + 1;
     }
-    r = soma(a, b/*, s, c, s*/);
+    r = soma(a, b, s, c, s);
 
     if(r > 0) {
         int list lista;
@@ -58,7 +62,7 @@ int main() {
             tamanho = 1 + tamanho;
         }
         write("A soma dos elementos da lista eh ");
-        if(total > -999999 && total < 0/* && sei_la == oi*/) {
+        if(total > -999999 && total < 0 && sei_la == oi) {
             writeln("negativa. Como pode ver a lista:");
             _write_list(lista, tamanho);
         } else if (total > 99999 * 23892 + 21 + 92 * (32 - - 12)) {
@@ -72,9 +76,24 @@ int main() {
     } else 
         writeln("AQUI");
     
+    int teste1;
+    int teste2;
+    a = teste1 * teste2 + 9.9 * (2);
+
     //oi = 2 + oi +e_eu_sei_la(lista, tamanho);
     
     lista = 5;
     oi = 50 - 20 + (1 && 1) * 20;
+
+    float list t;
+    float list w;
+    t = w;
+    a = b + ?t;
+    int i;
+    int oi;
+    float v;
+
+    i = v * soma(a, b);
+
     return 0;
 }

@@ -112,6 +112,36 @@ struct No* montaNo(char *nome, struct No *no_1, struct No *no_2, struct No *no_3
     return no;
 }
 
+struct No* castNo(char* lexema, struct No* esqNo, struct No* dirNo, int escopo, int linha, int coluna, int* num_erros_semanticos) {
+    if((!strcmp(esqNo->tipo, "int") || !strcmp(esqNo->tipo, "float")) && ((!strcmp(dirNo->tipo, "int") || !strcmp(dirNo->tipo, "float")))) {
+        struct No* no;
+        if(!strcmp(esqNo->tipo, dirNo->tipo)) {
+            no = montaNo(lexema, esqNo, dirNo, NULL, NULL, escopo, NULL);
+            strcpy(no->tipo, esqNo->tipo);
+            return no;
+        }
+        else {
+            if(!strcmp(esqNo->tipo, "int")) {
+                no = montaNo(lexema, NULL, dirNo, NULL, NULL, escopo, NULL);
+                no->no1 = montaNo("(float)", esqNo, NULL, NULL, NULL, escopo, NULL);
+            } else if(!strcmp(dirNo->tipo, "int")) {
+                no = montaNo(lexema, esqNo, NULL, NULL, NULL, escopo, NULL);
+                no->no2 = montaNo("(float)", dirNo, NULL, NULL, NULL, escopo, NULL);
+            }
+            strcpy(no->tipo, "float");
+            return no;
+        }
+    } else {
+        //printf("%s e %s\n", esqNo->tipo, dirNo->tipo);
+        printf("Erro semantico: tipo errado na operacao %s\nLinha:%d\nColuna:%d\n\n", lexema, linha, coluna);
+        struct No* no = montaNo(lexema, esqNo, dirNo, NULL, NULL, escopo, NULL);         // comentar essa e a proxima caso deseje nao passar o tipo errado
+        strcpy(no->tipo, esqNo->tipo);
+        ++(*num_erros_semanticos);
+        return no;
+    }
+}
+
+
 /*
     Funcao que auxilia adiciona um novo no filho a lista
     Argumentos: a lista que contem os nos e o no filho
