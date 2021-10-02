@@ -35,6 +35,7 @@ int push(struct tabelaSimb** ult, char *simbolo, char *varOuFunc, char *tipo, ch
         novo->escopo = escopo;
         novo->linha = linha;
         novo->coluna = coluna;
+        novo->tipoArgs = NULL;
         novo->prox = NULL;
 
         if(*ult == NULL) {
@@ -53,6 +54,14 @@ int push(struct tabelaSimb** ult, char *simbolo, char *varOuFunc, char *tipo, ch
     }
 }
 
+void printaArgs(struct listaArgs *prim) {
+    while(prim != NULL) {
+        printf("%s\n", prim->tipo);
+        prim = prim->prox;
+    }
+    printf("\n");
+}
+
 /*
     Funcao que imprime a tabela de simbolos
     Argumentos: o primeiro elemento da tabela
@@ -61,6 +70,9 @@ void printaLista(struct tabelaSimb *prim) {
     printf("\t\t\t\t\t    Simbolo\t Var/Func/Const\t\t   Tipo\t       Num Args\t\t Escopo\t\t  Linha\t         Coluna\n\n");
     while(prim != NULL) {
         printf("%51s\t%15s\t%15s\t%15d\t%15d\t%15d\t%15d\n", prim->simbolo, prim->varOuFunc, prim->tipo, prim->numArgs, prim->escopo, prim->linha, prim->coluna);
+        /*if(prim->tipoArgs != NULL) {
+            printaArgs(prim->tipoArgs);
+        }*/
         prim = prim->prox;
     }
 }
@@ -69,13 +81,14 @@ void printaLista(struct tabelaSimb *prim) {
     Funcao que insere o numero de argumentos de uma funcao ja listada na tabela de simbolos
     Argumentos: o primeiro elemento da tabela, o simbolo e escopo que identificam o elemento e o numero de argumentos
 */
-void insereArg(struct tabelaSimb **prim, char *simb, int escopo, int numArgs) {
+void insereArg(struct tabelaSimb **prim, char *simb, int escopo, int numArgs, struct listaArgs **lista) {
     if(prim == NULL)
         return;
     struct tabelaSimb *aux = *prim;
     while(aux != NULL) {
         if(!(strcmp(aux->simbolo, simb)) && aux->escopo == escopo) {
             aux->numArgs = numArgs;
+            aux->tipoArgs = *lista;
             break;
         }
         aux = aux->prox;
@@ -101,6 +114,32 @@ struct tabelaSimb* retSimb(struct tabelaSimb ** prim, char *simbolo, struct list
     return retSimb(&(*prim)->prox, simbolo, cabecaEsc);
 }
 
+struct listaArgs* pushArgs(struct listaArgs** prim, char *tipo) {
+    struct listaArgs *aux = *prim;
+    struct listaArgs* novo = (struct listaArgs*) malloc (sizeof(struct listaArgs));
+
+    strcpy(novo->tipo, tipo);
+    novo->prox = NULL;
+
+    if(*prim == NULL) {
+        *prim = novo;
+    } else {
+        while(aux->prox != NULL)
+            aux = aux->prox;
+        aux->prox = novo;
+    }
+    return *prim;
+}
+
+int liberaArgs(struct listaArgs *prim) {
+    if(prim == NULL) {
+        return 1;
+    }
+    struct listaArgs * aux = prim->prox;
+    free(prim);
+    return liberaArgs(aux);
+}
+
 /*
     Desaloca a memoria utilizada pela tabela de simbolos
     Argumentos: o elemento atual da lista
@@ -111,6 +150,7 @@ int liberaLista(struct tabelaSimb *prim) {
         return 1;
     }
     struct tabelaSimb * aux = prim->prox;
+    liberaArgs(prim->tipoArgs);
     free(prim);
     return liberaLista(aux);
 }
