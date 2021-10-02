@@ -45,7 +45,7 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 44 "./src/sintaxe.y"
+#line 48 "./src/sintaxe.y"
 
     struct token {
         char lexema[50];
@@ -104,7 +104,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 52 "./src/sintaxe.y"
+#line 56 "./src/sintaxe.y"
 
     struct token tok;
     struct No* no;              // Estrutura do no

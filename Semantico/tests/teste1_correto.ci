@@ -15,7 +15,7 @@ int _write_list(int list lista, int tamanho) {
 
 // Funcao que soma e subtrai 5
 
-int soma(int a, int b) {
+int soma(float a, float b) {
     return a+b*5;
 }
 
@@ -94,6 +94,12 @@ int main() {
     float v;
 
     i = v * soma(a, b);
+
+    soma2(2);
+
+    _write_list(3, 2.3);
+
+    soma(3, 2.0);
 
     return 0;
 }
