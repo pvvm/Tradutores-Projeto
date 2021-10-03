@@ -2,6 +2,7 @@
 int oi;
 
 int _write_list(int list lista, int tamanho) {
+    oi = i + 2;
     int i;
     float header;
     for(i = 0.0; i < tamanho; i = i + 1) {
@@ -93,7 +94,7 @@ int main() {
     int oi;
     float v;
 
-
+    num = 20;
 
     i = v * soma(a, b);
 

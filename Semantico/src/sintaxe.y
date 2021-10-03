@@ -89,7 +89,7 @@ void yyerror(const char *);
 %type <lista> declarations
 %type <no> declaration function funcDecl parameters block
 %type <lista> moreStmt
-%type <no> stmt conditional bracesStmt iteration expIte  io varDecl iteArgs
+%type <no> stmt conditional bracesOrNot iteration expIte  io varDecl iteArgs
 %type <no> attribuition expList expLogic andLogic expComp expRel expArit expMul
 %type <no> negElement element ret
 %type <lista> arguments
@@ -163,32 +163,33 @@ moreStmt:       moreStmt block                          {$$ = novaListaNo(&$1, $
                                                         $$ = novaListaNo(&lista, $1);}
                 ;
 
-block:          stmt                                    {$$ = $1;}                          
+block:          stmt                                    {$$ = $1;}
+                | varDecl PV                            {$$ = $1;}                          
                 | ABRE_C moreStmt FECHA_C               {$$ = montaNo("block", NULL, NULL, NULL, $2, retUlt(&primeiro), NULL);}
                 ;
 
 stmt:           conditional                             {$$ = $1;}
                 | iteration                             {$$ = $1;}
-                | varDecl PV                            {$$ = $1;}
                 | attribuition PV                       {$$ = $1;}
                 | io PV                                 {$$ = $1;}
                 | ret PV                                {$$ = $1;}
                 | error                                 {}
                 ;
 
-conditional:    IF ABRE_P attribuition FECHA_P bracesStmt                                   {$$ = montaNo($1.lexema, NULL, $5, NULL, NULL, retUlt(&primeiro), NULL);
+                // A professora falou que esse ELSE é desnecessario
+conditional:    IF ABRE_P attribuition FECHA_P bracesOrNot                                   {$$ = montaNo($1.lexema, NULL, $5, NULL, NULL, retUlt(&primeiro), NULL);
                                                                                             $$->no1 = montaNo("condArg", $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-                | IF ABRE_P attribuition FECHA_P bracesStmt ELSE bracesStmt %prec ELSE      {$$ = montaNo($1.lexema, NULL, $5, $7, NULL, retUlt(&primeiro), NULL);
+                | IF ABRE_P attribuition FECHA_P bracesOrNot ELSE bracesOrNot/* %prec ELSE*/      {$$ = montaNo($1.lexema, NULL, $5, $7, NULL, retUlt(&primeiro), NULL);
                                                                                             $$->no1 = montaNo("condArg", $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-                | IF ABRE_P error FECHA_P bracesStmt                                        {}
+                | IF ABRE_P error FECHA_P bracesOrNot                                        {}
                 ;
 
-bracesStmt:     ABRE_C moreStmt FECHA_C                 {$$ = montaNo("statements", NULL, NULL, NULL, $2, retUlt(&primeiro), NULL);}
+bracesOrNot:    ABRE_C moreStmt FECHA_C                 {$$ = montaNo("statements", NULL, NULL, NULL, $2, retUlt(&primeiro), NULL);}
                 | stmt                                  {$$ = montaNo("statements", $1, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
                 ;
 
-iteration:      FOR ABRE_P iteArgs FECHA_P bracesStmt              {$$ = montaNo($1.lexema, $3, $5, NULL, NULL, retUlt(&primeiro), NULL);}
-                | FOR ABRE_P error {yyerrok;} FECHA_P bracesStmt   {}
+iteration:      FOR ABRE_P iteArgs FECHA_P bracesOrNot              {$$ = montaNo($1.lexema, $3, $5, NULL, NULL, retUlt(&primeiro), NULL);}
+                | FOR ABRE_P error {yyerrok;} FECHA_P bracesOrNot   {}
                 ;
 
 iteArgs:        expIte PV expIte PV expIte              {$$ = montaNo("iteArgs", $1, $3, $5, NULL, retUlt(&primeiro), NULL);}
@@ -205,7 +206,7 @@ io:             ENTRADA ABRE_P ID FECHA_P               {struct tabelaSimb *simb
                                                         $$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                         $$->no1 = montaNo($3.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);}
 
-                | SAIDA ABRE_P attribuition FECHA_P     {$$ = montaNo($1.lexema, $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
+                | SAIDA ABRE_P expLogic FECHA_P         {$$ = montaNo($1.lexema, $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
 
                 | SAIDA ABRE_P STRING FECHA_P           {// Inclui a string na tabela de simbolos
                                                         num_erros_semanticos += push(&cabeca, $3.lexema, "constante", "string", "", retUlt(&primeiro), $3.linha, $3.coluna);
@@ -236,28 +237,34 @@ attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb
                                                         $$ = montaNo($2.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                         $$->no1 = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);
                                                         //printf("%s e %s\n", simb->tipo, $3->tipo);
-                                                        if((!strcmp($3->tipo, "int") && !strcmp($$->no1->simbolo->tipo, "float")) || (!strcmp($3->tipo, "float") && !strcmp($$->no1->simbolo->tipo, "int"))) {
-                                                            char aux[15];
-                                                            strcpy(aux, "(");
-                                                            strcat(aux, simb->tipo);
-                                                            strcat(aux, ")");
-                                                            struct No* no = montaNo(aux, $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);
-                                                            $$->no2 = no;
-                                                        } else if(!strcmp($3->tipo, "int list")){
-                                                            if(strcmp($$->no1->simbolo->tipo, "int list")) {
-                                                                printf("Erro semantico: tipo errado na operacao %s (%s, %s)\nLinha:%d\nColuna:%d\n\n", $2.lexema, $$->no1->simbolo->tipo, $3->tipo, yylval.tok.linha, yylval.tok.coluna);
-                                                                ++num_erros_semanticos;
+                                                        if(simb != NULL) {
+                                                            if((!strcmp($3->tipo, "int") && !strcmp($$->no1->simbolo->tipo, "float")) || (!strcmp($3->tipo, "float") && !strcmp($$->no1->simbolo->tipo, "int"))) {
+                                                                char aux[15];
+                                                                strcpy(aux, "(");
+                                                                strcat(aux, simb->tipo);
+                                                                strcat(aux, ")");
+                                                                struct No* no = montaNo(aux, $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                                $$->no2 = no;
+                                                            } else if(!strcmp($3->tipo, "int list")){
+                                                                if(strcmp($$->no1->simbolo->tipo, "int list")) {
+                                                                    printf("Erro semantico: tipo errado na operacao %s (%s, %s)\nLinha: %d\nColuna: %d\n\n", $2.lexema, $$->no1->simbolo->tipo, $3->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                                    ++num_erros_semanticos;
+                                                                }
+                                                                $$->no2 = $3;
+                                                            } else if(!strcmp($3->tipo, "float list")){
+                                                                if(strcmp($$->no1->simbolo->tipo, "float list")) {
+                                                                    printf("Erro semantico: tipo errado na operacao %s (%s, %s)\nLinha: %d\nColuna: %d\n\n", $2.lexema, $$->no1->simbolo->tipo, $3->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                                    ++num_erros_semanticos;
+                                                                }
+                                                                $$->no2 = $3;
+                                                            } else {
+                                                                //printf("Erro semantico: tipo errado na operacao %s\nLinha:%d\nColuna:%d\n\n", $2.lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                                //++num_erros_semanticos;
+                                                                $$->no2 = $3;
                                                             }
-                                                            $$->no2 = $3;
-                                                        } else if(!strcmp($3->tipo, "float list")){
-                                                            if(strcmp($$->no1->simbolo->tipo, "float list")) {
-                                                                printf("Erro semantico: tipo errado na operacao %s (%s, %s)\nLinha:%d\nColuna:%d\n\n", $2.lexema, $$->no1->simbolo->tipo, $3->tipo, yylval.tok.linha, yylval.tok.coluna);
-                                                                ++num_erros_semanticos;
-                                                            }
-                                                            $$->no2 = $3;
                                                         } else {
-                                                            //printf("Erro semantico: tipo errado na operacao %s\nLinha:%d\nColuna:%d\n\n", $2.lexema, yylval.tok.linha, yylval.tok.coluna);
-                                                            //++num_erros_semanticos;
+                                                            printf("Erro semantico: variavel %s nao declarada\nLinha: %d\nColuna: %d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                            ++num_erros_semanticos;
                                                             $$->no2 = $3;
                                                         }}
                 | expLogic                              {$$ = $1;}
@@ -365,12 +372,12 @@ element:        ID                                      {struct tabelaSimb *simb
                                                         if($$->simbolo != NULL)
                                                             strcpy($$->tipo, $$->simbolo->tipo);
                                                         else {
-                                                            printf("Erro semantico: variavel nao declarada\nLinha:%d\nColuna:%d\n\n", yylval.tok.linha, yylval.tok.coluna);
+                                                            printf("Erro semantico: variavel %s nao declarada\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
                                                             ++num_erros_semanticos;
                                                             strcpy($$->tipo, "undefined");
                                                         }}
 
-                | ABRE_P attribuition FECHA_P           {$$ = $2;}
+                | ABRE_P expLogic FECHA_P               {$$ = $2;}
 
                 | ID ABRE_P arguments FECHA_P           {struct tabelaSimb *simb = retSimb(&cabeca, $1.lexema, &primeiro);
                                                         $$ = montaNo($1.lexema, NULL, NULL, NULL, $3, retUlt(&primeiro), simb);
@@ -444,11 +451,11 @@ element:        ID                                      {struct tabelaSimb *simb
                                                         strcpy($$->tipo, "NIL");}
                 ;
 
-arguments:      arguments VIRG attribuition             {$$ = novaListaNo(&$1, $3);
+arguments:      arguments VIRG expLogic                 {$$ = novaListaNo(&$1, $3);
                                                         ++num_args_chamada;
                                                         pushArgs(&args, $3->tipo);}
 
-                | attribuition                          {struct listaNo* lista = NULL;
+                | expLogic                              {struct listaNo* lista = NULL;
                                                         $$ = novaListaNo(&lista, $1);
                                                         ++num_args_chamada;
                                                         pushArgs(&args, $1->tipo);}
