@@ -24,7 +24,6 @@ int leq_10(float x) {
 	return x <= 10;
 }
 
-
 int main() {
 
 	writeln("Digite os número de elementos da lista: ");
@@ -48,6 +47,26 @@ int main() {
 		write("A nova lista tem "); write(n); writeln(" elementos.");
 	}
 	else writeln("A nova lista não possui elementos.");
+
+	/*int z;
+	int x;
+	z = x + * 5;
+	z = x + 5 *;
+
+	for(){
+		z = x + 5 *;
+	}
+
+	for(;;;){
+		z = x + 5 *;
+	}
+	for(;){
+		z = x + 5 *;
+	}
+
+	read();
+	write();
+	writeln();*/
 
 	return 0;
 }

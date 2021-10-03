@@ -3,7 +3,7 @@ int oi;
 
 int _write_list(int list lista, int tamanho) {
     int i;
-    int header;
+    float header;
     for(i = 0.0; i < tamanho; i = i + 1) {
         header = ?lista;    // Testando comentario
         lista = %lista;
@@ -92,6 +92,8 @@ int main() {
     int i;
     int oi;
     float v;
+
+
 
     i = v * soma(a, b);
 
