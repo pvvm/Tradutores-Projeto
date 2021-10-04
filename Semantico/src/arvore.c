@@ -113,6 +113,7 @@ struct No* montaNo(char *nome, struct No *no_1, struct No *no_2, struct No *no_3
 }
 
 struct No* castNo(char* lexema, struct No* esqNo, struct No* dirNo, int escopo, int linha, int coluna, int* num_erros_semanticos) {
+    // Checa se eh == ou !=, visto que eh possivel fazer operacao entre listas e NIL
     if(!strcmp(lexema, "==") || !strcmp(lexema, "!=")) {
         struct No* no;
         if((!strcmp(esqNo->tipo, "NIL") && !strcmp(dirNo->tipo, "int list")) || ((!strcmp(esqNo->tipo, "NIL") && !strcmp(dirNo->tipo, "float list")))) {
@@ -127,8 +128,10 @@ struct No* castNo(char* lexema, struct No* esqNo, struct No* dirNo, int escopo, 
     }
     if((!strcmp(esqNo->tipo, "int") || !strcmp(esqNo->tipo, "float")) && ((!strcmp(dirNo->tipo, "int") || !strcmp(dirNo->tipo, "float")))) {
         struct No* no;
+        // Checa se sao tipos iguais
         if(!strcmp(esqNo->tipo, dirNo->tipo)) {
             no = montaNo(lexema, esqNo, dirNo, NULL, NULL, escopo, NULL);
+            // Operacoes logicas e relacionais sempre retornam tipo inteiro
             if(!strcmp(lexema, "==") || !strcmp(lexema, "!=") || !strcmp(lexema, "&&") || !strcmp(lexema, "||") || !strcmp(lexema, ">=") || !strcmp(lexema, "<=") || !strcmp(lexema, "<") || !strcmp(lexema, ">"))
                 strcpy(no->tipo, "int");
             else
@@ -152,7 +155,7 @@ struct No* castNo(char* lexema, struct No* esqNo, struct No* dirNo, int escopo, 
     } else {
         //printf("%s e %s\n", esqNo->tipo, dirNo->tipo);
         printf("ERRO SEMANTICO: tipo errado na operacao %s (%s, %s)\nLinha:%d\nColuna:%d\n\n", lexema, esqNo->tipo, dirNo->tipo, linha, coluna);
-        struct No* no = montaNo(lexema, esqNo, dirNo, NULL, NULL, escopo, NULL);         // comentar essa e a proxima caso deseje nao passar o tipo errado
+        struct No* no = montaNo(lexema, esqNo, dirNo, NULL, NULL, escopo, NULL);
         strcpy(no->tipo, "undefined");
         ++(*num_erros_semanticos);
         return no;
