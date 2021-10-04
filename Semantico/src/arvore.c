@@ -129,7 +129,10 @@ struct No* castNo(char* lexema, struct No* esqNo, struct No* dirNo, int escopo, 
         struct No* no;
         if(!strcmp(esqNo->tipo, dirNo->tipo)) {
             no = montaNo(lexema, esqNo, dirNo, NULL, NULL, escopo, NULL);
-            strcpy(no->tipo, esqNo->tipo);
+            if(!strcmp(lexema, "==") || !strcmp(lexema, "!=") || !strcmp(lexema, "&&") || !strcmp(lexema, "||") || !strcmp(lexema, ">=") || !strcmp(lexema, "<=") || !strcmp(lexema, "<") || !strcmp(lexema, ">"))
+                strcpy(no->tipo, "int");
+            else
+                strcpy(no->tipo, esqNo->tipo);
             return no;
         }
         else {
@@ -140,12 +143,15 @@ struct No* castNo(char* lexema, struct No* esqNo, struct No* dirNo, int escopo, 
                 no = montaNo(lexema, esqNo, NULL, NULL, NULL, escopo, NULL);
                 no->no2 = montaNo("(float)", dirNo, NULL, NULL, NULL, escopo, NULL);
             }
-            strcpy(no->tipo, "float");
+            if(!strcmp(lexema, "==") || !strcmp(lexema, "!=") || !strcmp(lexema, "&&") || !strcmp(lexema, "||") || !strcmp(lexema, ">=") || !strcmp(lexema, "<=") || !strcmp(lexema, "<") || !strcmp(lexema, ">"))
+                strcpy(no->tipo, "int");
+            else
+                strcpy(no->tipo, "float");
             return no;
         }
     } else {
         //printf("%s e %s\n", esqNo->tipo, dirNo->tipo);
-        printf("Erro semantico: tipo errado na operacao %s (%s, %s)\nLinha:%d\nColuna:%d\n\n", lexema, esqNo->tipo, dirNo->tipo, linha, coluna);
+        printf("ERRO SEMANTICO: tipo errado na operacao %s (%s, %s)\nLinha:%d\nColuna:%d\n\n", lexema, esqNo->tipo, dirNo->tipo, linha, coluna);
         struct No* no = montaNo(lexema, esqNo, dirNo, NULL, NULL, escopo, NULL);         // comentar essa e a proxima caso deseje nao passar o tipo errado
         strcpy(no->tipo, "undefined");
         ++(*num_erros_semanticos);

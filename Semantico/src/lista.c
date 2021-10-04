@@ -49,7 +49,7 @@ int push(struct tabelaSimb** ult, char *simbolo, char *varOuFunc, char *tipo, ch
         }
         return 0;
     } else {        // Caso o simbolo ja tenha sido declarado
-        printf("Erro semantico: simbolo %s ja declarado nesse escopo\nLinha:%d\nColuna:%d\n\n", simbolo, linha, coluna);
+        printf("ERRO SEMANTICO: simbolo %s ja declarado nesse escopo\nLinha:%d\nColuna:%d\n\n", simbolo, linha, coluna);
         return 1;
     }
 }

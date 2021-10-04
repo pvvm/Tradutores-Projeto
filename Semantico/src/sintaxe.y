@@ -36,6 +36,8 @@ int num_args = 0;
 int num_args_chamada = 0;
 int argumentos = 0;
 char aux[50];
+char tipo_func[50];
+char tipo_func_return[50];
 struct No * raiz;
 struct tabelaSimb* cabeca = NULL;
 struct listaEscopo* primeiro = NULL;
@@ -91,7 +93,7 @@ void yyerror(const char *);
 %type <lista> moreStmt
 %type <no> stmt conditional bracesOrNot iteration expIte  io varDecl iteArgs
 %type <no> attribuition expList expLogic andLogic expComp expRel expArit expMul
-%type <no> negElement element ret
+%type <no> expUn element ret
 %type <lista> arguments
 
 
@@ -103,7 +105,7 @@ program:        declarations                            {raiz = montaNo("program
 
                                                         // Checa se existe main
                                                         if(procuraLista(&cabeca, "main", 0)) {
-                                                            printf("Erro semantico: funcao main nao declarada\nLinha:%d\nColuna:%d\n\n", yylval.tok.linha, yylval.tok.coluna);
+                                                            printf("ERRO SEMANTICO: funcao main nao declarada\nLinha:%d\nColuna:%d\n\n", yylval.tok.linha, yylval.tok.coluna);
                                                             ++num_erros_semanticos;
                                                         }
                                                         printf("Foram encontrados %d erros lexicos\n", num_erros_lexicos);
@@ -113,13 +115,12 @@ program:        declarations                            {raiz = montaNo("program
                                                         if(num_erros_sintaticos == 0 && num_erros_lexicos == 0/* && num_erros_semanticos == 0*/) {
                                                             printf("========================================================== ARVORE SINTATICA ABSTRADA =========================================================\n\n");
                                                             printaArvore(raiz);
-                                                            //desalocar(raiz);      // Ver se tem problema tirar o desalocar daqui
+                                                            desalocar(raiz);      // Ver se tem problema tirar o desalocar daqui
                                                             printf("\n\n");
                                                         }
                                                         printf("\n\n================================================================== TABELA DE SIMBOLOS =================================================================\n\n");
                                                         printaLista(cabeca);
                                                         liberaLista(cabeca);
-                                                        desalocar(raiz);
                                                         liberaEsc(primeiro);}
                 | /* empty */
                 ;
@@ -137,21 +138,23 @@ declaration:    function                                {$$ = $1;}
                 ;
 
                 // Inclui na lista o escopo novo para definir o escopo de argumentos (apos isso, retira da lista)
-function:       funcDecl ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos = 1;} parameters FECHA_P {insereArg(&cabeca, aux, 0, num_args, &args); num_args = 0; popEsc(&primeiro); argumentos = 0; args = NULL;} ABRE_C moreStmt FECHA_C       {$$ = montaNo("function", $1, $4, NULL, $8, retUlt(&primeiro), NULL);}
-                | error ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos = 1;} parameters FECHA_P {insereArg(&cabeca, aux, 0, num_args, &args); num_args = 0; popEsc(&primeiro); argumentos = 0; args = NULL;} ABRE_C moreStmt FECHA_C        {$$ = montaNo("function",$4, NULL, NULL, $8, retUlt(&primeiro), NULL);}
-                | funcDecl ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                                       {$$ = montaNo("function", $1, NULL, NULL, $5, retUlt(&primeiro), NULL);}
-                | error ABRE_P FECHA_P ABRE_C moreStmt FECHA_C                                          {$$ = montaNo("function", NULL, NULL, NULL, $5, retUlt(&primeiro), NULL);}
+function:       funcDecl ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos = 1; strcpy(tipo_func_return, tipo_func);} parameters FECHA_P   {insereArg(&cabeca, aux, 0, num_args, &args); num_args = 0; popEsc(&primeiro); argumentos = 0; args = NULL;} ABRE_C moreStmt FECHA_C       {$$ = montaNo("function", $1, $4, NULL, $8, retUlt(&primeiro), NULL); strcpy(tipo_func_return, "");}
+                | error ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos = 1; strcpy(tipo_func_return, tipo_func);} parameters FECHA_P    {insereArg(&cabeca, aux, 0, num_args, &args); num_args = 0; popEsc(&primeiro); argumentos = 0; args = NULL;} ABRE_C moreStmt FECHA_C        {$$ = montaNo("function",$4, NULL, NULL, $8, retUlt(&primeiro), NULL); strcpy(tipo_func_return, "");}
+                | funcDecl ABRE_P FECHA_P {strcpy(tipo_func_return, tipo_func);} ABRE_C moreStmt FECHA_C    {$$ = montaNo("function", $1, NULL, NULL, $6, retUlt(&primeiro), NULL); strcpy(tipo_func_return, "");}
+                | error ABRE_P FECHA_P {strcpy(tipo_func_return, tipo_func);} ABRE_C moreStmt FECHA_C       {$$ = montaNo("function", NULL, NULL, NULL, $6, retUlt(&primeiro), NULL); strcpy(tipo_func_return, "");}
                 ;
 
 funcDecl:       TIPO ID                                 {$$ = NULL;
                                                         // Variavel aux necessaria para inserir o numero de argumentos na tabela
                                                         strcpy(aux, $2.lexema);
                                                         // Inclui o termo na tabela de simbolos
-                                                        num_erros_semanticos += push(&cabeca, $2.lexema, "funcao", $1.lexema, "", retUlt(&primeiro), $1.linha, $1.coluna);}
+                                                        num_erros_semanticos += push(&cabeca, $2.lexema, "funcao", $1.lexema, "", retUlt(&primeiro), $1.linha, $1.coluna);
+                                                        strcpy(tipo_func, $1.lexema);}
 
                 | TIPO LIST ID                          {$$ = NULL;
                                                         strcpy(aux, $3.lexema);
-                                                        num_erros_semanticos += push(&cabeca, $3.lexema, "funcao", strcat($1.lexema, " list"), "", retUlt(&primeiro), $1.linha, $1.coluna);}
+                                                        num_erros_semanticos += push(&cabeca, $3.lexema, "funcao", strcat($1.lexema, " list"), "", retUlt(&primeiro), $1.linha, $1.coluna);
+                                                        strcpy(tipo_func, $1.lexema);}
                 ;
 
 parameters:     parameters VIRG varDecl                 {$$ = $1; num_args++;}
@@ -247,23 +250,30 @@ attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb
                                                                 $$->no2 = no;
                                                             } else if(!strcmp($3->tipo, "int list")){
                                                                 if(strcmp($$->no1->simbolo->tipo, "int list")) {
-                                                                    printf("Erro semantico: tipo errado na operacao %s (%s, %s)\nLinha: %d\nColuna: %d\n\n", $2.lexema, $$->no1->simbolo->tipo, $3->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                                    printf("ERRO SEMANTICO: tipo errado na operacao %s (%s, %s)\nLinha: %d\nColuna: %d\n\n", $2.lexema, $$->no1->simbolo->tipo, $3->tipo, yylval.tok.linha, yylval.tok.coluna);
                                                                     ++num_erros_semanticos;
                                                                 }
                                                                 $$->no2 = $3;
                                                             } else if(!strcmp($3->tipo, "float list")){
                                                                 if(strcmp($$->no1->simbolo->tipo, "float list")) {
-                                                                    printf("Erro semantico: tipo errado na operacao %s (%s, %s)\nLinha: %d\nColuna: %d\n\n", $2.lexema, $$->no1->simbolo->tipo, $3->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                                    printf("ERRO SEMANTICO: tipo errado na operacao %s (%s, %s)\nLinha: %d\nColuna: %d\n\n", $2.lexema, $$->no1->simbolo->tipo, $3->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                                    ++num_erros_semanticos;
+                                                                }
+                                                                $$->no2 = $3;
+                                                            } else if(!strcmp($$->no1->simbolo->tipo, "float list") || !strcmp($$->no1->simbolo->tipo, "int list")){
+                                                                if(strcmp($3->tipo, "float list") && strcmp($3->tipo, "int list") && strcmp($3->tipo, "NIL")) {
+                                                                    printf("ERRO SEMANTICO: tipo errado na operacao %s (%s, %s)\nLinha: %d\nColuna: %d\n\n", $2.lexema, $$->no1->simbolo->tipo, $3->tipo, yylval.tok.linha, yylval.tok.coluna);
                                                                     ++num_erros_semanticos;
                                                                 }
                                                                 $$->no2 = $3;
                                                             } else {
-                                                                //printf("Erro semantico: tipo errado na operacao %s\nLinha:%d\nColuna:%d\n\n", $2.lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                                //printf("ERRO SEMANTICO: tipo errado na operacao %s\nLinha:%d\nColuna:%d\n\n", $2.lexema, yylval.tok.linha, yylval.tok.coluna);
                                                                 //++num_erros_semanticos;
                                                                 $$->no2 = $3;
                                                             }
+
                                                         } else {
-                                                            printf("Erro semantico: variavel %s nao declarada\nLinha: %d\nColuna: %d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                            printf("ERRO SEMANTICO: variavel %s nao declarada\nLinha: %d\nColuna: %d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
                                                             ++num_erros_semanticos;
                                                             $$->no2 = $3;
                                                         }}
@@ -289,16 +299,16 @@ expRel:         expRel REL_OP_ALTA expList              {$$ = castNo($2.lexema, 
 expList:        expList LIST_OP_BIN expArit             {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);
                                                         int cont_erro = 0;
                                                         if(strcmp($1->simbolo->varOuFunc, "funcao")) {
-                                                            printf("Erro semantico: termo a esquerda nao eh funcao\nLinha:%d\nColuna:%d\n\n", yylval.tok.linha, yylval.tok.coluna);
+                                                            printf("ERRO SEMANTICO: termo a esquerda nao eh funcao\nLinha:%d\nColuna:%d\n\n", yylval.tok.linha, yylval.tok.coluna);
                                                             ++num_erros_semanticos;
                                                             ++cont_erro;
                                                         } else if($1->simbolo->numArgs != 1) {
-                                                            printf("Erro semantico: funcao nao eh unaria\nLinha:%d\nColuna:%d\n\n", yylval.tok.linha, yylval.tok.coluna);
+                                                            printf("ERRO SEMANTICO: funcao nao eh unaria\nLinha:%d\nColuna:%d\n\n", yylval.tok.linha, yylval.tok.coluna);
                                                             ++num_erros_semanticos;
                                                             ++cont_erro;
                                                         }
                                                         if(strcmp($3->tipo, "int list") && strcmp($3->tipo, "float list")) {
-                                                            printf("Erro semantico: termo a direita nao eh uma lista\nLinha:%d\nColuna:%d\n\n", yylval.tok.linha, yylval.tok.coluna);
+                                                            printf("ERRO SEMANTICO: termo a direita nao eh uma lista\nLinha:%d\nColuna:%d\n\n", yylval.tok.linha, yylval.tok.coluna);
                                                             ++num_erros_semanticos;
                                                             ++cont_erro;
                                                         }
@@ -315,8 +325,28 @@ expList:        expList LIST_OP_BIN expArit             {$$ = montaNo($2.lexema,
                                                             strcpy($$->tipo, "undefined");
                                                         }
                                                         }
-                | expList LIST_OP_CONSTRUTOR expArit    {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);
-                                                        strcpy($$->tipo, $3->tipo);}
+                | expList LIST_OP_CONSTRUTOR expArit    {$$ = montaNo($2.lexema, NULL, $3, NULL, NULL, retUlt(&primeiro), NULL);
+                                                        if((strcmp($3->tipo, "int list") && strcmp($3->tipo, "float list")) || (strcmp($1->tipo, "int") && strcmp($1->tipo, "float"))) {
+                                                            printf("ERRO SEMANTICO: tipo errado na operacao %s (%s, %s)\nLinha: %d\nColuna: %d\n\n", $2.lexema, $1->tipo, $3->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                            ++num_erros_semanticos;
+                                                            strcpy($$->tipo, "undefined");
+                                                        } else {
+                                                            char aux[15];
+                                                            strcpy(aux, $3->tipo);
+                                                            char* aux1 = strtok($3->tipo, " ");
+                                                            if(strcmp($1->tipo, aux1)) {
+                                                                char aux2[15];
+                                                                strcpy(aux2, "(");
+                                                                strcat(aux2, aux1);
+                                                                strcat(aux2, ")");
+                                                                struct No* no = montaNo(aux2, $1, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                                $$->no1 = no;
+                                                            } else {
+                                                                $$->no1 = $1;
+                                                            }
+                                                            strcpy($$->tipo, aux);
+                                                        }
+                                                        }
                 | expArit                               {$$ = $1;}
                 ;
 
@@ -325,15 +355,15 @@ expArit:        expArit ARIT_OP_MAIS expMul             {$$ = castNo($2.lexema, 
                 | expMul                                {$$ = $1;}
                 ;
 
-expMul:         expMul ARIT_OP_ALTA negElement          {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);}
-                | negElement                            {$$ = $1;}
+expMul:         expMul ARIT_OP_ALTA expUn               {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);}
+                | expUn                                 {$$ = $1;}
                 ;
 
-negElement:     LOG_OP_NEG element                      {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+expUn:          LOG_OP_NEG element                      {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                         if(!strcmp($2->tipo, "int list") || !strcmp($2->tipo, "float list") || !strcmp($2->tipo, "int") || !strcmp($2->tipo, "float"))
                                                             strcpy($$->tipo, $2->tipo);
                                                         else {
-                                                            printf("Erro semantico: tipo errado na operacao %s (%s)\nLinha:%d\nColuna:%d\n\n", $1.lexema, $2->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                            printf("ERRO SEMANTICO: tipo errado na operacao %s (%s)\nLinha:%d\nColuna:%d\n\n", $1.lexema, $2->tipo, yylval.tok.linha, yylval.tok.coluna);
                                                             strcpy($$->tipo, "undefined");
                                                             ++num_erros_semanticos;
                                                         }}
@@ -341,13 +371,13 @@ negElement:     LOG_OP_NEG element                      {$$ = montaNo($1.lexema,
                                                         if(!strcmp($2->tipo, "int") || !strcmp($2->tipo, "float"))
                                                             strcpy($$->tipo, $2->tipo);
                                                         else if(!strcmp($2->tipo, "int list") || !strcmp($2->tipo, "float list") || !strcmp($2->tipo, "NIL")){
-                                                            printf("Erro semantico: tipo errado na operacao %s (%s)\nLinha:%d\nColuna:%d\n\n", $1.lexema, $2->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                            printf("ERRO SEMANTICO: tipo errado na operacao %s (%s)\nLinha:%d\nColuna:%d\n\n", $1.lexema, $2->tipo, yylval.tok.linha, yylval.tok.coluna);
                                                             strcpy($$->tipo, "undefined");
                                                             ++num_erros_semanticos;
                                                         }}
                 | LIST_OP_UN element                    {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                         if(!strcmp($2->tipo, "int") || !strcmp($2->tipo, "float")  || !strcmp($2->tipo, "NIL")) {
-                                                            printf("Erro semantico: tipo errado na operacao %s (%s)\nLinha:%d\nColuna:%d\n\n", $1.lexema, $2->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                            printf("ERRO SEMANTICO: tipo errado na operacao %s (%s)\nLinha:%d\nColuna:%d\n\n", $1.lexema, $2->tipo, yylval.tok.linha, yylval.tok.coluna);
                                                             strcpy($$->tipo, "undefined");
                                                             ++num_erros_semanticos;
                                                         }else if(!strcmp($2->tipo, "int list") || !strcmp($2->tipo, "float list"))
@@ -355,7 +385,7 @@ negElement:     LOG_OP_NEG element                      {$$ = montaNo($1.lexema,
                                                         }
                 | LIST_OP_HEADER element                {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                         if(!strcmp($2->tipo, "int") || !strcmp($2->tipo, "float")  || !strcmp($2->tipo, "NIL")) {
-                                                            printf("Erro semantico: tipo errado na operacao %s (%s)\nLinha:%d\nColuna:%d\n\n", $1.lexema, $2->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                            printf("ERRO SEMANTICO: tipo errado na operacao %s (%s)\nLinha:%d\nColuna:%d\n\n", $1.lexema, $2->tipo, yylval.tok.linha, yylval.tok.coluna);
                                                             strcpy($$->tipo, "undefined");
                                                             ++num_erros_semanticos;
                                                         }else if(!strcmp($2->tipo, "int list") || !strcmp($2->tipo, "float list")){
@@ -372,7 +402,7 @@ element:        ID                                      {struct tabelaSimb *simb
                                                         if($$->simbolo != NULL)
                                                             strcpy($$->tipo, $$->simbolo->tipo);
                                                         else {
-                                                            printf("Erro semantico: variavel %s nao declarada\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                            printf("ERRO SEMANTICO: variavel %s nao declarada\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
                                                             ++num_erros_semanticos;
                                                             strcpy($$->tipo, "undefined");
                                                         }}
@@ -384,10 +414,10 @@ element:        ID                                      {struct tabelaSimb *simb
                                                         if($$->simbolo != NULL) {
                                                             strcpy($$->tipo, $$->simbolo->tipo);
                                                             if($$->simbolo->numArgs > num_args_chamada) {
-                                                                printf("Erro semantico: poucos argumentos para a funcao %s\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                                printf("ERRO SEMANTICO: poucos argumentos para a funcao %s\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
                                                                 ++num_erros_semanticos;
                                                             } else if($$->simbolo->numArgs < num_args_chamada) {
-                                                                printf("Erro semantico: muitos argumentos para a funcao %s\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                                printf("ERRO SEMANTICO: muitos argumentos para a funcao %s\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
                                                                 ++num_erros_semanticos;
                                                             }
                                                             if(args != NULL) {
@@ -398,10 +428,10 @@ element:        ID                                      {struct tabelaSimb *simb
                                                                 while(aux1 != NULL && aux2 != NULL) {
                                                                     if(strcmp(aux1->tipo, aux2->tipo)) {
                                                                         if(!strcmp(aux1->tipo, "int list") || !strcmp(aux2->tipo, "int list")) {
-                                                                            printf("Erro semantico: argumento de tipo errado %s\nLinha:%d\nColuna:%d\n\n", aux2->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                                            printf("ERRO SEMANTICO: argumento de tipo errado (%s)\nLinha:%d\nColuna:%d\n\n", aux2->tipo, yylval.tok.linha, yylval.tok.coluna);
                                                                             ++num_erros_semanticos;
                                                                         } else if(!strcmp(aux1->tipo, "float list") || !strcmp(aux2->tipo, "float list")) {
-                                                                            printf("Erro semantico: argumento de tipo errado %s\nLinha:%d\nColuna:%d\n\n", aux2->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                                            printf("ERRO SEMANTICO: argumento de tipo errado (%s)\nLinha:%d\nColuna:%d\n\n", aux2->tipo, yylval.tok.linha, yylval.tok.coluna);
                                                                             ++num_erros_semanticos;
                                                                         } else {
                                                                             char aux[15];
@@ -421,7 +451,7 @@ element:        ID                                      {struct tabelaSimb *simb
                                                                 //printaArgs(args);
                                                             }
                                                         } else {
-                                                            printf("Erro semantico: funcao %s nao declarada\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                            printf("ERRO SEMANTICO: declaracao implicita da funcao %s\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
                                                             ++num_erros_semanticos;
                                                             strcpy($$->tipo, "undefined");
                                                         }
@@ -435,7 +465,7 @@ element:        ID                                      {struct tabelaSimb *simb
                                                         if($$->simbolo != NULL)
                                                             strcpy($$->tipo, $$->simbolo->tipo);
                                                         else {
-                                                            printf("Erro semantico: funcao %s nao declarada\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                            printf("ERRO SEMANTICO: declaracao implicita da funcao %s\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
                                                             ++num_erros_semanticos;
                                                             strcpy($$->tipo, "undefined");
                                                         }
@@ -461,7 +491,24 @@ arguments:      arguments VIRG expLogic                 {$$ = novaListaNo(&$1, $
                                                         pushArgs(&args, $1->tipo);}
                 ;
 
-ret:            RETURN attribuition                     {$$ = montaNo("return", $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
+ret:            RETURN expLogic                         {if(!strcmp($2->tipo, tipo_func_return))
+                                                            $$ = montaNo("return", $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                        else {
+                                                            if((!strcmp($2->tipo, "int") && !strcmp(tipo_func_return, "float")) || (!strcmp($2->tipo, "float") && !strcmp(tipo_func_return, "int"))) {
+                                                                $$ = montaNo("return", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                                char aux[15];
+                                                                strcpy(aux, "(");
+                                                                strcat(aux, tipo_func_return);
+                                                                strcat(aux, ")");
+                                                                struct No* no = montaNo(aux, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                                $$->no1 = no;
+                                                            } else {
+                                                                $$ = montaNo("return", $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                                printf("ERRO SEMANTICO: retorno de tipo errado (%s, %s)\nLinha:%d\nColuna:%d\n\n", tipo_func_return, $2->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                                ++num_erros_semanticos;
+                                                            }
+                                                        }
+                                                        }
                 ;
 
 %%
@@ -471,7 +518,7 @@ ret:            RETURN attribuition                     {$$ = montaNo("return", 
     Funcao que imprime onde ocorreu o erro sintatico
 */
 void yyerror(const char *s) {
-    printf("ERRO: %s\nLinha: %d\tColuna: %d\n\n", s, yylval.tok.linha, yylval.tok.coluna);
+    printf("ERRO: %s\nLinha: %d\nColuna: %d\n\n", s, yylval.tok.linha, yylval.tok.coluna);
     ++num_erros_sintaticos;
 }
 
