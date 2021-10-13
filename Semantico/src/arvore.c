@@ -75,7 +75,10 @@ int printaArvore(struct No* no) {
 
     //printf("%s", no->tipo);
     
-    printf("| %s\n", no->nome);
+    if(strcmp(no->tipo, ""))
+        printf("| %s\t\t\t\t<%s>\n", no->nome, no->tipo);
+    else
+        printf("| %s\n", no->nome);
 
     // Responsavel por imprimir o nos filhos
     ++profund;
@@ -141,10 +144,10 @@ struct No* castNo(char* lexema, struct No* esqNo, struct No* dirNo, int escopo, 
         else {
             if(!strcmp(esqNo->tipo, "int")) {
                 no = montaNo(lexema, NULL, dirNo, NULL, NULL, escopo, NULL);
-                no->no1 = montaNo("(float)", esqNo, NULL, NULL, NULL, escopo, NULL);
+                no->no1 = montaNo("(int_to_float)", esqNo, NULL, NULL, NULL, escopo, NULL);
             } else if(!strcmp(dirNo->tipo, "int")) {
                 no = montaNo(lexema, esqNo, NULL, NULL, NULL, escopo, NULL);
-                no->no2 = montaNo("(float)", dirNo, NULL, NULL, NULL, escopo, NULL);
+                no->no2 = montaNo("(int_to_float)", dirNo, NULL, NULL, NULL, escopo, NULL);
             }
             if(!strcmp(lexema, "==") || !strcmp(lexema, "!=") || !strcmp(lexema, "&&") || !strcmp(lexema, "||") || !strcmp(lexema, ">=") || !strcmp(lexema, "<=") || !strcmp(lexema, "<") || !strcmp(lexema, ">"))
                 strcpy(no->tipo, "int");

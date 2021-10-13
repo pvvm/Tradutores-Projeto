@@ -35,7 +35,7 @@ int main() {
     read(valor2);
     valores = valor2 : valores;
 
-    float imc;
+    int imc;
     imc = calcula_imc(valores);
     classifica_imc(imc);
 

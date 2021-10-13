@@ -7,7 +7,7 @@
 
 typedef struct tabelaSimb {
     char simbolo[500];           // Simbolo que representa
-    char varOuFunc[15];              // 0 == var e 1 == func
+    char varOuFunc[15];         // Se eh var, func ou const
     char tipo[15];              // Tipo
     char valor[50];             // Valor armazenado (se tiver)
     int numArgs;

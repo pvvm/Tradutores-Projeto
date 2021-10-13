@@ -124,9 +124,45 @@ declaration:    function                                {$$ = $1;}
                 ;
 
                 // Inclui na lista o escopo novo para definir o escopo de argumentos (apos isso, retira da lista)
-function:       funcDecl ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos = 1; strcpy(tipo_func_return, tipo_func);} parameters FECHA_P   {insereArg(&cabeca, aux, 0, num_args, &args); num_args = 0; popEsc(&primeiro); argumentos = 0; args = NULL;} ABRE_C moreStmt FECHA_C       {$$ = montaNo("function", $1, $4, NULL, $8, retUlt(&primeiro), NULL); strcpy(tipo_func_return, "");}
-                | error ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos = 1; strcpy(tipo_func_return, tipo_func);} parameters FECHA_P    {insereArg(&cabeca, aux, 0, num_args, &args); num_args = 0; popEsc(&primeiro); argumentos = 0; args = NULL;} ABRE_C moreStmt FECHA_C        {$$ = montaNo("function",$4, NULL, NULL, $8, retUlt(&primeiro), NULL); strcpy(tipo_func_return, "");}
-                | funcDecl ABRE_P FECHA_P {strcpy(tipo_func_return, tipo_func);} ABRE_C moreStmt FECHA_C    {$$ = montaNo("function", $1, NULL, NULL, $6, retUlt(&primeiro), NULL); strcpy(tipo_func_return, "");}
+function:       funcDecl ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos = 1; strcpy(tipo_func_return, tipo_func);} parameters FECHA_P
+                    {insereArg(&cabeca, aux, 0, num_args, &args); num_args = 0; popEsc(&primeiro); argumentos = 0; args = NULL;} ABRE_C moreStmt FECHA_C       
+                    {$$ = montaNo("function", $1, $4, NULL, $8, retUlt(&primeiro), NULL);
+                    // Adiciona o return default do tipo da funcao
+                    struct No *ret_default = montaNo("return", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                    if(!strcmp(tipo_func_return, "int")) {
+                        ret_default->no1 = montaNo("0", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                        strcpy(ret_default->no1->tipo, "int");
+                    } else if(!strcmp(tipo_func_return, "float")) {
+                        ret_default->no1 = montaNo("0.0", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                        strcpy(ret_default->no1->tipo, "float");
+                    } else if(!strcmp(tipo_func_return, "int list") || !strcmp(tipo_func_return, "float list")) {
+                        ret_default->no1 = montaNo("NIL", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                        strcpy(ret_default->no1->tipo, "NIL");
+                    }
+                    $$->lista = novaListaNo(&$$->lista, ret_default);
+                    strcpy(tipo_func_return, "");
+                    }
+                
+                | error ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos = 1; strcpy(tipo_func_return, tipo_func);} parameters FECHA_P
+                    {insereArg(&cabeca, aux, 0, num_args, &args); num_args = 0; popEsc(&primeiro); argumentos = 0; args = NULL;} ABRE_C moreStmt FECHA_C        {$$ = montaNo("function",$4, NULL, NULL, $8, retUlt(&primeiro), NULL); strcpy(tipo_func_return, "");}
+                
+                | funcDecl ABRE_P FECHA_P {strcpy(tipo_func_return, tipo_func);} ABRE_C moreStmt FECHA_C    
+                    {$$ = montaNo("function", $1, NULL, NULL, $6, retUlt(&primeiro), NULL);
+                    // Adiciona o return default do tipo da funcao
+                    struct No *ret_default = montaNo("return", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                    if(!strcmp(tipo_func_return, "int")) {
+                        ret_default->no1 = montaNo("0", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                        strcpy(ret_default->no1->tipo, "int");
+                    } else if(!strcmp(tipo_func_return, "float")) {
+                        ret_default->no1 = montaNo("0.0", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                        strcpy(ret_default->no1->tipo, "float");
+                    } else if(!strcmp(tipo_func_return, "int list") || !strcmp(tipo_func_return, "float list")) {
+                        ret_default->no1 = montaNo("NIL", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                        strcpy(ret_default->no1->tipo, tipo_func_return);
+                    }
+                    $$->lista = novaListaNo(&$$->lista, ret_default);
+                    strcpy(tipo_func_return, "");}
+                
                 | error ABRE_P FECHA_P {strcpy(tipo_func_return, tipo_func);} ABRE_C moreStmt FECHA_C       {$$ = montaNo("function", NULL, NULL, NULL, $6, retUlt(&primeiro), NULL); strcpy(tipo_func_return, "");}
                 ;
 
@@ -193,7 +229,10 @@ expIte:         attribuition                            {$$ = $1;}
                                                         // apos isso, esse ponteiro eh associado ao no em que ele aparece na arvore
 io:             ENTRADA ABRE_P ID FECHA_P               {struct tabelaSimb *simb = retSimb(&cabeca, $3.lexema, &primeiro);
                                                         $$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
-                                                        $$->no1 = montaNo($3.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);}
+                                                        $$->no1 = montaNo($3.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);
+                                                        if(simb != NULL)
+                                                            strcpy($$->no1->tipo, $$->no1->simbolo->tipo);
+                                                        }
 
                 | SAIDA ABRE_P expLogic FECHA_P         {$$ = montaNo($1.lexema, $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
 
@@ -227,12 +266,16 @@ attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb
                                                         $$->no1 = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);
                                                         // Checagem de tipos na atribuicao
                                                         if(simb != NULL) {
+                                                            strcpy($$->no1->tipo, $$->no1->simbolo->tipo);
+                                                            strcpy($$->tipo, $$->no1->simbolo->tipo);
                                                             //Se for int com float
                                                             if((!strcmp($3->tipo, "int") && !strcmp($$->no1->simbolo->tipo, "float")) || (!strcmp($3->tipo, "float") && !strcmp($$->no1->simbolo->tipo, "int"))) {
                                                                 char aux[15];
                                                                 strcpy(aux, "(");
-                                                                strcat(aux, simb->tipo);
-                                                                strcat(aux, ")");
+                                                                if(!strcmp(simb->tipo, "int"))
+                                                                    strcat(aux, "float_to_int)");
+                                                                else if(!strcmp(simb->tipo, "float"))
+                                                                    strcat(aux, "int_to_float)");
                                                                 struct No* no = montaNo(aux, $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                                 $$->no2 = no;
                                                             } else if(!strcmp($3->tipo, "int list")){
@@ -265,7 +308,10 @@ attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb
                                                             printf("ERRO SEMANTICO: variavel %s nao declarada\nLinha: %d\nColuna: %d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
                                                             ++num_erros_semanticos;
                                                             $$->no2 = $3;
-                                                        }}
+                                                            strcpy($$->no1->tipo, "undefined");
+                                                            strcpy($$->tipo, "undefined");
+                                                        }
+                                                        }
                 | expLogic                              {$$ = $1;}
                 ;
 
@@ -327,19 +373,21 @@ expList:        expList LIST_OP_BIN expArit             {$$ = montaNo($2.lexema,
                                                         } else {
                                                             char aux[15];
                                                             strcpy(aux, $3->tipo);
-                                                            char* aux1 = strtok($3->tipo, " ");
+                                                            char* aux1 = strtok(aux, " ");
                                                             //Adiciona o no de coercao
                                                             if(strcmp($1->tipo, aux1)) {
                                                                 char aux2[15];
                                                                 strcpy(aux2, "(");
-                                                                strcat(aux2, aux1);
-                                                                strcat(aux2, ")");
+                                                                if(!strcmp(aux1, "int"))
+                                                                    strcat(aux2, "float_to_int)");
+                                                                else if(!strcmp(aux1, "float"))
+                                                                    strcat(aux2, "int_to_float)");
                                                                 struct No* no = montaNo(aux2, $1, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                                 $$->no1 = no;
                                                             } else {
                                                                 $$->no1 = $1;
                                                             }
-                                                            strcpy($$->tipo, aux);
+                                                            strcpy($$->tipo, $3->tipo);
                                                         }
                                                         }
                 | expArit                               {$$ = $1;}
@@ -388,7 +436,9 @@ expUn:          LOG_OP_NEG element                      {$$ = montaNo($1.lexema,
                                                             strcpy($$->tipo, "undefined");
                                                             ++num_erros_semanticos;
                                                         }else if(!strcmp($2->tipo, "int list") || !strcmp($2->tipo, "float list")){
-                                                            char* aux = strtok($2->tipo, " ");
+                                                            char copia[15];
+                                                            strcpy(copia, $2->tipo);
+                                                            char* aux = strtok(copia, " ");
                                                             strcpy($$->tipo, aux);
                                                         }}
                 | element                               {$$ = $1;}
@@ -442,8 +492,10 @@ element:        ID                                      {struct tabelaSimb *simb
                                                                             // Se nao, pode fazer o no de coercao
                                                                             char aux[15];
                                                                             strcpy(aux, "(");
-                                                                            strcat(aux, aux1->tipo);
-                                                                            strcat(aux, ")");
+                                                                            if(!strcmp(aux1->tipo, "int"))
+                                                                                strcat(aux, "float_to_int)");
+                                                                            else if(!strcmp(aux1->tipo, "float"))
+                                                                                strcat(aux, "int_to_float)");
                                                                             struct No* no = montaNo(aux, auxNo->no, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                                             auxNo->no = no;
                                                                         }
@@ -507,8 +559,10 @@ ret:            RETURN expLogic                         {if(!strcmp($2->tipo, ti
                                                                 $$ = montaNo("return", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                                 char aux[15];
                                                                 strcpy(aux, "(");
-                                                                strcat(aux, tipo_func_return);
-                                                                strcat(aux, ")");
+                                                                if(!strcmp(tipo_func_return, "int"))
+                                                                    strcat(aux, "float_to_int)");
+                                                                else if(!strcmp(tipo_func_return, "float"))
+                                                                    strcat(aux, "int_to_float)");
                                                                 struct No* no = montaNo(aux, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                                 $$->no1 = no;
                                                             } else {
