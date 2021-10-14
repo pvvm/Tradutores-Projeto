@@ -586,8 +586,8 @@ static const yytype_int16 yyrline[] =
      217,   217,   220,   223,   224,   230,   237,   239,   245,   246,
      250,   257,   264,   315,   318,   319,   322,   323,   326,   327,
      330,   331,   334,   367,   393,   396,   397,   398,   401,   402,
-     405,   414,   423,   432,   444,   449,   460,   462,   521,   533,
-     536,   539,   543,   547,   553
+     405,   414,   423,   432,   444,   449,   460,   462,   527,   539,
+     542,   545,   549,   553,   559
 };
 #endif
 
@@ -2807,51 +2807,57 @@ yyreduce:
                                                         {struct tabelaSimb *simb = retSimb(&cabeca, (yyvsp[-3].tok).lexema, &primeiro);
                                                         (yyval.no) = montaNo((yyvsp[-3].tok).lexema, NULL, NULL, NULL, (yyvsp[-1].lista), retUlt(&primeiro), simb);
                                                         if((yyval.no)->simbolo != NULL) {
-                                                            strcpy((yyval.no)->tipo, (yyval.no)->simbolo->tipo);
-                                                            // Checa se o numero de argumentos esta correto
-                                                            if((yyval.no)->simbolo->numArgs > num_args_chamada) {
-                                                                printf("ERRO SEMANTICO: poucos argumentos para a funcao %s\nLinha:%d\nColuna:%d\n\n", (yyvsp[-3].tok).lexema, yylval.tok.linha, yylval.tok.coluna);
-                                                                ++num_erros_semanticos;
-                                                            } else if((yyval.no)->simbolo->numArgs < num_args_chamada) {
-                                                                printf("ERRO SEMANTICO: muitos argumentos para a funcao %s\nLinha:%d\nColuna:%d\n\n", (yyvsp[-3].tok).lexema, yylval.tok.linha, yylval.tok.coluna);
-                                                                ++num_erros_semanticos;
-                                                            }
-                                                            if(args != NULL) {
-                                                                struct listaArgs * aux1 = (yyval.no)->simbolo->tipoArgs;
-                                                                struct listaArgs * aux2 = args;
-                                                                int cont = 0;
-                                                                struct listaNo * auxNo = (yyval.no)->lista;
-                                                                // Itera sobre os tipos dos argumentos
-                                                                while(aux1 != NULL && aux2 != NULL) {
-                                                                    // Se forem diferentes
-                                                                    if(strcmp(aux1->tipo, aux2->tipo)) {
-                                                                        // Se for int list
-                                                                        if(!strcmp(aux1->tipo, "int list") || !strcmp(aux2->tipo, "int list")) {
-                                                                            printf("ERRO SEMANTICO: argumento de tipo errado (%s)\nLinha:%d\nColuna:%d\n\n", aux2->tipo, yylval.tok.linha, yylval.tok.coluna);
-                                                                            ++num_erros_semanticos;
-                                                                        // Se for float list
-                                                                        } else if(!strcmp(aux1->tipo, "float list") || !strcmp(aux2->tipo, "float list")) {
-                                                                            printf("ERRO SEMANTICO: argumento de tipo errado (%s)\nLinha:%d\nColuna:%d\n\n", aux2->tipo, yylval.tok.linha, yylval.tok.coluna);
-                                                                            ++num_erros_semanticos;
-                                                                        } else {
-                                                                            // Se nao, pode fazer o no de coercao
-                                                                            char aux[15];
-                                                                            strcpy(aux, "(");
-                                                                            if(!strcmp(aux1->tipo, "int"))
-                                                                                strcat(aux, "float_to_int)");
-                                                                            else if(!strcmp(aux1->tipo, "float"))
-                                                                                strcat(aux, "int_to_float)");
-                                                                            struct No* no = montaNo(aux, auxNo->no, NULL, NULL, NULL, retUlt(&primeiro), NULL);
-                                                                            auxNo->no = no;
-                                                                        }
-                                                                    }
-                                                                    aux1 = aux1->prox;
-                                                                    aux2 = aux2->prox;
-                                                                    auxNo = auxNo->prox;
-                                                                    cont++;
+                                                            if(!strcmp((yyval.no)->simbolo->varOuFunc, "funcao")) {
+                                                                strcpy((yyval.no)->tipo, (yyval.no)->simbolo->tipo);
+                                                                // Checa se o numero de argumentos esta correto
+                                                                if((yyval.no)->simbolo->numArgs > num_args_chamada) {
+                                                                    printf("ERRO SEMANTICO: poucos argumentos para a funcao %s\nLinha:%d\nColuna:%d\n\n", (yyvsp[-3].tok).lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                                    ++num_erros_semanticos;
+                                                                } else if((yyval.no)->simbolo->numArgs < num_args_chamada) {
+                                                                    printf("ERRO SEMANTICO: muitos argumentos para a funcao %s\nLinha:%d\nColuna:%d\n\n", (yyvsp[-3].tok).lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                                    ++num_erros_semanticos;
                                                                 }
-                                                                //printf("%d\n", yylval.tok.linha);
-                                                                //printaArgs(args);
+                                                                if(args != NULL) {
+                                                                    struct listaArgs * aux1 = (yyval.no)->simbolo->tipoArgs;
+                                                                    struct listaArgs * aux2 = args;
+                                                                    int cont = 0;
+                                                                    struct listaNo * auxNo = (yyval.no)->lista;
+                                                                    // Itera sobre os tipos dos argumentos
+                                                                    while(aux1 != NULL && aux2 != NULL) {
+                                                                        // Se forem diferentes
+                                                                        if(strcmp(aux1->tipo, aux2->tipo)) {
+                                                                            // Se for int list
+                                                                            if(!strcmp(aux1->tipo, "int list") || !strcmp(aux2->tipo, "int list")) {
+                                                                                printf("ERRO SEMANTICO: argumento de tipo errado (%s)\nLinha:%d\nColuna:%d\n\n", aux2->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                                                ++num_erros_semanticos;
+                                                                            // Se for float list
+                                                                            } else if(!strcmp(aux1->tipo, "float list") || !strcmp(aux2->tipo, "float list")) {
+                                                                                printf("ERRO SEMANTICO: argumento de tipo errado (%s)\nLinha:%d\nColuna:%d\n\n", aux2->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                                                ++num_erros_semanticos;
+                                                                            } else {
+                                                                                // Se nao, pode fazer o no de coercao
+                                                                                char aux[15];
+                                                                                strcpy(aux, "(");
+                                                                                if(!strcmp(aux1->tipo, "int"))
+                                                                                    strcat(aux, "float_to_int)");
+                                                                                else if(!strcmp(aux1->tipo, "float"))
+                                                                                    strcat(aux, "int_to_float)");
+                                                                                struct No* no = montaNo(aux, auxNo->no, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                                                auxNo->no = no;
+                                                                            }
+                                                                        }
+                                                                        aux1 = aux1->prox;
+                                                                        aux2 = aux2->prox;
+                                                                        auxNo = auxNo->prox;
+                                                                        cont++;
+                                                                    }
+                                                                    //printf("%d\n", yylval.tok.linha);
+                                                                    //printaArgs(args);
+                                                                }
+                                                            } else {
+                                                                printf("ERRO SEMANTICO: %s nao eh uma funcao\nLinha:%d\nColuna:%d\n\n", (yyvsp[-3].tok).lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                                ++num_erros_semanticos;
+                                                                strcpy((yyval.no)->tipo, "undefined");
                                                             }
                                                         } else {
                                                             printf("ERRO SEMANTICO: declaracao implicita da funcao %s\nLinha:%d\nColuna:%d\n\n", (yyvsp[-3].tok).lexema, yylval.tok.linha, yylval.tok.coluna);
@@ -2862,11 +2868,11 @@ yyreduce:
                                                         args = NULL;
                                                         num_args_chamada = 0;
                                                         }
-#line 2866 "./src/sintaxe.tab.c"
+#line 2872 "./src/sintaxe.tab.c"
     break;
 
   case 78: /* element: ID ABRE_P FECHA_P  */
-#line 521 "./src/sintaxe.y"
+#line 527 "./src/sintaxe.y"
                                                         {struct tabelaSimb *simb = retSimb(&cabeca, (yyvsp[-2].tok).lexema, &primeiro);
                                                         (yyval.no) = montaNo((yyvsp[-2].tok).lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);
                                                         if((yyval.no)->simbolo != NULL)
@@ -2878,49 +2884,49 @@ yyreduce:
                                                             strcpy((yyval.no)->tipo, "undefined");
                                                         }
                                                         }
-#line 2882 "./src/sintaxe.tab.c"
+#line 2888 "./src/sintaxe.tab.c"
     break;
 
   case 79: /* element: CONST_INT  */
-#line 533 "./src/sintaxe.y"
+#line 539 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo((yyvsp[0].tok).lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                         strcpy((yyval.no)->tipo, "int");}
-#line 2889 "./src/sintaxe.tab.c"
+#line 2895 "./src/sintaxe.tab.c"
     break;
 
   case 80: /* element: CONST_FLOAT  */
-#line 536 "./src/sintaxe.y"
+#line 542 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo((yyvsp[0].tok).lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                         strcpy((yyval.no)->tipo, "float");}
-#line 2896 "./src/sintaxe.tab.c"
+#line 2902 "./src/sintaxe.tab.c"
     break;
 
   case 81: /* element: NIL  */
-#line 539 "./src/sintaxe.y"
+#line 545 "./src/sintaxe.y"
                                                         {(yyval.no) = montaNo("NIL", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                         strcpy((yyval.no)->tipo, "NIL");}
-#line 2903 "./src/sintaxe.tab.c"
+#line 2909 "./src/sintaxe.tab.c"
     break;
 
   case 82: /* arguments: arguments VIRG expLogic  */
-#line 543 "./src/sintaxe.y"
+#line 549 "./src/sintaxe.y"
                                                         {(yyval.lista) = novaListaNo(&(yyvsp[-2].lista), (yyvsp[0].no));
                                                         ++num_args_chamada;
                                                         pushArgs(&args, (yyvsp[0].no)->tipo);}
-#line 2911 "./src/sintaxe.tab.c"
+#line 2917 "./src/sintaxe.tab.c"
     break;
 
   case 83: /* arguments: expLogic  */
-#line 547 "./src/sintaxe.y"
+#line 553 "./src/sintaxe.y"
                                                         {struct listaNo* lista = NULL;
                                                         (yyval.lista) = novaListaNo(&lista, (yyvsp[0].no));
                                                         ++num_args_chamada;
                                                         pushArgs(&args, (yyvsp[0].no)->tipo);}
-#line 2920 "./src/sintaxe.tab.c"
+#line 2926 "./src/sintaxe.tab.c"
     break;
 
   case 84: /* ret: RETURN expLogic  */
-#line 553 "./src/sintaxe.y"
+#line 559 "./src/sintaxe.y"
                                                         {if(!strcmp((yyvsp[0].no)->tipo, tipo_func_return))
                                                             (yyval.no) = montaNo("return", (yyvsp[0].no), NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                         // Se o tipo do retorno nao for o mesmo da funcao
@@ -2943,11 +2949,11 @@ yyreduce:
                                                             }
                                                         }
                                                         }
-#line 2947 "./src/sintaxe.tab.c"
+#line 2953 "./src/sintaxe.tab.c"
     break;
 
 
-#line 2951 "./src/sintaxe.tab.c"
+#line 2957 "./src/sintaxe.tab.c"
 
       default: break;
     }
@@ -3172,7 +3178,7 @@ yyreturn:
   return yyresult;
 }
 
-#line 577 "./src/sintaxe.y"
+#line 583 "./src/sintaxe.y"
 
 
 

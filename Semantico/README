@@ -10,7 +10,7 @@ Kernel 5.11.0-25-generic
 Bison (GNU Bison) 3.7.5
 
 Para compilar o tradutor, basta estar no diretório
-do projeto (17_0043665_semantico) e executar o comando:
+do projeto (17_0043665) e executar o comando:
 make
 
 Para executar o tradutor utilize o comando:

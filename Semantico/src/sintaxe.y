@@ -462,51 +462,57 @@ element:        ID                                      {struct tabelaSimb *simb
                 | ID ABRE_P arguments FECHA_P           {struct tabelaSimb *simb = retSimb(&cabeca, $1.lexema, &primeiro);
                                                         $$ = montaNo($1.lexema, NULL, NULL, NULL, $3, retUlt(&primeiro), simb);
                                                         if($$->simbolo != NULL) {
-                                                            strcpy($$->tipo, $$->simbolo->tipo);
-                                                            // Checa se o numero de argumentos esta correto
-                                                            if($$->simbolo->numArgs > num_args_chamada) {
-                                                                printf("ERRO SEMANTICO: poucos argumentos para a funcao %s\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
-                                                                ++num_erros_semanticos;
-                                                            } else if($$->simbolo->numArgs < num_args_chamada) {
-                                                                printf("ERRO SEMANTICO: muitos argumentos para a funcao %s\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
-                                                                ++num_erros_semanticos;
-                                                            }
-                                                            if(args != NULL) {
-                                                                struct listaArgs * aux1 = $$->simbolo->tipoArgs;
-                                                                struct listaArgs * aux2 = args;
-                                                                int cont = 0;
-                                                                struct listaNo * auxNo = $$->lista;
-                                                                // Itera sobre os tipos dos argumentos
-                                                                while(aux1 != NULL && aux2 != NULL) {
-                                                                    // Se forem diferentes
-                                                                    if(strcmp(aux1->tipo, aux2->tipo)) {
-                                                                        // Se for int list
-                                                                        if(!strcmp(aux1->tipo, "int list") || !strcmp(aux2->tipo, "int list")) {
-                                                                            printf("ERRO SEMANTICO: argumento de tipo errado (%s)\nLinha:%d\nColuna:%d\n\n", aux2->tipo, yylval.tok.linha, yylval.tok.coluna);
-                                                                            ++num_erros_semanticos;
-                                                                        // Se for float list
-                                                                        } else if(!strcmp(aux1->tipo, "float list") || !strcmp(aux2->tipo, "float list")) {
-                                                                            printf("ERRO SEMANTICO: argumento de tipo errado (%s)\nLinha:%d\nColuna:%d\n\n", aux2->tipo, yylval.tok.linha, yylval.tok.coluna);
-                                                                            ++num_erros_semanticos;
-                                                                        } else {
-                                                                            // Se nao, pode fazer o no de coercao
-                                                                            char aux[15];
-                                                                            strcpy(aux, "(");
-                                                                            if(!strcmp(aux1->tipo, "int"))
-                                                                                strcat(aux, "float_to_int)");
-                                                                            else if(!strcmp(aux1->tipo, "float"))
-                                                                                strcat(aux, "int_to_float)");
-                                                                            struct No* no = montaNo(aux, auxNo->no, NULL, NULL, NULL, retUlt(&primeiro), NULL);
-                                                                            auxNo->no = no;
-                                                                        }
-                                                                    }
-                                                                    aux1 = aux1->prox;
-                                                                    aux2 = aux2->prox;
-                                                                    auxNo = auxNo->prox;
-                                                                    cont++;
+                                                            if(!strcmp($$->simbolo->varOuFunc, "funcao")) {
+                                                                strcpy($$->tipo, $$->simbolo->tipo);
+                                                                // Checa se o numero de argumentos esta correto
+                                                                if($$->simbolo->numArgs > num_args_chamada) {
+                                                                    printf("ERRO SEMANTICO: poucos argumentos para a funcao %s\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                                    ++num_erros_semanticos;
+                                                                } else if($$->simbolo->numArgs < num_args_chamada) {
+                                                                    printf("ERRO SEMANTICO: muitos argumentos para a funcao %s\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                                    ++num_erros_semanticos;
                                                                 }
-                                                                //printf("%d\n", yylval.tok.linha);
-                                                                //printaArgs(args);
+                                                                if(args != NULL) {
+                                                                    struct listaArgs * aux1 = $$->simbolo->tipoArgs;
+                                                                    struct listaArgs * aux2 = args;
+                                                                    int cont = 0;
+                                                                    struct listaNo * auxNo = $$->lista;
+                                                                    // Itera sobre os tipos dos argumentos
+                                                                    while(aux1 != NULL && aux2 != NULL) {
+                                                                        // Se forem diferentes
+                                                                        if(strcmp(aux1->tipo, aux2->tipo)) {
+                                                                            // Se for int list
+                                                                            if(!strcmp(aux1->tipo, "int list") || !strcmp(aux2->tipo, "int list")) {
+                                                                                printf("ERRO SEMANTICO: argumento de tipo errado (%s)\nLinha:%d\nColuna:%d\n\n", aux2->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                                                ++num_erros_semanticos;
+                                                                            // Se for float list
+                                                                            } else if(!strcmp(aux1->tipo, "float list") || !strcmp(aux2->tipo, "float list")) {
+                                                                                printf("ERRO SEMANTICO: argumento de tipo errado (%s)\nLinha:%d\nColuna:%d\n\n", aux2->tipo, yylval.tok.linha, yylval.tok.coluna);
+                                                                                ++num_erros_semanticos;
+                                                                            } else {
+                                                                                // Se nao, pode fazer o no de coercao
+                                                                                char aux[15];
+                                                                                strcpy(aux, "(");
+                                                                                if(!strcmp(aux1->tipo, "int"))
+                                                                                    strcat(aux, "float_to_int)");
+                                                                                else if(!strcmp(aux1->tipo, "float"))
+                                                                                    strcat(aux, "int_to_float)");
+                                                                                struct No* no = montaNo(aux, auxNo->no, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                                                auxNo->no = no;
+                                                                            }
+                                                                        }
+                                                                        aux1 = aux1->prox;
+                                                                        aux2 = aux2->prox;
+                                                                        auxNo = auxNo->prox;
+                                                                        cont++;
+                                                                    }
+                                                                    //printf("%d\n", yylval.tok.linha);
+                                                                    //printaArgs(args);
+                                                                }
+                                                            } else {
+                                                                printf("ERRO SEMANTICO: %s nao eh uma funcao\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                                ++num_erros_semanticos;
+                                                                strcpy($$->tipo, "undefined");
                                                             }
                                                         } else {
                                                             printf("ERRO SEMANTICO: declaracao implicita da funcao %s\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
