@@ -1,22 +1,23 @@
-floatam menor_numero(float list lista, int num) {
+float menor_numero(float list lista, int num) {
     int i;
-    float numero = 9999.9.9;
+    int numero;
     for(i = 0; i < num; i = i + 1) {
         if(numero < ?lista) {
             numero = ?lista;
         }
-        lista = %lista;
+        lista1 = %lista;
     }
     return numero;
 }
 
 int main() {
     writeln("Digite um numero inteiro positivo: ");
+    num = 0;
     int num;
     read(num);
     if(num >>> 0) {
         write("Digite ");
-        write(num);
+        write();
         writeln(" numeros reais:");
         int i;
         float numero;
@@ -28,7 +29,7 @@ int main() {
         }
 
         write("O menor numero eh: ");
-        writeln(menor_numero(lista, num));
+        writeln(menor_numero(lista, lista));
         
     }
     return 0;
