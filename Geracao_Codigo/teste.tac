@@ -6,17 +6,38 @@ inttofl $3, 2
 mul $4, $1, $3
 inttofl $5, 1
 mul $6, $4, $5
-minus $7, $1
-not $8, $1
-mul $9, $2, 3
-inttofl $10, $9
-add $11, $1, $10
-sub $12, $11, 20.3
-inttofl $13, 20
-slt $14, $12, $13
-slt $15, 12, 20
-sleq $16, 31, 20
-sleq $17, 20, 31
-seq $18, $0, $2
-seq $19, $0, $2
-not $20, $19
+mov $7, $6
+minus $8, $7
+fltoint $9, $8
+mov $10, $8
+not $11, $7
+mov $12, $11
+mul $13, $10, 3
+inttofl $14, $13
+add $15, $12, $14
+sub $16, $15, 20.3
+inttofl $17, 20
+slt $18, $16, $17
+mov $19, $18
+slt $20, 12, 20
+inttofl $21, $20
+mov $22, $20
+sleq $23, 31, 20
+inttofl $24, $23
+mov $25, $23
+sleq $26, 20, 31
+inttofl $27, $26
+mov $28, $26
+seq $29, $19, $10
+inttofl $30, $29
+mov $31, $29
+seq $32, $19, $10
+not $33, $32
+inttofl $34, $33
+mov $35, $33
+add $36, $19, $10
+inttofl $37, $36
+and $38, $37, $35
+or $39, $38, $10
+inttofl $40, $39
+mov $41, $39

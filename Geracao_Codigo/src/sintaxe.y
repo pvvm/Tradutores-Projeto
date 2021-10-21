@@ -314,6 +314,8 @@ attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb
                                                                     strcat(aux, "int_to_float)");
                                                                 struct No* no = montaNo(aux, $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                                 $$->no2 = no;
+                                                                geraCasting($$->no1->valor_temp, $3->valor_temp, &ger_codigo_var, escrita, $$);
+                                                                geraOperacoes($2.lexema, $3->valor_temp, NULL, &ger_codigo_var, escrita, $$);
                                                             } else if(!strcmp($3->tipo, "int list")){
                                                                 //Se for int list e outro
                                                                 if(strcmp($$->no1->simbolo->tipo, "int list")) {
@@ -336,6 +338,8 @@ attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb
                                                                 }
                                                                 $$->no2 = $3;
                                                             } else {
+                                                                geraCasting($$->no1->valor_temp, $3->valor_temp, &ger_codigo_var, escrita, $$);
+                                                                geraOperacoes($2.lexema, $3->valor_temp, NULL, &ger_codigo_var, escrita, $$);
                                                                 $$->no2 = $3;
                                                             }
 
@@ -351,11 +355,15 @@ attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb
                 | expLogic                              {$$ = $1;}
                 ;
 
-expLogic:       expLogic LOG_OP_OU andLogic             {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);}
+expLogic:       expLogic LOG_OP_OU andLogic             {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);
+                                                        geraCasting($1->valor_temp, $3->valor_temp, &ger_codigo_var, escrita, $$);
+                                                        geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$);}
                 | andLogic                              {$$ = $1;}
                 ;
 
-andLogic:       andLogic LOG_OP_E expComp               {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);}
+andLogic:       andLogic LOG_OP_E expComp               {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);
+                                                        geraCasting($1->valor_temp, $3->valor_temp, &ger_codigo_var, escrita, $$);
+                                                        geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$);}
                 | expComp                               {$$ = $1;}
                 ;
 

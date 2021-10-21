@@ -36,6 +36,12 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             if(!strcmp(no->tipo, "int") || !strcmp(no->tipo, "float")) {
                 strcpy(aux_str, "not ");
             }   // FAZER O CASO DO ! EM LISTA
+        } else if(!strcmp(operador, "=")) {
+            strcpy(aux_str, "mov ");
+            if(no->no1 != NULL && no->no1->simbolo != NULL) {
+                strcpy(no->no1->simbolo->var_temp, temp);
+                //printf("%s\n\n", no->no1->simbolo->var_temp);
+            }
         }
         strcat(aux_str, temp);
         strcat(aux_str, ", ");
@@ -83,6 +89,10 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             strcat(aux_str, ", ");
             strcat(aux_str, copia_temp);
             invertido = -1;
+        } else if(!strcmp(operador, "&&")) {
+            strcpy(aux_str, "and ");
+        } else if(!strcmp(operador, "||")) {
+            strcpy(aux_str, "or ");
         }
 
         if(invertido == 0) {
@@ -108,36 +118,44 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
 }
 
 void geraCasting(char *operando1, char *operando2, int *ger_codigo_var, FILE* escrita, struct No* no) {
-    char aux_str[200];
+    char aux_str[200] = "";
     char aux_num[10];
     char temp[11];
     sprintf(aux_num, "%d", *ger_codigo_var);
     strcpy(temp, "$");
     strcat(temp, aux_num);
     //printf("%s %s\n\n", no->no1->nome, no->no2->nome);
+    if(no != NULL) {
+        if(no->no1 != NULL) {
+            if(!strcmp(no->no1->nome, "(int_to_float)"))
+                strcpy(aux_str, "inttofl ");
+            else if(!strcmp(no->no1->nome, "(float_to_int)"))
+                strcpy(aux_str, "fltoint ");
+            if(!strcmp(no->no1->nome, "(int_to_float)") || !strcmp(no->no1->nome, "(float_to_int)")) {
+                strcat(aux_str, temp);
+                strcat(aux_str, ", ");
+                strcat(aux_str, operando1);
+                strcat(aux_str, "\n");
+                fputs(aux_str, escrita);
+                strcpy(no->no1->valor_temp, temp);
+                (*ger_codigo_var)++;
+            }
+        }
 
-    if(!strcmp(no->no1->nome, "(int_to_float)")) {
-        strcpy(aux_str, "inttofl ");
-        strcat(aux_str, temp);
-        strcat(aux_str, ", ");
-        strcat(aux_str, operando1);
-        strcat(aux_str, "\n");
-        fputs(aux_str, escrita);
-        strcpy(no->no1->valor_temp, temp);
-        (*ger_codigo_var)++;
+        if(no->no2 != NULL) {
+            if(!strcmp(no->no2->nome, "(int_to_float)"))
+                strcpy(aux_str, "inttofl ");
+            else if(!strcmp(no->no2->nome, "(float_to_int)"))
+                strcpy(aux_str, "fltoint ");
+            if(!strcmp(no->no2->nome, "(int_to_float)") || !strcmp(no->no2->nome, "(float_to_int)")) {
+                strcat(aux_str, temp);
+                strcat(aux_str, ", ");
+                strcat(aux_str, operando2);
+                strcat(aux_str, "\n");
+                fputs(aux_str, escrita);
+                strcpy(no->no2->valor_temp, temp);
+                (*ger_codigo_var)++;
+            }
+        }
     }
-
-    if(!strcmp(no->no2->nome, "(int_to_float)")) {
-        strcpy(aux_str, "inttofl ");
-        strcat(aux_str, temp);
-        strcat(aux_str, ", ");
-        strcat(aux_str, operando2);
-        strcat(aux_str, "\n");
-        fputs(aux_str, escrita);
-        strcpy(no->no2->valor_temp, temp);
-        //printf("%s\n", no->no2->valor_temp);
-        (*ger_codigo_var)++;
-    }
-
-    // Fazer o de float para int
 }

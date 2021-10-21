@@ -11,4 +11,5 @@ int main() {
     b = 31 >= 20;
     b = a == c;
     b = a != c;
+    b = a + c && b || c;
 }
