@@ -14,7 +14,7 @@ typedef struct tabelaSimb {
     int escopo;                 // Escopo ao qual pertence
     int linha;                  // Linha onde foi declarado
     int coluna;                 // Coluna onde foi declarado
-    int var_temp;
+    char var_temp[15];
     struct listaArgs *tipoArgs;
 
     struct tabelaSimb *prox;
@@ -35,7 +35,7 @@ typedef struct listaArgs {
 
 int procuraLista(struct tabelaSimb**, char *, int);
 
-int push(struct tabelaSimb**, char *, char *, char *, char *, int, int, int, int);
+int push(struct tabelaSimb**, char *, char *, char *, char *, int, int, int, char *);
 
 void printaArgs(struct listaArgs *);
 
