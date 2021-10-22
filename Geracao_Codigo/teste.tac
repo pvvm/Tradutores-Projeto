@@ -9,7 +9,7 @@ mul $6, $4, $5
 mov $7, $6
 minus $8, $7
 fltoint $9, $8
-mov $10, $8
+mov $10, $9
 not $11, $7
 mov $12, $11
 mul $13, $10, 3
@@ -21,23 +21,23 @@ slt $18, $16, $17
 mov $19, $18
 slt $20, 12, 20
 inttofl $21, $20
-mov $22, $20
+mov $22, $21
 sleq $23, 31, 20
 inttofl $24, $23
-mov $25, $23
+mov $25, $24
 sleq $26, 20, 31
 inttofl $27, $26
-mov $28, $26
+mov $28, $27
 seq $29, $19, $10
 inttofl $30, $29
-mov $31, $29
+mov $31, $30
 seq $32, $19, $10
 not $33, $32
 inttofl $34, $33
-mov $35, $33
+mov $35, $34
 add $36, $19, $10
 inttofl $37, $36
 and $38, $37, $35
 or $39, $38, $10
 inttofl $40, $39
-mov $41, $39
+mov $41, $40

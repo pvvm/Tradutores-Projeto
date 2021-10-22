@@ -38,12 +38,15 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             }   // FAZER O CASO DO ! EM LISTA
         } else if(!strcmp(operador, "=")) {
             strcpy(aux_str, "mov ");
-            if(no->no1 != NULL && no->no1->simbolo != NULL) {
-                strcpy(no->no1->simbolo->var_temp, temp);
+            printf("%s\n\n", operando1);
+            (*ger_codigo_var)--;
+            // Salva a nova variavel temporaria na tabela de simbolos
+            //if(no->no1 != NULL && no->no1->simbolo != NULL) {
+            //    strcpy(no->no1->simbolo->var_temp, temp);
                 //printf("%s\n\n", no->no1->simbolo->var_temp);
-            }
+            //}
         }
-        strcat(aux_str, temp);
+        strcat(aux_str, no->no1->simbolo->var_temp);
         strcat(aux_str, ", ");
         strcat(aux_str, operando1);
 
@@ -138,6 +141,7 @@ void geraCasting(char *operando1, char *operando2, int *ger_codigo_var, FILE* es
                 strcat(aux_str, "\n");
                 fputs(aux_str, escrita);
                 strcpy(no->no1->valor_temp, temp);
+                strcpy(operando1 , temp);           // Gambiarra pra fazer o mov pegar como operando o valor do inttofl e fltoint
                 (*ger_codigo_var)++;
             }
         }
@@ -154,6 +158,7 @@ void geraCasting(char *operando1, char *operando2, int *ger_codigo_var, FILE* es
                 strcat(aux_str, "\n");
                 fputs(aux_str, escrita);
                 strcpy(no->no2->valor_temp, temp);
+                strcpy(operando2 , temp);           // Gambiarra pra fazer o mov pegar como operando o valor do inttofl e fltoint
                 (*ger_codigo_var)++;
             }
         }

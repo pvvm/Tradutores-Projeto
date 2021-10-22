@@ -2556,7 +2556,7 @@ yyreduce:
                                                                     strcat(aux, "int_to_float)");
                                                                 struct No* no = montaNo(aux, (yyvsp[0].no), NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                                 (yyval.no)->no2 = no;
-                                                                geraCasting((yyval.no)->no1->valor_temp, (yyvsp[0].no)->valor_temp, &ger_codigo_var, escrita, (yyval.no));
+                                                                geraCasting(NULL, (yyvsp[0].no)->valor_temp, &ger_codigo_var, escrita, (yyval.no));
                                                                 geraOperacoes((yyvsp[-1].tok).lexema, (yyvsp[0].no)->valor_temp, NULL, &ger_codigo_var, escrita, (yyval.no));
                                                             } else if(!strcmp((yyvsp[0].no)->tipo, "int list")){
                                                                 //Se for int list e outro
@@ -2580,7 +2580,7 @@ yyreduce:
                                                                 }
                                                                 (yyval.no)->no2 = (yyvsp[0].no);
                                                             } else {
-                                                                geraCasting((yyval.no)->no1->valor_temp, (yyvsp[0].no)->valor_temp, &ger_codigo_var, escrita, (yyval.no));
+                                                                geraCasting(NULL, (yyvsp[0].no)->valor_temp, &ger_codigo_var, escrita, (yyval.no));
                                                                 geraOperacoes((yyvsp[-1].tok).lexema, (yyvsp[0].no)->valor_temp, NULL, &ger_codigo_var, escrita, (yyval.no));
                                                                 (yyval.no)->no2 = (yyvsp[0].no);
                                                             }

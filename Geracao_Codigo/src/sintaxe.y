@@ -314,7 +314,7 @@ attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb
                                                                     strcat(aux, "int_to_float)");
                                                                 struct No* no = montaNo(aux, $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                                 $$->no2 = no;
-                                                                geraCasting($$->no1->valor_temp, $3->valor_temp, &ger_codigo_var, escrita, $$);
+                                                                geraCasting(NULL, $3->valor_temp, &ger_codigo_var, escrita, $$);
                                                                 geraOperacoes($2.lexema, $3->valor_temp, NULL, &ger_codigo_var, escrita, $$);
                                                             } else if(!strcmp($3->tipo, "int list")){
                                                                 //Se for int list e outro
@@ -338,7 +338,7 @@ attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb
                                                                 }
                                                                 $$->no2 = $3;
                                                             } else {
-                                                                geraCasting($$->no1->valor_temp, $3->valor_temp, &ger_codigo_var, escrita, $$);
+                                                                geraCasting(NULL, $3->valor_temp, &ger_codigo_var, escrita, $$);
                                                                 geraOperacoes($2.lexema, $3->valor_temp, NULL, &ger_codigo_var, escrita, $$);
                                                                 $$->no2 = $3;
                                                             }
