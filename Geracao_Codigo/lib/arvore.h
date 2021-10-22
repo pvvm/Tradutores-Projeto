@@ -10,7 +10,7 @@ typedef struct No {
     char nome[500];
     int escopo;
     char tipo[15];
-    char valor_temp[15];
+    char valor_temp[50];
     struct No* no1;
     struct No* no2;
     struct No* no3;

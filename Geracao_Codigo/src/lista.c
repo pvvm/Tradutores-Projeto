@@ -20,7 +20,7 @@ int procuraLista(struct tabelaSimb** prim, char *simbolo, int escopo) {
     Argumentos: o elemento atual e o simbolo, se eh variavel, funcao ou constante, tipo, valor, escopo, linha e coluna do novo elemento
     Retorno: 0 se foi adicionado o simbolo na tabela e 1 se nao
 */
-int push(struct tabelaSimb** ult, char *simbolo, char *varOuFunc, char *tipo, char *valor, int escopo, int linha, int coluna, int var_temp) {
+int push(struct tabelaSimb** ult, char *simbolo, char *varOuFunc, char *tipo, char *valor, int escopo, int linha, int coluna, char *var_temp) {
     struct tabelaSimb **aux = ult;
     if(procuraLista(aux, simbolo, escopo)) {
         struct tabelaSimb *aux2 = *ult;
@@ -36,7 +36,7 @@ int push(struct tabelaSimb** ult, char *simbolo, char *varOuFunc, char *tipo, ch
         novo->coluna = coluna;
         novo->tipoArgs = NULL;
         novo->prox = NULL;
-        novo->var_temp = var_temp;
+        strcpy(novo->var_temp, var_temp);
 
         if(*ult == NULL) {
             *ult = novo;
@@ -69,7 +69,7 @@ void printaArgs(struct listaArgs *prim) {
 void printaLista(struct tabelaSimb *prim) {
     printf("\t\t\t\t\t    Simbolo\t Var/Func/Const\t\t   Tipo\t       Num Args\t\t Escopo\t\t  Linha\t         Coluna\n\n");
     while(prim != NULL) {
-        printf("%51s\t%15s\t%15s\t%15d\t%15d\t%15d\t%15d\t%15d\n", prim->simbolo, prim->varOuFunc, prim->tipo, prim->numArgs, prim->escopo, prim->linha, prim->coluna, prim->var_temp);
+        printf("%51s\t%15s\t%15s\t%15d\t%15d\t%15d\t%15d\t%15s\n", prim->simbolo, prim->varOuFunc, prim->tipo, prim->numArgs, prim->escopo, prim->linha, prim->coluna, prim->var_temp);
         /*if(prim->tipoArgs != NULL) {
             printaArgs(prim->tipoArgs);
         }*/
