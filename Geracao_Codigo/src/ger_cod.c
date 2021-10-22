@@ -14,7 +14,7 @@ void inicioDefault(int ger_codigo_var, FILE* escrita, char *tipo) {
     else if(!strcmp(tipo, "float"))
         strcat(aux_str, ", 0.0\n");
     else
-        strcat(aux_str, ", MUDAR AQUI\n");
+        strcat(aux_str, ", 0\n");
     
     fputs(aux_str, escrita);
 }
@@ -27,26 +27,31 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
     strcpy(temp, "$");
     strcat(temp, aux_num);
     strcpy(aux_str, "");
+    int opcao_var = 0;
 
     // Operacoes unarias
     if(operando2 == NULL) {
         if(!strcmp(operador, "-")) {
             strcpy(aux_str, "minus ");
+            strcat(aux_str, temp);
         } else if(!strcmp(operador, "!")) {
             if(!strcmp(no->tipo, "int") || !strcmp(no->tipo, "float")) {
                 strcpy(aux_str, "not ");
+                strcat(aux_str, temp);
             }   // FAZER O CASO DO ! EM LISTA
         } else if(!strcmp(operador, "=")) {
+            opcao_var = 1;
             strcpy(aux_str, "mov ");
-            printf("%s\n\n", operando1);
-            (*ger_codigo_var)--;
+            strcat(aux_str, no->no1->simbolo->var_temp);
+            //printf("%s\n\n", operando1);
+            //(*ger_codigo_var)--;      Comentei pra evitar que mov nao aumentasse esse numero
+
             // Salva a nova variavel temporaria na tabela de simbolos
             //if(no->no1 != NULL && no->no1->simbolo != NULL) {
             //    strcpy(no->no1->simbolo->var_temp, temp);
                 //printf("%s\n\n", no->no1->simbolo->var_temp);
             //}
         }
-        strcat(aux_str, no->no1->simbolo->var_temp);
         strcat(aux_str, ", ");
         strcat(aux_str, operando1);
 
@@ -116,7 +121,11 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
 
     strcat(aux_str, "\n");
     fputs(aux_str, escrita);
-    strcpy(no->valor_temp, temp);
+    if(opcao_var == 0)
+        strcpy(no->valor_temp, temp);
+    else
+        strcpy(no->valor_temp, no->no1->simbolo->var_temp);
+    
     (*ger_codigo_var)++;
 }
 
@@ -163,4 +172,22 @@ void geraCasting(char *operando1, char *operando2, int *ger_codigo_var, FILE* es
             }
         }
     }
+}
+
+void mandaLabel(int *label_cont, int opcao, char *operador, FILE *escrita, struct pilhaLabel **topo) {
+    char aux_str[200];
+    char aux_num[10];
+    char label[11];
+    sprintf(aux_num, "%d", *label_cont);
+    strcpy(label, "L");
+    strcat(label, aux_num);
+    strcpy(aux_str, "brz ");
+    strcat(aux_str, label);
+    strcat(aux_str, ", ");
+    strcat(aux_str, operador);
+    strcat(aux_str, "\n");
+    fputs(aux_str, escrita);
+    (*label_cont)++;
+
+    pushLabel(topo, label);
 }

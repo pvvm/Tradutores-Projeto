@@ -1,12 +1,19 @@
 %define parse.error verbose
 %define lr.type canonical-lr
 
+/*
+TODO:   ADICIONAR A CONDICAO PRA FAZER AS OPERACOES DE GERAR CODIGO (SE TIVER ERROS LEXICOS, SINTATICOS...)
+        CORRIGIR A QUESTAO DO ELSE IF
+
+*/
+
 %{
 #include <stdio.h>
 #include <string.h>
 #include "../lib/arvore.h"
 #include "../lib/lista.h"
 #include "../lib/ger_cod.h"
+#include "../lib/pilha.h"
 
 
 extern int yylex(void);
@@ -23,14 +30,18 @@ int num_args = 0;
 int num_args_chamada = 0;
 int argumentos = 0;
 int ger_codigo_var = 0;
+int label_cont = 0;
+int tem_else = 0;
 char aux[50];
 char tipo_func[50];
 char tipo_func_return[50];
 char nome_arq[200];
+char retorno_expressao[50];
 struct No * raiz;
 struct tabelaSimb* cabeca = NULL;
 struct listaEscopo* primeiro = NULL;
 struct listaArgs* args = NULL;
+struct pilhaLabel* topo = NULL;
 FILE *escrita;
 
 void yyerror(const char *);
@@ -178,12 +189,26 @@ funcDecl:       TIPO ID                                 {$$ = NULL;
                                                         strcpy(aux, $2.lexema);
                                                         // Inclui o termo na tabela de simbolos
                                                         num_erros_semanticos += push(&cabeca, $2.lexema, "funcao", $1.lexema, "", retUlt(&primeiro), $1.linha, $1.coluna, "");
-                                                        strcpy(tipo_func, $1.lexema);}
+                                                        strcpy(tipo_func, $1.lexema);
+
+                                                        // Adiciona o label da funcao no codigo
+                                                        char nome_func[200];
+                                                        strcpy(nome_func, "\n");
+                                                        strcat(nome_func, $2.lexema);
+                                                        strcat(nome_func, ":\n");
+                                                        fputs(nome_func, escrita);}
 
                 | TIPO LIST ID                          {$$ = NULL;
                                                         strcpy(aux, $3.lexema);
                                                         num_erros_semanticos += push(&cabeca, $3.lexema, "funcao", strcat($1.lexema, " list"), "", retUlt(&primeiro), $1.linha, $1.coluna, "");
-                                                        strcpy(tipo_func, $1.lexema);}
+                                                        strcpy(tipo_func, $1.lexema);
+
+                                                        // Adiciona o label da funcao no codigo
+                                                        char nome_func[200];
+                                                        strcpy(nome_func, "\n");
+                                                        strcat(nome_func, $3.lexema);
+                                                        strcat(nome_func, ":\n");
+                                                        fputs(nome_func, escrita);}
                 ;
 
 parameters:     parameters VIRG varDecl                 {$$ = $1; num_args++;}
@@ -209,15 +234,48 @@ stmt:           conditional                             {$$ = $1;}
                 ;
 
                 // A professora falou que esse ELSE é desnecessario
-conditional:    IF ABRE_P attribuition FECHA_P bracesOrNot                                   {$$ = montaNo($1.lexema, NULL, $5, NULL, NULL, retUlt(&primeiro), NULL);
-                                                                                            $$->no1 = montaNo("condArg", $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-                | IF ABRE_P attribuition FECHA_P bracesOrNot ELSE bracesOrNot/* %prec ELSE*/      {$$ = montaNo($1.lexema, NULL, $5, $7, NULL, retUlt(&primeiro), NULL);
-                                                                                            $$->no1 = montaNo("condArg", $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
-                | IF ABRE_P error FECHA_P bracesOrNot                                        {}
+conditional:    IF ABRE_P attribuition FECHA_P bracesOrNot                                  {$$ = montaNo($1.lexema, NULL, $5, NULL, NULL, retUlt(&primeiro), NULL);
+                                                                                            $$->no1 = montaNo("condArg", $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                                                            char aux[50];
+                                                                                            if(topo != NULL) {
+                                                                                                strcpy(aux, topo->label);
+                                                                                                strcat(aux, ":\n");
+                                                                                                fputs(aux, escrita);
+                                                                                                popLabel(&topo);
+                                                                                            }}
+
+                | IF ABRE_P attribuition FECHA_P bracesOrNot ELSE                           {char jump[50];
+                                                                                            char aux_num[10];
+                                                                                            strcpy(jump, "jump L");
+                                                                                            sprintf(aux_num, "%d", label_cont);
+                                                                                            strcat(jump, aux_num);
+                                                                                            strcat(jump, "\n");
+                                                                                            fputs(jump, escrita);
+                                                                                            char aux[50];
+                                                                                            if(topo != NULL) {
+                                                                                                strcpy(aux, topo->label);
+                                                                                                strcat(aux, ":\n");
+                                                                                                fputs(aux, escrita);
+                                                                                                popLabel(&topo);
+                                                                                                tem_else = 1;
+                                                                                            }}
+
+                bracesOrNot/* %prec ELSE*/                                                  {$$ = montaNo($1.lexema, NULL, $5, $8, NULL, retUlt(&primeiro), NULL);
+                                                                                            $$->no1 = montaNo("condArg", $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                                                            char aux_num[10];
+                                                                                            char lab[50];
+                                                                                            strcpy(lab, "L");
+                                                                                            sprintf(aux_num, "%d", label_cont);
+                                                                                            strcat(lab, aux_num);
+                                                                                            strcat(lab, ":\n");
+                                                                                            fputs(lab, escrita);
+                                                                                            tem_else = 0;
+                                                                                            label_cont++;}
+                | IF ABRE_P error FECHA_P bracesOrNot                                       {}
                 ;
 
-bracesOrNot:    ABRE_C moreStmt FECHA_C                 {$$ = montaNo("statements", NULL, NULL, NULL, $2, retUlt(&primeiro), NULL);}
-                | stmt                                  {$$ = montaNo("statements", $1, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
+bracesOrNot:    ABRE_C {if(tem_else == 0) mandaLabel(&label_cont, 0, retorno_expressao, escrita, &topo);} moreStmt FECHA_C                 {$$ = montaNo("statements", NULL, NULL, NULL, $3, retUlt(&primeiro), NULL);}
+                | {if(tem_else == 0) mandaLabel(&label_cont, 0, retorno_expressao, escrita, &topo);} stmt                                  {$$ = montaNo("statements", $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
                 ;
 
 iteration:      FOR ABRE_P iteArgs FECHA_P bracesOrNot              {$$ = montaNo($1.lexema, $3, $5, NULL, NULL, retUlt(&primeiro), NULL);}
@@ -316,6 +374,7 @@ attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb
                                                                 $$->no2 = no;
                                                                 geraCasting(NULL, $3->valor_temp, &ger_codigo_var, escrita, $$);
                                                                 geraOperacoes($2.lexema, $3->valor_temp, NULL, &ger_codigo_var, escrita, $$);
+                                                                strcpy(retorno_expressao, $$->valor_temp);
                                                             } else if(!strcmp($3->tipo, "int list")){
                                                                 //Se for int list e outro
                                                                 if(strcmp($$->no1->simbolo->tipo, "int list")) {
@@ -341,6 +400,7 @@ attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb
                                                                 geraCasting(NULL, $3->valor_temp, &ger_codigo_var, escrita, $$);
                                                                 geraOperacoes($2.lexema, $3->valor_temp, NULL, &ger_codigo_var, escrita, $$);
                                                                 $$->no2 = $3;
+                                                                strcpy(retorno_expressao, $$->valor_temp);
                                                             }
 
                                                         } else {
@@ -352,7 +412,8 @@ attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb
                                                             strcpy($$->tipo, "undefined");
                                                         }
                                                         }
-                | expLogic                              {$$ = $1;}
+                | expLogic                              {$$ = $1;
+                                                        strcpy(retorno_expressao, $$->valor_temp);}
                 ;
 
 expLogic:       expLogic LOG_OP_OU andLogic             {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);
