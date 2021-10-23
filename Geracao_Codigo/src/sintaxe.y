@@ -33,6 +33,7 @@ int ger_codigo_var = 0;
 int label_cont = 0;
 int tem_else = 0;
 int flag_incremento = 0;
+int string_cont = 0;
 char aux[50];
 char tipo_func[50];
 char tipo_func_return[50];
@@ -334,7 +335,69 @@ io:             ENTRADA ABRE_P ID FECHA_P               {struct tabelaSimb *simb
                                                         num_erros_semanticos += push(&cabeca, $3.lexema, "constante", "string", "", retUlt(&primeiro), $3.linha, $3.coluna, "");
                                                         struct tabelaSimb *simb = retSimb(&cabeca, $3.lexema, &primeiro);
                                                         $$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
-                                                        $$->no1 = montaNo($3.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);}
+                                                        $$->no1 = montaNo($3.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);
+                                                        char aux[300];
+                                                        char aux_num1[15];
+                                                        char aux_num2[15];
+                                                        char aux_num3[15];
+
+                                                        strcpy(aux, "mov $");                       // mov $, tamanho_string
+                                                        sprintf(aux_num3, "%d", ger_codigo_var);
+                                                        strcat(aux, aux_num3);
+                                                        ger_codigo_var++;
+                                                        strcat(aux, ", ");
+                                                        sprintf(aux_num1, "%d", ((int)strlen($3.lexema) - 2));    // TIRAR O -2 CASO DE PROBLEMA
+                                                        strcat(aux, aux_num1);
+
+                                                        strcat(aux, "\nmov $");                        // mov $, 0
+                                                        sprintf(aux_num1, "%d", ger_codigo_var);
+                                                        ger_codigo_var++;
+                                                        strcat(aux, aux_num1);
+                                                        strcat(aux, ", 0\n");
+                                                        fputs(aux, escrita);
+
+                                                        //mandaLabel(&label_cont, 1, retorno_expressao, escrita, &topo);  // L :
+
+                                                        strcpy(aux, "mov $");                       // mov $, &
+                                                        sprintf(aux_num2, "%d", ger_codigo_var);
+                                                        strcat(aux, aux_num2);
+                                                        strcat(aux, ", &s");
+                                                        sprintf(aux_num2, "%d", string_cont);
+                                                        string_cont++;
+                                                        strcat(aux, aux_num2);
+
+                                                        strcat(aux, "\nmov $");
+                                                        sprintf(aux_num2, "%d", ger_codigo_var);
+                                                        strcat(aux, aux_num2);
+                                                        strcat(aux, ", $");
+                                                        strcat(aux, aux_num2);
+                                                        strcat(aux, "[$");
+                                                        strcat(aux, aux_num1);
+                                                        ger_codigo_var++;
+
+                                                        strcat(aux, "]\nprint $");
+                                                        strcat(aux, aux_num2);
+                                                        strcat(aux, "\nadd $");
+                                                        strcat(aux, aux_num1);
+                                                        strcat(aux, ", $");
+                                                        strcat(aux, aux_num1);
+
+                                                        strcat(aux, ", 1\nsub $");
+                                                        sprintf(aux_num2, "%d", ger_codigo_var);
+                                                        strcat(aux, aux_num2);
+                                                        strcat(aux, ", $");
+                                                        strcat(aux, aux_num3);
+                                                        strcat(aux, ", $");
+                                                        strcat(aux, aux_num1);
+                                                        
+                                                        strcat(aux, "\nbrnz L");
+                                                        strcat(aux, ", $");
+                                                        strcat(aux, aux_num2);
+
+                                                        ger_codigo_var++;
+
+                                                        fputs(aux, escrita);
+                                                        }
 
                 | ENTRADA ABRE_P error FECHA_P          {}
                 | SAIDA ABRE_P error FECHA_P            {}

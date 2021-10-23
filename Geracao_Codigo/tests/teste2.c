@@ -1,7 +1,22 @@
+//int a;
+
 int main() {
+    writeln("Testando essa caceta");
+    /*a = 3;
+    writeln(a);
+
     int a;
+    writeln(a);
+
     int b;
     int c;
+
+    {
+        int a;
+        a = 3;
+        writeln(a);
+    }
+    writeln(a);
 
     for(a = 0; a < 3; a = a + 1) {
         for(b = 0; b < 2; b = b + 1) {
@@ -18,7 +33,7 @@ int main() {
     writeln(c);
     float d;
     read(d);
-    writeln(d);
+    writeln(d);*/
 
     /*for(a = 0; a < 10; a = a + 1 + 2) {
         b = 2;

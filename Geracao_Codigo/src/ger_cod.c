@@ -20,7 +20,7 @@ void inicioDefault(int ger_codigo_var, FILE* escrita, char *tipo) {
 }
 
 void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_codigo_var, FILE* escrita, struct No* no, int incremento, char *inst_incremento) {
-    char aux_str[200];
+    char aux_str[300];
     char aux_num[10];
     char temp[11];
     sprintf(aux_num, "%d", *ger_codigo_var);
