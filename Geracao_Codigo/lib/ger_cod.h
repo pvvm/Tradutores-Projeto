@@ -10,9 +10,9 @@
 
 void inicioDefault(int, FILE *, char *);
 
-void geraOperacoes(char *, char *, char *, int *, FILE *, struct No*);
+void geraOperacoes(char *, char *, char *, int *, FILE *, struct No*, int, char *);
 
-void geraCasting(char *, char *, int *, FILE*, struct No*);
+void geraCasting(char *, char *, int *, FILE*, struct No*, int, char *);
 
 void mandaLabel(int *, int, char *, FILE *, struct pilhaLabel**);
 

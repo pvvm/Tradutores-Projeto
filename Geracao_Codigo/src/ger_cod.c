@@ -19,7 +19,7 @@ void inicioDefault(int ger_codigo_var, FILE* escrita, char *tipo) {
     fputs(aux_str, escrita);
 }
 
-void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_codigo_var, FILE* escrita, struct No* no) {
+void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_codigo_var, FILE* escrita, struct No* no, int incremento, char *inst_incremento) {
     char aux_str[200];
     char aux_num[10];
     char temp[11];
@@ -28,6 +28,7 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
     strcat(temp, aux_num);
     strcpy(aux_str, "");
     int opcao_var = 0;
+    int so_um_operando = 0;
 
     // Operacoes unarias
     if(operando2 == NULL) {
@@ -45,14 +46,21 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             strcat(aux_str, no->no1->simbolo->var_temp);
             //printf("%s\n\n", operando1);
             //(*ger_codigo_var)--;      Comentei pra evitar que mov nao aumentasse esse numero
-
-            // Salva a nova variavel temporaria na tabela de simbolos
-            //if(no->no1 != NULL && no->no1->simbolo != NULL) {
-            //    strcpy(no->no1->simbolo->var_temp, temp);
-                //printf("%s\n\n", no->no1->simbolo->var_temp);
-            //}
+        } else if(!strcmp(operador, "write")) {
+            strcpy(aux_str, "print ");
+            so_um_operando = 1;
+        } else if(!strcmp(operador, "writeln")) {
+            strcpy(aux_str, "println ");
+            so_um_operando = 1;
+        } else if(!strcmp(operador, "read")) {
+            if(!strcmp(no->no1->simbolo->tipo, "int"))
+                strcpy(aux_str, "scani ");
+            else if(!strcmp(no->no1->simbolo->tipo, "float"))
+                strcpy(aux_str, "scanf ");
+            so_um_operando = 1;
         }
-        strcat(aux_str, ", ");
+        if(so_um_operando == 0)
+            strcat(aux_str, ", ");
         strcat(aux_str, operando1);
 
     // Operacoes binarias
@@ -120,7 +128,11 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
 
 
     strcat(aux_str, "\n");
-    fputs(aux_str, escrita);
+    if(incremento == 1)
+        strcat(inst_incremento, aux_str);
+    else
+        fputs(aux_str, escrita);
+    
     if(opcao_var == 0)
         strcpy(no->valor_temp, temp);
     else
@@ -129,7 +141,7 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
     (*ger_codigo_var)++;
 }
 
-void geraCasting(char *operando1, char *operando2, int *ger_codigo_var, FILE* escrita, struct No* no) {
+void geraCasting(char *operando1, char *operando2, int *ger_codigo_var, FILE* escrita, struct No* no, int incremento, char *inst_incremento) {
     char aux_str[200] = "";
     char aux_num[10];
     char temp[11];
@@ -148,7 +160,10 @@ void geraCasting(char *operando1, char *operando2, int *ger_codigo_var, FILE* es
                 strcat(aux_str, ", ");
                 strcat(aux_str, operando1);
                 strcat(aux_str, "\n");
-                fputs(aux_str, escrita);
+                if(incremento == 1)
+                    strcat(inst_incremento, aux_str);
+                else
+                    fputs(aux_str, escrita);
                 strcpy(no->no1->valor_temp, temp);
                 strcpy(operando1 , temp);           // Gambiarra pra fazer o mov pegar como operando o valor do inttofl e fltoint
                 (*ger_codigo_var)++;
@@ -165,7 +180,10 @@ void geraCasting(char *operando1, char *operando2, int *ger_codigo_var, FILE* es
                 strcat(aux_str, ", ");
                 strcat(aux_str, operando2);
                 strcat(aux_str, "\n");
-                fputs(aux_str, escrita);
+                if(incremento == 1)
+                    strcat(inst_incremento, aux_str);
+                else
+                    fputs(aux_str, escrita);
                 strcpy(no->no2->valor_temp, temp);
                 strcpy(operando2 , temp);           // Gambiarra pra fazer o mov pegar como operando o valor do inttofl e fltoint
                 (*ger_codigo_var)++;
@@ -181,11 +199,16 @@ void mandaLabel(int *label_cont, int opcao, char *operador, FILE *escrita, struc
     sprintf(aux_num, "%d", *label_cont);
     strcpy(label, "L");
     strcat(label, aux_num);
-    strcpy(aux_str, "brz ");
-    strcat(aux_str, label);
-    strcat(aux_str, ", ");
-    strcat(aux_str, operador);
-    strcat(aux_str, "\n");
+    if(opcao == 0) {
+        strcpy(aux_str, "brz ");
+        strcat(aux_str, label);
+        strcat(aux_str, ", ");
+        strcat(aux_str, operador);
+        strcat(aux_str, "\n");
+    } else if(opcao == 1) {
+        strcpy(aux_str, label);
+        strcat(aux_str, ":\n");
+    }
     fputs(aux_str, escrita);
     (*label_cont)++;
 

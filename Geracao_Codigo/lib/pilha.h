@@ -10,8 +10,17 @@ typedef struct pilhaLabel {
     struct pilhaLabel *prox;
 } label;
 
+typedef struct pilhaIncremento {
+    char incremento[200];
+    struct pilhaIncremento *prox;
+} incremento;
+
 void pushLabel(struct pilhaLabel**, char *);
 
 void popLabel(struct pilhaLabel**);
+
+void pushIncremento(struct pilhaIncremento**, char *);
+
+void popIncremento(struct pilhaIncremento**);
 
 #endif
