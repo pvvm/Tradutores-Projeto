@@ -1,7 +1,17 @@
 //int a;
 
+float funcao(int a, int b) {
+    writeln(a + b);
+    return 1;
+}
+
 int main() {
-    writeln("Testando essa caceta");
+    int a;
+    for(a = 0; a < 10; a = a + 1)
+        writeln("Testando essa caceta");
+    funcao(2.999, 7.156);
+    writeln("So mais uma vez");
+    write(20 + 3);
     /*a = 3;
     writeln(a);
 

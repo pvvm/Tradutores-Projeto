@@ -125,8 +125,31 @@ program:        declarations                            {raiz = montaNo("program
                                                         }
                                                         printf("\n\n================================================================== TABELA DE SIMBOLOS =================================================================\n\n");
                                                         printaLista(cabeca);
-                                                        if(num_erros_sintaticos != 0 || num_erros_lexicos != 0 || num_erros_semanticos != 0)
+
+                                                        FILE *final = fopen(nome_arq, "w");
+                                                        if(num_erros_sintaticos == 0 && num_erros_lexicos == 0 && num_erros_semanticos == 0) {
+                                                            FILE *table = fopen("tabela123.tac", "w");
+                                                            fputs(".table\n\n", table);
+                                                            int contador_string = 0;
+                                                            // Cria o arquivo com o .table
+                                                            escreveTable(table, cabeca, contador_string);
+                                                            fclose(table);
+                                                            fclose(escrita);
+
+                                                            FILE *f1 = fopen("code321.tac", "r");
+                                                            FILE *f2 = fopen("tabela123.tac", "r");
+                                                            // Unifica o arquivo do .table com o .code
+                                                            uneArquivos(final, f1, f2);
+                                                            fclose(f1);
+                                                            fclose(f2);
+                                                            remove("tabela123.tac");
+                                                        } else
+                                                            fclose(escrita);
+                                                        remove("code321.tac");
+                                                        if(num_erros_sintaticos != 0 || num_erros_lexicos != 0 || num_erros_semanticos != 0) {
                                                             remove(nome_arq);
+                                                        }
+                                                        fclose(final);
                                                         
                                                         liberaLista(cabeca);
                                                         liberaEsc(primeiro);}
@@ -161,6 +184,8 @@ function:       funcDecl ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos 
                         ret_default->no1 = montaNo("NIL", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                         strcpy(ret_default->no1->tipo, "NIL");
                     }
+                    if(strcmp(aux, "main"))     // RETIRAR CASO A RECLAMACAO DO TAC NAO SEJA UM PROBLEMA
+                        geraOperacoes("return", ret_default->no1->nome, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);
                     $$->lista = novaListaNo(&$$->lista, ret_default);
                     strcpy(tipo_func_return, "");
                     }
@@ -182,6 +207,8 @@ function:       funcDecl ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos 
                         ret_default->no1 = montaNo("NIL", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                         strcpy(ret_default->no1->tipo, tipo_func_return);
                     }
+                    if(strcmp(aux, "main"))     // RETIRAR CASO A RECLAMACAO DO TAC NAO SEJA UM PROBLEMA
+                        geraOperacoes("return", ret_default->no1->nome, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);
                     $$->lista = novaListaNo(&$$->lista, ret_default);
                     strcpy(tipo_func_return, "");}
                 
@@ -324,79 +351,19 @@ io:             ENTRADA ABRE_P ID FECHA_P               {struct tabelaSimb *simb
                                                         $$->no1 = montaNo($3.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);
                                                         if(simb != NULL) {
                                                             strcpy($$->no1->tipo, $$->no1->simbolo->tipo);
-                                                        geraOperacoes($1.lexema, simb->var_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
+                                                            geraOperacoes($1.lexema, simb->var_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);
                                                         }
                                                         }
 
                 | SAIDA ABRE_P expLogic FECHA_P         {$$ = montaNo($1.lexema, $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);
-                                                        geraOperacoes($1.lexema, $3->valor_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);}
+                                                        geraOperacoes($1.lexema, $3->valor_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);}
 
                 | SAIDA ABRE_P STRING FECHA_P           {// Inclui a string na tabela de simbolos
                                                         num_erros_semanticos += push(&cabeca, $3.lexema, "constante", "string", "", retUlt(&primeiro), $3.linha, $3.coluna, "");
                                                         struct tabelaSimb *simb = retSimb(&cabeca, $3.lexema, &primeiro);
                                                         $$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                         $$->no1 = montaNo($3.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);
-                                                        char aux[300];
-                                                        char aux_num1[15];
-                                                        char aux_num2[15];
-                                                        char aux_num3[15];
-
-                                                        strcpy(aux, "mov $");                       // mov $, tamanho_string
-                                                        sprintf(aux_num3, "%d", ger_codigo_var);
-                                                        strcat(aux, aux_num3);
-                                                        ger_codigo_var++;
-                                                        strcat(aux, ", ");
-                                                        sprintf(aux_num1, "%d", ((int)strlen($3.lexema) - 2));    // TIRAR O -2 CASO DE PROBLEMA
-                                                        strcat(aux, aux_num1);
-
-                                                        strcat(aux, "\nmov $");                        // mov $, 0
-                                                        sprintf(aux_num1, "%d", ger_codigo_var);
-                                                        ger_codigo_var++;
-                                                        strcat(aux, aux_num1);
-                                                        strcat(aux, ", 0\n");
-                                                        fputs(aux, escrita);
-
-                                                        //mandaLabel(&label_cont, 1, retorno_expressao, escrita, &topo);  // L :
-
-                                                        strcpy(aux, "mov $");                       // mov $, &
-                                                        sprintf(aux_num2, "%d", ger_codigo_var);
-                                                        strcat(aux, aux_num2);
-                                                        strcat(aux, ", &s");
-                                                        sprintf(aux_num2, "%d", string_cont);
-                                                        string_cont++;
-                                                        strcat(aux, aux_num2);
-
-                                                        strcat(aux, "\nmov $");
-                                                        sprintf(aux_num2, "%d", ger_codigo_var);
-                                                        strcat(aux, aux_num2);
-                                                        strcat(aux, ", $");
-                                                        strcat(aux, aux_num2);
-                                                        strcat(aux, "[$");
-                                                        strcat(aux, aux_num1);
-                                                        ger_codigo_var++;
-
-                                                        strcat(aux, "]\nprint $");
-                                                        strcat(aux, aux_num2);
-                                                        strcat(aux, "\nadd $");
-                                                        strcat(aux, aux_num1);
-                                                        strcat(aux, ", $");
-                                                        strcat(aux, aux_num1);
-
-                                                        strcat(aux, ", 1\nsub $");
-                                                        sprintf(aux_num2, "%d", ger_codigo_var);
-                                                        strcat(aux, aux_num2);
-                                                        strcat(aux, ", $");
-                                                        strcat(aux, aux_num3);
-                                                        strcat(aux, ", $");
-                                                        strcat(aux, aux_num1);
-                                                        
-                                                        strcat(aux, "\nbrnz L");
-                                                        strcat(aux, ", $");
-                                                        strcat(aux, aux_num2);
-
-                                                        ger_codigo_var++;
-
-                                                        fputs(aux, escrita);
+                                                        geraOperacoes($1.lexema, $3.lexema, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 1, &label_cont, &string_cont);
                                                         }
 
                 | ENTRADA ABRE_P error FECHA_P          {}
@@ -420,7 +387,7 @@ varDecl:        TIPO ID                                 {$$ = NULL;
                                                             strcpy(num_var, "#");
                                                             strcat(num_var, aux_num);
                                                             num_erros_semanticos += push(&cabeca, $2.lexema, "variavel", $1.lexema, "", retUlt(&primeiro), $1.linha, $1.coluna, num_var);
-                                                            pushArgs(&args, $1.lexema);
+                                                            pushArgs(&args, $1.lexema, num_var);
                                                         }
                                                         
                                                         ger_codigo_var++;
@@ -440,7 +407,7 @@ varDecl:        TIPO ID                                 {$$ = NULL;
                                                             strcpy(num_var, "#");
                                                             strcat(num_var, aux_num);
                                                             num_erros_semanticos += push(&cabeca, $3.lexema, "variavel", strcat($1.lexema, " list"), "", retUlt(&primeiro), $1.linha, $1.coluna, num_var);
-                                                            pushArgs(&args, $1.lexema);
+                                                            pushArgs(&args, $1.lexema, num_var);
                                                         }
 
                                                         ger_codigo_var++;
@@ -465,7 +432,7 @@ attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb
                                                                 struct No* no = montaNo(aux, $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                                 $$->no2 = no;
                                                                 geraCasting(NULL, $3->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
-                                                                geraOperacoes($2.lexema, $3->valor_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
+                                                                geraOperacoes($2.lexema, $3->valor_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);
                                                                 strcpy(retorno_expressao, $$->valor_temp);
                                                             } else if(!strcmp($3->tipo, "int list")){
                                                                 //Se for int list e outro
@@ -490,7 +457,7 @@ attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb
                                                                 $$->no2 = $3;
                                                             } else {
                                                                 geraCasting(NULL, $3->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
-                                                                geraOperacoes($2.lexema, $3->valor_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
+                                                                geraOperacoes($2.lexema, $3->valor_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);
                                                                 $$->no2 = $3;
                                                                 strcpy(retorno_expressao, $$->valor_temp);
                                                             }
@@ -510,25 +477,25 @@ attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb
 
 expLogic:       expLogic LOG_OP_OU andLogic             {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);
                                                         geraCasting($1->valor_temp, $3->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
-                                                        geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);}
+                                                        geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);}
                 | andLogic                              {$$ = $1;}
                 ;
 
 andLogic:       andLogic LOG_OP_E expComp               {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);
                                                         geraCasting($1->valor_temp, $3->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
-                                                        geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);}
+                                                        geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);}
                 | expComp                               {$$ = $1;}
                 ;
 
 expComp:        expComp REL_OP_BAIXA expRel             {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);
                                                         geraCasting($1->valor_temp, $3->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
-                                                        geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);}
+                                                        geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);}
                 | expRel                                {$$ = $1;}
                 ;
 
 expRel:         expRel REL_OP_ALTA expList              {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);
                                                         geraCasting($1->valor_temp, $3->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
-                                                        geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);}
+                                                        geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);}
                 | expList                               {$$ = $1;}
                 ;
 
@@ -596,16 +563,16 @@ expList:        expList LIST_OP_BIN expArit             {$$ = montaNo($2.lexema,
 
 expArit:        expArit ARIT_OP_MAIS expMul             {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);
                                                         geraCasting($1->valor_temp, $3->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
-                                                        geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);}
+                                                        geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);}
                 | expArit ARIT_OP_MENOS expMul          {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);
                                                         geraCasting($1->valor_temp, $3->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
-                                                        geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);}
+                                                        geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);}
                 | expMul                                {$$ = $1;}
                 ;
 
 expMul:         expMul ARIT_OP_ALTA expUn               {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);
                                                         geraCasting($1->valor_temp, $3->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
-                                                        geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);}
+                                                        geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);}
                 | expUn                                 {$$ = $1;}
                 ;
 
@@ -613,7 +580,7 @@ expUn:          LOG_OP_NEG element                      {$$ = montaNo($1.lexema,
                                                         if(!strcmp($2->tipo, "int list") || !strcmp($2->tipo, "float list") || !strcmp($2->tipo, "int") || !strcmp($2->tipo, "float")) {
                                                             strcpy($$->tipo, $2->tipo);
                                                             if(!strcmp($2->tipo, "int") || !strcmp($2->tipo, "float")) {
-                                                                geraOperacoes($1.lexema, $2->valor_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
+                                                                geraOperacoes($1.lexema, $2->valor_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);
                                                             }       // FAZER O CASO DO ! DE LISTA
                                                         } else {
                                                             // Se nao eh lista
@@ -624,7 +591,7 @@ expUn:          LOG_OP_NEG element                      {$$ = montaNo($1.lexema,
                 | ARIT_OP_MENOS element                 {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                         if(!strcmp($2->tipo, "int") || !strcmp($2->tipo, "float")) {
                                                             strcpy($$->tipo, $2->tipo);
-                                                            geraOperacoes($1.lexema, $2->valor_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
+                                                            geraOperacoes($1.lexema, $2->valor_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);
                                                         } else if(!strcmp($2->tipo, "int list") || !strcmp($2->tipo, "float list") || !strcmp($2->tipo, "NIL")){
                                                             // Se eh lista ou NIL
                                                             printf("ERRO SEMANTICO: tipo errado na operacao %s (%s)\nLinha:%d\nColuna:%d\n\n", $1.lexema, $2->tipo, yylval.tok.linha, yylval.tok.coluna);
@@ -676,6 +643,7 @@ element:        ID                                      {struct tabelaSimb *simb
 
                 | ID ABRE_P arguments FECHA_P           {struct tabelaSimb *simb = retSimb(&cabeca, $1.lexema, &primeiro);
                                                         $$ = montaNo($1.lexema, NULL, NULL, NULL, $3, retUlt(&primeiro), simb);
+                                                        int cont_argumentos = 0;
                                                         if($$->simbolo != NULL) {
                                                             if(!strcmp($$->simbolo->varOuFunc, "funcao")) {
                                                                 strcpy($$->tipo, $$->simbolo->tipo);
@@ -707,13 +675,42 @@ element:        ID                                      {struct tabelaSimb *simb
                                                                             } else {
                                                                                 // Se nao, pode fazer o no de coercao
                                                                                 char aux[15];
+                                                                                char casting[100];
+                                                                                char temp[16];
+                                                                                char aux_num[15];
                                                                                 strcpy(aux, "(");
-                                                                                if(!strcmp(aux1->tipo, "int"))
+                                                                                if(!strcmp(aux1->tipo, "int")) {
                                                                                     strcat(aux, "float_to_int)");
-                                                                                else if(!strcmp(aux1->tipo, "float"))
+
+                                                                                    strcpy(casting, "fltoint ");
+                                                                                    sprintf(aux_num, "%d", ger_codigo_var);
+                                                                                    strcpy(temp, "$");
+                                                                                    strcat(temp, aux_num);
+                                                                                    strcat(casting, temp);
+                                                                                    strcat(casting, ", ");
+                                                                                    strcat(casting, aux2->var_temp);
+                                                                                    strcat(casting, "\n");
+                                                                                    fputs(casting, escrita);
+                                                                                    geraOperacoes("parameter", temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);
+
+                                                                                } else if(!strcmp(aux1->tipo, "float")) {
                                                                                     strcat(aux, "int_to_float)");
+
+                                                                                    strcpy(casting, "inttofl ");
+                                                                                    sprintf(aux_num, "%d", ger_codigo_var);
+                                                                                    strcpy(temp, "$");
+                                                                                    strcat(temp, aux_num);
+                                                                                    strcat(casting, temp);
+                                                                                    strcat(casting, ", ");
+                                                                                    strcat(casting, aux2->var_temp);
+                                                                                    strcat(casting, "\n");
+                                                                                    fputs(casting, escrita);
+                                                                                    geraOperacoes("parameter", temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);
+
+                                                                                }
                                                                                 struct No* no = montaNo(aux, auxNo->no, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                                                 auxNo->no = no;
+                                                                                cont_argumentos++;
                                                                             }
                                                                         }
                                                                         aux1 = aux1->prox;
@@ -734,6 +731,17 @@ element:        ID                                      {struct tabelaSimb *simb
                                                             ++num_erros_semanticos;
                                                             strcpy($$->tipo, "undefined");
                                                         }
+                                                        if(num_erros_lexicos == 0 && num_erros_sintaticos == 0 && num_erros_semanticos == 0) {
+                                                            char aux[200];
+                                                            char num_args[5];
+                                                            strcpy(aux, "call ");
+                                                            strcat(aux, $1.lexema);
+                                                            strcat(aux, ", ");
+                                                            sprintf(num_args, "%d", cont_argumentos);
+                                                            strcat(aux, num_args);
+                                                            strcat(aux, "\n");
+                                                            fputs(aux, escrita);
+                                                        }
                                                         liberaArgs(args);
                                                         args = NULL;
                                                         num_args_chamada = 0;
@@ -741,10 +749,16 @@ element:        ID                                      {struct tabelaSimb *simb
 
                 | ID ABRE_P FECHA_P                     {struct tabelaSimb *simb = retSimb(&cabeca, $1.lexema, &primeiro);
                                                         $$ = montaNo($1.lexema, NULL, NULL, NULL, NULL, retUlt(&primeiro), simb);
-                                                        if($$->simbolo != NULL)
+                                                        // Cria o call na geracao de codigo
+                                                        if($$->simbolo != NULL) {
                                                             strcpy($$->tipo, $$->simbolo->tipo);
+                                                            char aux[200];
+                                                            strcpy(aux, "call ");
+                                                            strcat(aux, $1.lexema);
+                                                            strcat(aux, "\n");
+                                                            fputs(aux, escrita);
                                                         // Caso a funcao ainda nao tenha sido declarada
-                                                        else {
+                                                        } else {
                                                             printf("ERRO SEMANTICO: declaracao implicita da funcao %s\nLinha:%d\nColuna:%d\n\n", $1.lexema, yylval.tok.linha, yylval.tok.coluna);
                                                             ++num_erros_semanticos;
                                                             strcpy($$->tipo, "undefined");
@@ -769,18 +783,20 @@ element:        ID                                      {struct tabelaSimb *simb
 
 arguments:      arguments VIRG expLogic                 {$$ = novaListaNo(&$1, $3);
                                                         ++num_args_chamada;
-                                                        pushArgs(&args, $3->tipo);}
+                                                        pushArgs(&args, $3->tipo, $3->valor_temp);}
 
                 | expLogic                              {struct listaNo* lista = NULL;
                                                         $$ = novaListaNo(&lista, $1);
                                                         ++num_args_chamada;
-                                                        pushArgs(&args, $1->tipo);}
+                                                        pushArgs(&args, $1->tipo, $1->valor_temp);}
                 ;
 
-ret:            RETURN expLogic                         {if(!strcmp($2->tipo, tipo_func_return))
+ret:            RETURN expLogic                         {if(!strcmp($2->tipo, tipo_func_return)) {
                                                             $$ = montaNo("return", $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
+                                                            geraOperacoes($1.lexema, $$->no1->valor_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);
+
                                                         // Se o tipo do retorno nao for o mesmo da funcao
-                                                        else {
+                                                        } else {
                                                             // Se for int ou float, eh possivel fazer coercao
                                                             if((!strcmp($2->tipo, "int") && !strcmp(tipo_func_return, "float")) || (!strcmp($2->tipo, "float") && !strcmp(tipo_func_return, "int"))) {
                                                                 $$ = montaNo("return", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
@@ -792,6 +808,8 @@ ret:            RETURN expLogic                         {if(!strcmp($2->tipo, ti
                                                                     strcat(aux, "int_to_float)");
                                                                 struct No* no = montaNo(aux, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                                 $$->no1 = no;
+                                                                geraCasting($2->valor_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
+                                                                geraOperacoes($1.lexema, $$->no1->valor_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);
                                                             } else {
                                                                 $$ = montaNo("return", $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                                 printf("ERRO SEMANTICO: retorno de tipo errado (%s, %s)\nLinha:%d\nColuna:%d\n\n", tipo_func_return, $2->tipo, yylval.tok.linha, yylval.tok.coluna);
@@ -824,7 +842,8 @@ int main(int argc, char **argv) {
         nome = strtok(NULL, "/");
     }
     nome = strtok(aux_nome, ".");
-    escrita = fopen(strcat(nome, ".tac"), "w");
+    escrita = fopen("code321.tac", "w");
+    strcat(nome, ".tac");
     strcpy(nome_arq, nome);
     fputs(".code\n", escrita);
 
@@ -835,7 +854,6 @@ int main(int argc, char **argv) {
         yyparse();
     }
     fclose(yyin);
-    fclose(escrita);
 
     yylex_destroy();
 

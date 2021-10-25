@@ -114,11 +114,12 @@ struct tabelaSimb* retSimb(struct tabelaSimb ** prim, char *simbolo, struct list
     return retSimb(&(*prim)->prox, simbolo, cabecaEsc);
 }
 
-struct listaArgs* pushArgs(struct listaArgs** prim, char *tipo) {
+struct listaArgs* pushArgs(struct listaArgs** prim, char *tipo, char *var_temp) {
     struct listaArgs *aux = *prim;
     struct listaArgs* novo = (struct listaArgs*) malloc (sizeof(struct listaArgs));
 
     strcpy(novo->tipo, tipo);
+    strcpy(novo->var_temp, var_temp);
     novo->prox = NULL;
 
     if(*prim == NULL) {

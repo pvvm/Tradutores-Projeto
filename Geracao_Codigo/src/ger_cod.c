@@ -19,7 +19,7 @@ void inicioDefault(int ger_codigo_var, FILE* escrita, char *tipo) {
     fputs(aux_str, escrita);
 }
 
-void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_codigo_var, FILE* escrita, struct No* no, int incremento, char *inst_incremento) {
+void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_codigo_var, FILE* escrita, struct No* no, int incremento, char *inst_incremento, int eh_string, int *label_cont, int *string_cont) {
     char aux_str[300];
     char aux_num[10];
     char temp[11];
@@ -32,36 +32,112 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
 
     // Operacoes unarias
     if(operando2 == NULL) {
-        if(!strcmp(operador, "-")) {
-            strcpy(aux_str, "minus ");
-            strcat(aux_str, temp);
-        } else if(!strcmp(operador, "!")) {
-            if(!strcmp(no->tipo, "int") || !strcmp(no->tipo, "float")) {
-                strcpy(aux_str, "not ");
+        if(eh_string == 0) {
+            if(!strcmp(operador, "-")) {
+                strcpy(aux_str, "minus ");
                 strcat(aux_str, temp);
-            }   // FAZER O CASO DO ! EM LISTA
-        } else if(!strcmp(operador, "=")) {
-            opcao_var = 1;
-            strcpy(aux_str, "mov ");
-            strcat(aux_str, no->no1->simbolo->var_temp);
-            //printf("%s\n\n", operando1);
-            //(*ger_codigo_var)--;      Comentei pra evitar que mov nao aumentasse esse numero
-        } else if(!strcmp(operador, "write")) {
-            strcpy(aux_str, "print ");
-            so_um_operando = 1;
-        } else if(!strcmp(operador, "writeln")) {
-            strcpy(aux_str, "println ");
-            so_um_operando = 1;
-        } else if(!strcmp(operador, "read")) {
-            if(!strcmp(no->no1->simbolo->tipo, "int"))
-                strcpy(aux_str, "scani ");
-            else if(!strcmp(no->no1->simbolo->tipo, "float"))
-                strcpy(aux_str, "scanf ");
-            so_um_operando = 1;
+            } else if(!strcmp(operador, "!")) {
+                if(!strcmp(no->tipo, "int") || !strcmp(no->tipo, "float")) {
+                    strcpy(aux_str, "not ");
+                    strcat(aux_str, temp);
+                }   // FAZER O CASO DO ! EM LISTA
+            } else if(!strcmp(operador, "=")) {
+                opcao_var = 1;
+                strcpy(aux_str, "mov ");
+                strcat(aux_str, no->no1->simbolo->var_temp);
+                //printf("%s\n\n", operando1);
+                //(*ger_codigo_var)--;      Comentei pra evitar que mov nao aumentasse esse numero
+            } else if(!strcmp(operador, "write")) {
+                strcpy(aux_str, "print ");
+                so_um_operando = 1;
+            } else if(!strcmp(operador, "writeln")) {
+                strcpy(aux_str, "println ");
+                so_um_operando = 1;
+            } else if(!strcmp(operador, "read")) {
+                if(!strcmp(no->no1->simbolo->tipo, "int"))
+                    strcpy(aux_str, "scani ");
+                else if(!strcmp(no->no1->simbolo->tipo, "float"))
+                    strcpy(aux_str, "scanf ");
+                so_um_operando = 1;
+            } else if(!strcmp(operador, "return")) {
+                strcpy(aux_str, "return ");
+                so_um_operando = 1;
+            } else if(!strcmp(operador, "parameter")) {
+                strcpy(aux_str, "param ");
+                so_um_operando = 1;
+            }
+            if(so_um_operando == 0)
+                strcat(aux_str, ", ");
+            strcat(aux_str, operando1);
+        } else {
+            char aux[300];
+            char aux_num1[15];
+            char aux_num2[15];
+            char aux_num3[15];
+            char label[10];
+
+            strcpy(aux, "mov $");                       // mov $, tamanho_string
+            sprintf(aux_num3, "%d", *ger_codigo_var);
+            strcat(aux, aux_num3);
+            (*ger_codigo_var)++;
+            strcat(aux, ", ");
+            sprintf(aux_num1, "%d", ((int)strlen(operando1) - 2));    // TIRAR O -2 CASO DE PROBLEMA
+            strcat(aux, aux_num1);
+
+            strcat(aux, "\nmov $");                        // mov $, 0
+            sprintf(aux_num1, "%d", *ger_codigo_var);
+            (*ger_codigo_var)++;
+            strcat(aux, aux_num1);
+            strcat(aux, ", 0\nL");
+
+            sprintf(label, "%d", *label_cont);  // L :
+            strcat(aux, label);
+
+            strcat(aux, ":\nmov $");                       // mov $, &
+            sprintf(aux_num2, "%d", *ger_codigo_var);
+            strcat(aux, aux_num2);
+            strcat(aux, ", &s");
+            sprintf(aux_num2, "%d", *string_cont);
+            (*string_cont)++;
+            strcat(aux, aux_num2);
+
+            strcat(aux, "\nmov $");
+            sprintf(aux_num2, "%d", *ger_codigo_var);
+            strcat(aux, aux_num2);
+            strcat(aux, ", $");
+            strcat(aux, aux_num2);
+            strcat(aux, "[$");
+            strcat(aux, aux_num1);
+            (*ger_codigo_var)++;
+
+            strcat(aux, "]\nprint $");
+            strcat(aux, aux_num2);
+            strcat(aux, "\nadd $");
+            strcat(aux, aux_num1);
+            strcat(aux, ", $");
+            strcat(aux, aux_num1);
+
+            strcat(aux, ", 1\nsub $");
+            sprintf(aux_num2, "%d", *ger_codigo_var);
+            strcat(aux, aux_num2);
+            strcat(aux, ", $");
+            strcat(aux, aux_num3);
+            strcat(aux, ", $");
+            strcat(aux, aux_num1);
+            
+            strcat(aux, "\nbrnz L");
+            strcat(aux, label);
+            strcat(aux, ", $");
+            strcat(aux, aux_num2);
+
+            if(!strcmp(operador, "writeln"))
+                strcat(aux, "\nprint \'\\n\'");
+
+            (*label_cont)++;
+            (*ger_codigo_var)++;
+
+            fputs(aux, escrita);
         }
-        if(so_um_operando == 0)
-            strcat(aux_str, ", ");
-        strcat(aux_str, operando1);
 
     // Operacoes binarias
     } else {
@@ -213,4 +289,33 @@ void mandaLabel(int *label_cont, int opcao, char *operador, FILE *escrita, struc
     (*label_cont)++;
 
     pushLabel(topo, label);
+}
+
+void escreveTable(FILE *arquivo, struct tabelaSimb *prim, int contador_string) {
+    if(prim != NULL) {
+        if(!strcmp(prim->tipo, "string")) {
+            char aux[500];
+            char num[5];
+            strcpy(aux, "char s");
+            sprintf(num, "%d", contador_string);
+            strcat(aux, num);
+            strcat(aux, "[] = ");
+            strcat(aux, prim->simbolo);
+            strcat(aux, "\n");
+            fputs(aux, arquivo);
+            contador_string++;
+        }
+        escreveTable(arquivo, prim->prox, contador_string);
+    }
+}
+
+void uneArquivos(FILE *final, FILE *code, FILE *table) {
+    char caracter;
+    while((caracter = fgetc(table)) != EOF)
+        fputc(caracter, final);
+
+    fputs("\n", final);
+    
+    while((caracter = fgetc(code)) != EOF) 
+        fputc(caracter, final);
 }
