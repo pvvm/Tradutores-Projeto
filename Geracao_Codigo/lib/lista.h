@@ -27,6 +27,7 @@ typedef struct listaEscopo {
 
 typedef struct listaArgs {
     char tipo[15];
+    char var_temp[15];
     struct listaArgs *prox;
 } lArgs;
 
@@ -47,7 +48,7 @@ int liberaArgs(struct listaArgs *);
 
 int liberaLista(struct tabelaSimb *);
 
-struct listaArgs* pushArgs(struct listaArgs**, char *);
+struct listaArgs* pushArgs(struct listaArgs**, char *, char *);
 
 struct tabelaSimb* retSimb(struct tabelaSimb **, char *, struct listaEscopo **);
 
