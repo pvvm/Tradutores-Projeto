@@ -305,6 +305,20 @@ void escreveTable(FILE *arquivo, struct tabelaSimb *prim, int contador_string) {
             fputs(aux, arquivo);
             contador_string++;
         }
+        if(prim->escopo == 0 && !strcmp(prim->varOuFunc, "variavel")) {
+            char aux[200];
+            strcpy(aux, prim->tipo);
+            strcat(aux, " ");
+            strcat(aux, prim->var_temp);
+            strcat(aux, " = ");
+            if(!strcmp(prim->tipo, "int") || !strcmp(prim->tipo, "int list") || !strcmp(prim->tipo, "float list")) {
+                strcat(aux, "0\n");
+            } else if(!strcmp(prim->tipo, "float")) {
+                strcat(aux, "0.0\n");
+            }
+            fputs(aux, arquivo);
+        }
+
         escreveTable(arquivo, prim->prox, contador_string);
     }
 }

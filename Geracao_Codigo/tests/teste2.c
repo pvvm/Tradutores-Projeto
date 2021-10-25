@@ -1,15 +1,24 @@
-//int a;
+int a;
+int teste;
 
 float funcao(int a, int b) {
     writeln(a + b);
-    return 1;
+    return a == a+b;
 }
 
 int main() {
+    teste = 20 + 1;
+    int e;
+    e = a;
+    read(a);
+    write(a);
+    e = teste;
     int a;
     for(a = 0; a < 10; a = a + 1)
         writeln("Testando essa caceta");
-    funcao(2.999, 7.156);
+    writeln(funcao(3, 7.156));
+    a = 2 + funcao(3, 7.156);
+    writeln(a);
     writeln("So mais uma vez");
     write(20 + 3);
     /*a = 3;

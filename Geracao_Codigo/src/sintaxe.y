@@ -5,6 +5,7 @@
 TODO:   ADICIONAR A CONDICAO PRA FAZER AS OPERACOES DE GERAR CODIGO (SE TIVER ERROS LEXICOS, SINTATICOS...)
         CORRIGIR A QUESTAO DO ELSE IF
         CORRIGIR O CASO DE HAVER UM LABEL NO FIM DO ARQUIVO, OU SEJA, NENHUMA INSTRUCAO DEPOIS DELE
+        VER COMO DEFINE UMA LIST GLOBAL
 */
 
 %{
@@ -34,6 +35,7 @@ int label_cont = 0;
 int tem_else = 0;
 int flag_incremento = 0;
 int string_cont = 0;
+int eh_global = 1;
 char aux[50];
 char tipo_func[50];
 char tipo_func_return[50];
@@ -169,7 +171,7 @@ declaration:    function                                {$$ = $1;}
                 ;
 
                 // Inclui na lista o escopo novo para definir o escopo de argumentos (apos isso, retira da lista)
-function:       funcDecl ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos = 1; strcpy(tipo_func_return, tipo_func); ger_codigo_var = 0;} parameters FECHA_P
+function:       funcDecl ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos = 1; strcpy(tipo_func_return, tipo_func); ger_codigo_var = 0; eh_global = 0;} parameters FECHA_P
                     {insereArg(&cabeca, aux, 0, num_args, &args); num_args = 0; popEsc(&primeiro); argumentos = 0; args = NULL; ger_codigo_var = 0;} ABRE_C moreStmt FECHA_C       
                     {$$ = montaNo("function", $1, $4, NULL, $8, retUlt(&primeiro), NULL);
                     // Adiciona o return default do tipo da funcao
@@ -188,12 +190,13 @@ function:       funcDecl ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos 
                         geraOperacoes("return", ret_default->no1->nome, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);
                     $$->lista = novaListaNo(&$$->lista, ret_default);
                     strcpy(tipo_func_return, "");
+                    eh_global = 1;
                     }
                 
                 | error ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos = 1; strcpy(tipo_func_return, tipo_func);} parameters FECHA_P
                     {insereArg(&cabeca, aux, 0, num_args, &args); num_args = 0; popEsc(&primeiro); argumentos = 0; args = NULL;} ABRE_C moreStmt FECHA_C        {$$ = montaNo("function",$4, NULL, NULL, $8, retUlt(&primeiro), NULL); strcpy(tipo_func_return, "");}
                 
-                | funcDecl ABRE_P FECHA_P {strcpy(tipo_func_return, tipo_func); ger_codigo_var = 0;} ABRE_C moreStmt FECHA_C    
+                | funcDecl ABRE_P FECHA_P {strcpy(tipo_func_return, tipo_func); ger_codigo_var = 0; eh_global = 0;} ABRE_C moreStmt FECHA_C    
                     {$$ = montaNo("function", $1, NULL, NULL, $6, retUlt(&primeiro), NULL);
                     // Adiciona o return default do tipo da funcao
                     struct No *ret_default = montaNo("return", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
@@ -210,7 +213,8 @@ function:       funcDecl ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos 
                     if(strcmp(aux, "main"))     // RETIRAR CASO A RECLAMACAO DO TAC NAO SEJA UM PROBLEMA
                         geraOperacoes("return", ret_default->no1->nome, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);
                     $$->lista = novaListaNo(&$$->lista, ret_default);
-                    strcpy(tipo_func_return, "");}
+                    strcpy(tipo_func_return, "");
+                    eh_global = 1;}
                 
                 | error ABRE_P FECHA_P {strcpy(tipo_func_return, tipo_func);} ABRE_C moreStmt FECHA_C       {$$ = montaNo("function", NULL, NULL, NULL, $6, retUlt(&primeiro), NULL); strcpy(tipo_func_return, "");}
                 ;
@@ -352,6 +356,9 @@ io:             ENTRADA ABRE_P ID FECHA_P               {struct tabelaSimb *simb
                                                         if(simb != NULL) {
                                                             strcpy($$->no1->tipo, $$->no1->simbolo->tipo);
                                                             geraOperacoes($1.lexema, simb->var_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);
+                                                        } else {
+                                                            printf("ERRO SEMANTICO: variavel %s nao declarada\nLinha:%d\nColuna:%d\n\n", $3.lexema, yylval.tok.linha, yylval.tok.coluna);
+                                                            ++num_erros_semanticos;
                                                         }
                                                         }
 
@@ -373,15 +380,20 @@ io:             ENTRADA ABRE_P ID FECHA_P               {struct tabelaSimb *simb
 
 varDecl:        TIPO ID                                 {$$ = NULL;
                                                         // Inclui o termo na tabela de simbolos
-                                                        char num_var[15];
+                                                        char num_var[50];
                                                         char aux_num[15];
                                                         sprintf(aux_num, "%d", ger_codigo_var);
                                                         if(argumentos == 0) {
-                                                            strcpy(num_var, "$");
-                                                            strcat(num_var, aux_num);
-                                                            num_erros_semanticos += push(&cabeca, $2.lexema, "variavel", $1.lexema, "", retUlt(&primeiro), $1.linha, $1.coluna, num_var);
-                                                            // Inicializacao default da variavel na geracao de codigo
-                                                            inicioDefault(ger_codigo_var, escrita, $1.lexema);
+                                                            if(eh_global == 0) {
+                                                                strcpy(num_var, "$");
+                                                                strcat(num_var, aux_num);
+                                                                num_erros_semanticos += push(&cabeca, $2.lexema, "variavel", $1.lexema, "", retUlt(&primeiro), $1.linha, $1.coluna, num_var);
+                                                                // Inicializacao default da variavel na geracao de codigo
+                                                                inicioDefault(ger_codigo_var, escrita, $1.lexema);
+                                                            } else if(eh_global == 1) {
+                                                                strcpy(num_var, $2.lexema);
+                                                                num_erros_semanticos += push(&cabeca, $2.lexema, "variavel", $1.lexema, "", retUlt(&primeiro), $1.linha, $1.coluna, num_var);
+                                                            }
                                                         }
                                                         else if(argumentos == 1) {
                                                             strcpy(num_var, "#");
@@ -399,10 +411,15 @@ varDecl:        TIPO ID                                 {$$ = NULL;
                                                         char aux_num[15];
                                                         sprintf(aux_num, "%d", ger_codigo_var);
                                                         if(argumentos == 0) {
-                                                            strcpy(num_var, "$");
-                                                            strcat(num_var, aux_num);
-                                                            num_erros_semanticos += push(&cabeca, $3.lexema, "variavel", strcat($1.lexema, " list"), "", retUlt(&primeiro), $1.linha, $1.coluna, num_var);
-                                                            inicioDefault(ger_codigo_var, escrita, $1.lexema);
+                                                            if(eh_global == 0) {
+                                                                strcpy(num_var, "$");
+                                                                strcat(num_var, aux_num);
+                                                                num_erros_semanticos += push(&cabeca, $3.lexema, "variavel", strcat($1.lexema, " list"), "", retUlt(&primeiro), $1.linha, $1.coluna, num_var);
+                                                                inicioDefault(ger_codigo_var, escrita, $1.lexema);
+                                                            } else if(eh_global == 1) {
+                                                                strcpy(num_var, $3.lexema);
+                                                                num_erros_semanticos += push(&cabeca, $3.lexema, "variavel", strcat($1.lexema, " list"), "", retUlt(&primeiro), $1.linha, $1.coluna, num_var);
+                                                            }
                                                         } else if(argumentos == 1) {
                                                             strcpy(num_var, "#");
                                                             strcat(num_var, aux_num);
@@ -659,11 +676,14 @@ element:        ID                                      {struct tabelaSimb *simb
                                                                     struct listaArgs * aux1 = $$->simbolo->tipoArgs;
                                                                     struct listaArgs * aux2 = args;
                                                                     int cont = 0;
+                                                                    int flag = 0;
                                                                     struct listaNo * auxNo = $$->lista;
                                                                     // Itera sobre os tipos dos argumentos
                                                                     while(aux1 != NULL && aux2 != NULL) {
+                                                                        flag = 0;
                                                                         // Se forem diferentes
                                                                         if(strcmp(aux1->tipo, aux2->tipo)) {
+                                                                            flag = 1;
                                                                             // Se for int list
                                                                             if(!strcmp(aux1->tipo, "int list") || !strcmp(aux2->tipo, "int list")) {
                                                                                 printf("ERRO SEMANTICO: argumento de tipo errado (%s)\nLinha:%d\nColuna:%d\n\n", aux2->tipo, yylval.tok.linha, yylval.tok.coluna);
@@ -713,6 +733,10 @@ element:        ID                                      {struct tabelaSimb *simb
                                                                                 cont_argumentos++;
                                                                             }
                                                                         }
+                                                                        if(flag == 0) {
+                                                                            geraOperacoes("parameter", aux2->var_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont);
+                                                                            cont_argumentos++;
+                                                                        }
                                                                         aux1 = aux1->prox;
                                                                         aux2 = aux2->prox;
                                                                         auxNo = auxNo->prox;
@@ -734,12 +758,20 @@ element:        ID                                      {struct tabelaSimb *simb
                                                         if(num_erros_lexicos == 0 && num_erros_sintaticos == 0 && num_erros_semanticos == 0) {
                                                             char aux[200];
                                                             char num_args[5];
+                                                            char num_temp[6];
                                                             strcpy(aux, "call ");
                                                             strcat(aux, $1.lexema);
                                                             strcat(aux, ", ");
                                                             sprintf(num_args, "%d", cont_argumentos);
                                                             strcat(aux, num_args);
+                                                            strcat(aux, "\npop ");
+                                                            strcpy(num_temp, "$");
+                                                            sprintf(num_args, "%d", ger_codigo_var);
+                                                            ger_codigo_var++;
+                                                            strcat(num_temp, num_args);
+                                                            strcat(aux, num_temp);
                                                             strcat(aux, "\n");
+                                                            strcpy($$->valor_temp, num_temp);
                                                             fputs(aux, escrita);
                                                         }
                                                         liberaArgs(args);
@@ -753,9 +785,18 @@ element:        ID                                      {struct tabelaSimb *simb
                                                         if($$->simbolo != NULL) {
                                                             strcpy($$->tipo, $$->simbolo->tipo);
                                                             char aux[200];
+                                                            char num[5];
+                                                            char num_temp[6];
                                                             strcpy(aux, "call ");
                                                             strcat(aux, $1.lexema);
+                                                            strcat(aux, "\npop ");
+                                                            strcpy(num_temp, "$");
+                                                            sprintf(num, "%d", ger_codigo_var);
+                                                            ger_codigo_var++;
+                                                            strcat(num_temp, num);
+                                                            strcat(aux, num_temp);
                                                             strcat(aux, "\n");
+                                                            strcpy($$->valor_temp, num_temp);
                                                             fputs(aux, escrita);
                                                         // Caso a funcao ainda nao tenha sido declarada
                                                         } else {
