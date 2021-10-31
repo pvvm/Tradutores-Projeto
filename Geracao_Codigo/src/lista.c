@@ -69,7 +69,7 @@ void printaArgs(struct listaArgs *prim) {
 void printaLista(struct tabelaSimb *prim) {
     printf("\t\t\t\t\t    Simbolo\t Var/Func/Const\t\t   Tipo\t       Num Args\t\t Escopo\t\t  Linha\t         Coluna\n\n");
     while(prim != NULL) {
-        printf("%51s\t%15s\t%15s\t%15d\t%15d\t%15d\t%15d\t%15s\n", prim->simbolo, prim->varOuFunc, prim->tipo, prim->numArgs, prim->escopo, prim->linha, prim->coluna, prim->var_temp);
+        printf("%51s\t%15s\t%15s\t%15d\t%15d\t%15d\t%15d\n", prim->simbolo, prim->varOuFunc, prim->tipo, prim->numArgs, prim->escopo, prim->linha, prim->coluna);
         /*if(prim->tipoArgs != NULL) {
             printaArgs(prim->tipoArgs);
         }*/

@@ -120,10 +120,10 @@ Gramática
    74 expMul: expMul ARIT_OP_ALTA expUn
    75       | expUn
 
-   76 expUn: LOG_OP_NEG element
-   77      | ARIT_OP_MENOS element
-   78      | LIST_OP_UN element
-   79      | LIST_OP_HEADER element
+   76 expUn: LOG_OP_NEG expUn
+   77      | ARIT_OP_MENOS expUn
+   78      | LIST_OP_UN expUn
+   79      | LIST_OP_HEADER expUn
    80      | element
 
    81 element: ID
@@ -295,10 +295,10 @@ Não terminais com as regras onde eles aparecem
         à direita: 71 72 73 74
     expUn <no> (73)
         à esquerda: 76 77 78 79 80
-        à direita: 74 75
+        à direita: 74 75 76 77 78 79
     element <no> (74)
         à esquerda: 81 82 83 84 85 86 87
-        à direita: 76 77 78 79 80
+        à direita: 80
     arguments <lista> (75)
         à esquerda: 88 89
         à direita: 83 88
@@ -777,54 +777,74 @@ Estado 39
 
 Estado 40
 
-   78 expUn: LIST_OP_UN • element
+   78 expUn: LIST_OP_UN • expUn
 
-    CONST_INT    deslocar, e ir ao estado 44
-    CONST_FLOAT  deslocar, e ir ao estado 45
-    NIL          deslocar, e ir ao estado 46
-    ID           deslocar, e ir ao estado 75
-    ABRE_P       deslocar, e ir ao estado 48
+    LIST_OP_UN      deslocar, e ir ao estado 40
+    LIST_OP_HEADER  deslocar, e ir ao estado 41
+    ARIT_OP_MENOS   deslocar, e ir ao estado 42
+    LOG_OP_NEG      deslocar, e ir ao estado 43
+    CONST_INT       deslocar, e ir ao estado 44
+    CONST_FLOAT     deslocar, e ir ao estado 45
+    NIL             deslocar, e ir ao estado 46
+    ID              deslocar, e ir ao estado 75
+    ABRE_P          deslocar, e ir ao estado 48
 
-    element  ir ao estado 79
+    expUn    ir ao estado 79
+    element  ir ao estado 66
 
 
 Estado 41
 
-   79 expUn: LIST_OP_HEADER • element
+   79 expUn: LIST_OP_HEADER • expUn
 
-    CONST_INT    deslocar, e ir ao estado 44
-    CONST_FLOAT  deslocar, e ir ao estado 45
-    NIL          deslocar, e ir ao estado 46
-    ID           deslocar, e ir ao estado 75
-    ABRE_P       deslocar, e ir ao estado 48
+    LIST_OP_UN      deslocar, e ir ao estado 40
+    LIST_OP_HEADER  deslocar, e ir ao estado 41
+    ARIT_OP_MENOS   deslocar, e ir ao estado 42
+    LOG_OP_NEG      deslocar, e ir ao estado 43
+    CONST_INT       deslocar, e ir ao estado 44
+    CONST_FLOAT     deslocar, e ir ao estado 45
+    NIL             deslocar, e ir ao estado 46
+    ID              deslocar, e ir ao estado 75
+    ABRE_P          deslocar, e ir ao estado 48
 
-    element  ir ao estado 80
+    expUn    ir ao estado 80
+    element  ir ao estado 66
 
 
 Estado 42
 
-   77 expUn: ARIT_OP_MENOS • element
+   77 expUn: ARIT_OP_MENOS • expUn
 
-    CONST_INT    deslocar, e ir ao estado 44
-    CONST_FLOAT  deslocar, e ir ao estado 45
-    NIL          deslocar, e ir ao estado 46
-    ID           deslocar, e ir ao estado 75
-    ABRE_P       deslocar, e ir ao estado 48
+    LIST_OP_UN      deslocar, e ir ao estado 40
+    LIST_OP_HEADER  deslocar, e ir ao estado 41
+    ARIT_OP_MENOS   deslocar, e ir ao estado 42
+    LOG_OP_NEG      deslocar, e ir ao estado 43
+    CONST_INT       deslocar, e ir ao estado 44
+    CONST_FLOAT     deslocar, e ir ao estado 45
+    NIL             deslocar, e ir ao estado 46
+    ID              deslocar, e ir ao estado 75
+    ABRE_P          deslocar, e ir ao estado 48
 
-    element  ir ao estado 81
+    expUn    ir ao estado 81
+    element  ir ao estado 66
 
 
 Estado 43
 
-   76 expUn: LOG_OP_NEG • element
+   76 expUn: LOG_OP_NEG • expUn
 
-    CONST_INT    deslocar, e ir ao estado 44
-    CONST_FLOAT  deslocar, e ir ao estado 45
-    NIL          deslocar, e ir ao estado 46
-    ID           deslocar, e ir ao estado 75
-    ABRE_P       deslocar, e ir ao estado 48
+    LIST_OP_UN      deslocar, e ir ao estado 40
+    LIST_OP_HEADER  deslocar, e ir ao estado 41
+    ARIT_OP_MENOS   deslocar, e ir ao estado 42
+    LOG_OP_NEG      deslocar, e ir ao estado 43
+    CONST_INT       deslocar, e ir ao estado 44
+    CONST_FLOAT     deslocar, e ir ao estado 45
+    NIL             deslocar, e ir ao estado 46
+    ID              deslocar, e ir ao estado 75
+    ABRE_P          deslocar, e ir ao estado 48
 
-    element  ir ao estado 82
+    expUn    ir ao estado 82
+    element  ir ao estado 66
 
 
 Estado 44
@@ -1465,7 +1485,7 @@ Estado 78
 
 Estado 79
 
-   78 expUn: LIST_OP_UN element •
+   78 expUn: LIST_OP_UN expUn •
 
     PV                  reduzir usando a regra 78 (expUn)
     LOG_OP_OU           reduzir usando a regra 78 (expUn)
@@ -1481,7 +1501,7 @@ Estado 79
 
 Estado 80
 
-   79 expUn: LIST_OP_HEADER element •
+   79 expUn: LIST_OP_HEADER expUn •
 
     PV                  reduzir usando a regra 79 (expUn)
     LOG_OP_OU           reduzir usando a regra 79 (expUn)
@@ -1497,7 +1517,7 @@ Estado 80
 
 Estado 81
 
-   77 expUn: ARIT_OP_MENOS element •
+   77 expUn: ARIT_OP_MENOS expUn •
 
     PV                  reduzir usando a regra 77 (expUn)
     LOG_OP_OU           reduzir usando a regra 77 (expUn)
@@ -1513,7 +1533,7 @@ Estado 81
 
 Estado 82
 
-   76 expUn: LOG_OP_NEG element •
+   76 expUn: LOG_OP_NEG expUn •
 
     PV                  reduzir usando a regra 76 (expUn)
     LOG_OP_OU           reduzir usando a regra 76 (expUn)
@@ -3297,54 +3317,74 @@ Estado 171
 
 Estado 172
 
-   78 expUn: LIST_OP_UN • element
+   78 expUn: LIST_OP_UN • expUn
 
-    CONST_INT    deslocar, e ir ao estado 176
-    CONST_FLOAT  deslocar, e ir ao estado 177
-    NIL          deslocar, e ir ao estado 178
-    ID           deslocar, e ir ao estado 179
-    ABRE_P       deslocar, e ir ao estado 180
+    LIST_OP_UN      deslocar, e ir ao estado 172
+    LIST_OP_HEADER  deslocar, e ir ao estado 173
+    ARIT_OP_MENOS   deslocar, e ir ao estado 174
+    LOG_OP_NEG      deslocar, e ir ao estado 175
+    CONST_INT       deslocar, e ir ao estado 176
+    CONST_FLOAT     deslocar, e ir ao estado 177
+    NIL             deslocar, e ir ao estado 178
+    ID              deslocar, e ir ao estado 179
+    ABRE_P          deslocar, e ir ao estado 180
 
-    element  ir ao estado 215
+    expUn    ir ao estado 215
+    element  ir ao estado 188
 
 
 Estado 173
 
-   79 expUn: LIST_OP_HEADER • element
+   79 expUn: LIST_OP_HEADER • expUn
 
-    CONST_INT    deslocar, e ir ao estado 176
-    CONST_FLOAT  deslocar, e ir ao estado 177
-    NIL          deslocar, e ir ao estado 178
-    ID           deslocar, e ir ao estado 179
-    ABRE_P       deslocar, e ir ao estado 180
+    LIST_OP_UN      deslocar, e ir ao estado 172
+    LIST_OP_HEADER  deslocar, e ir ao estado 173
+    ARIT_OP_MENOS   deslocar, e ir ao estado 174
+    LOG_OP_NEG      deslocar, e ir ao estado 175
+    CONST_INT       deslocar, e ir ao estado 176
+    CONST_FLOAT     deslocar, e ir ao estado 177
+    NIL             deslocar, e ir ao estado 178
+    ID              deslocar, e ir ao estado 179
+    ABRE_P          deslocar, e ir ao estado 180
 
-    element  ir ao estado 216
+    expUn    ir ao estado 216
+    element  ir ao estado 188
 
 
 Estado 174
 
-   77 expUn: ARIT_OP_MENOS • element
+   77 expUn: ARIT_OP_MENOS • expUn
 
-    CONST_INT    deslocar, e ir ao estado 176
-    CONST_FLOAT  deslocar, e ir ao estado 177
-    NIL          deslocar, e ir ao estado 178
-    ID           deslocar, e ir ao estado 179
-    ABRE_P       deslocar, e ir ao estado 180
+    LIST_OP_UN      deslocar, e ir ao estado 172
+    LIST_OP_HEADER  deslocar, e ir ao estado 173
+    ARIT_OP_MENOS   deslocar, e ir ao estado 174
+    LOG_OP_NEG      deslocar, e ir ao estado 175
+    CONST_INT       deslocar, e ir ao estado 176
+    CONST_FLOAT     deslocar, e ir ao estado 177
+    NIL             deslocar, e ir ao estado 178
+    ID              deslocar, e ir ao estado 179
+    ABRE_P          deslocar, e ir ao estado 180
 
-    element  ir ao estado 217
+    expUn    ir ao estado 217
+    element  ir ao estado 188
 
 
 Estado 175
 
-   76 expUn: LOG_OP_NEG • element
+   76 expUn: LOG_OP_NEG • expUn
 
-    CONST_INT    deslocar, e ir ao estado 176
-    CONST_FLOAT  deslocar, e ir ao estado 177
-    NIL          deslocar, e ir ao estado 178
-    ID           deslocar, e ir ao estado 179
-    ABRE_P       deslocar, e ir ao estado 180
+    LIST_OP_UN      deslocar, e ir ao estado 172
+    LIST_OP_HEADER  deslocar, e ir ao estado 173
+    ARIT_OP_MENOS   deslocar, e ir ao estado 174
+    LOG_OP_NEG      deslocar, e ir ao estado 175
+    CONST_INT       deslocar, e ir ao estado 176
+    CONST_FLOAT     deslocar, e ir ao estado 177
+    NIL             deslocar, e ir ao estado 178
+    ID              deslocar, e ir ao estado 179
+    ABRE_P          deslocar, e ir ao estado 180
 
-    element  ir ao estado 218
+    expUn    ir ao estado 218
+    element  ir ao estado 188
 
 
 Estado 176
@@ -3594,54 +3634,74 @@ Estado 190
 
 Estado 191
 
-   78 expUn: LIST_OP_UN • element
+   78 expUn: LIST_OP_UN • expUn
 
-    CONST_INT    deslocar, e ir ao estado 195
-    CONST_FLOAT  deslocar, e ir ao estado 196
-    NIL          deslocar, e ir ao estado 197
-    ID           deslocar, e ir ao estado 198
-    ABRE_P       deslocar, e ir ao estado 199
+    LIST_OP_UN      deslocar, e ir ao estado 191
+    LIST_OP_HEADER  deslocar, e ir ao estado 192
+    ARIT_OP_MENOS   deslocar, e ir ao estado 193
+    LOG_OP_NEG      deslocar, e ir ao estado 194
+    CONST_INT       deslocar, e ir ao estado 195
+    CONST_FLOAT     deslocar, e ir ao estado 196
+    NIL             deslocar, e ir ao estado 197
+    ID              deslocar, e ir ao estado 198
+    ABRE_P          deslocar, e ir ao estado 199
 
-    element  ir ao estado 230
+    expUn    ir ao estado 230
+    element  ir ao estado 207
 
 
 Estado 192
 
-   79 expUn: LIST_OP_HEADER • element
+   79 expUn: LIST_OP_HEADER • expUn
 
-    CONST_INT    deslocar, e ir ao estado 195
-    CONST_FLOAT  deslocar, e ir ao estado 196
-    NIL          deslocar, e ir ao estado 197
-    ID           deslocar, e ir ao estado 198
-    ABRE_P       deslocar, e ir ao estado 199
+    LIST_OP_UN      deslocar, e ir ao estado 191
+    LIST_OP_HEADER  deslocar, e ir ao estado 192
+    ARIT_OP_MENOS   deslocar, e ir ao estado 193
+    LOG_OP_NEG      deslocar, e ir ao estado 194
+    CONST_INT       deslocar, e ir ao estado 195
+    CONST_FLOAT     deslocar, e ir ao estado 196
+    NIL             deslocar, e ir ao estado 197
+    ID              deslocar, e ir ao estado 198
+    ABRE_P          deslocar, e ir ao estado 199
 
-    element  ir ao estado 231
+    expUn    ir ao estado 231
+    element  ir ao estado 207
 
 
 Estado 193
 
-   77 expUn: ARIT_OP_MENOS • element
+   77 expUn: ARIT_OP_MENOS • expUn
 
-    CONST_INT    deslocar, e ir ao estado 195
-    CONST_FLOAT  deslocar, e ir ao estado 196
-    NIL          deslocar, e ir ao estado 197
-    ID           deslocar, e ir ao estado 198
-    ABRE_P       deslocar, e ir ao estado 199
+    LIST_OP_UN      deslocar, e ir ao estado 191
+    LIST_OP_HEADER  deslocar, e ir ao estado 192
+    ARIT_OP_MENOS   deslocar, e ir ao estado 193
+    LOG_OP_NEG      deslocar, e ir ao estado 194
+    CONST_INT       deslocar, e ir ao estado 195
+    CONST_FLOAT     deslocar, e ir ao estado 196
+    NIL             deslocar, e ir ao estado 197
+    ID              deslocar, e ir ao estado 198
+    ABRE_P          deslocar, e ir ao estado 199
 
-    element  ir ao estado 232
+    expUn    ir ao estado 232
+    element  ir ao estado 207
 
 
 Estado 194
 
-   76 expUn: LOG_OP_NEG • element
+   76 expUn: LOG_OP_NEG • expUn
 
-    CONST_INT    deslocar, e ir ao estado 195
-    CONST_FLOAT  deslocar, e ir ao estado 196
-    NIL          deslocar, e ir ao estado 197
-    ID           deslocar, e ir ao estado 198
-    ABRE_P       deslocar, e ir ao estado 199
+    LIST_OP_UN      deslocar, e ir ao estado 191
+    LIST_OP_HEADER  deslocar, e ir ao estado 192
+    ARIT_OP_MENOS   deslocar, e ir ao estado 193
+    LOG_OP_NEG      deslocar, e ir ao estado 194
+    CONST_INT       deslocar, e ir ao estado 195
+    CONST_FLOAT     deslocar, e ir ao estado 196
+    NIL             deslocar, e ir ao estado 197
+    ID              deslocar, e ir ao estado 198
+    ABRE_P          deslocar, e ir ao estado 199
 
-    element  ir ao estado 233
+    expUn    ir ao estado 233
+    element  ir ao estado 207
 
 
 Estado 195
@@ -4002,7 +4062,7 @@ Estado 214
 
 Estado 215
 
-   78 expUn: LIST_OP_UN element •
+   78 expUn: LIST_OP_UN expUn •
 
     LOG_OP_OU           reduzir usando a regra 78 (expUn)
     LOG_OP_E            reduzir usando a regra 78 (expUn)
@@ -4018,7 +4078,7 @@ Estado 215
 
 Estado 216
 
-   79 expUn: LIST_OP_HEADER element •
+   79 expUn: LIST_OP_HEADER expUn •
 
     LOG_OP_OU           reduzir usando a regra 79 (expUn)
     LOG_OP_E            reduzir usando a regra 79 (expUn)
@@ -4034,7 +4094,7 @@ Estado 216
 
 Estado 217
 
-   77 expUn: ARIT_OP_MENOS element •
+   77 expUn: ARIT_OP_MENOS expUn •
 
     LOG_OP_OU           reduzir usando a regra 77 (expUn)
     LOG_OP_E            reduzir usando a regra 77 (expUn)
@@ -4050,7 +4110,7 @@ Estado 217
 
 Estado 218
 
-   76 expUn: LOG_OP_NEG element •
+   76 expUn: LOG_OP_NEG expUn •
 
     LOG_OP_OU           reduzir usando a regra 76 (expUn)
     LOG_OP_E            reduzir usando a regra 76 (expUn)
@@ -4290,7 +4350,7 @@ Estado 229
 
 Estado 230
 
-   78 expUn: LIST_OP_UN element •
+   78 expUn: LIST_OP_UN expUn •
 
     VIRG                reduzir usando a regra 78 (expUn)
     LOG_OP_OU           reduzir usando a regra 78 (expUn)
@@ -4307,7 +4367,7 @@ Estado 230
 
 Estado 231
 
-   79 expUn: LIST_OP_HEADER element •
+   79 expUn: LIST_OP_HEADER expUn •
 
     VIRG                reduzir usando a regra 79 (expUn)
     LOG_OP_OU           reduzir usando a regra 79 (expUn)
@@ -4324,7 +4384,7 @@ Estado 231
 
 Estado 232
 
-   77 expUn: ARIT_OP_MENOS element •
+   77 expUn: ARIT_OP_MENOS expUn •
 
     VIRG                reduzir usando a regra 77 (expUn)
     LOG_OP_OU           reduzir usando a regra 77 (expUn)
@@ -4341,7 +4401,7 @@ Estado 232
 
 Estado 233
 
-   76 expUn: LOG_OP_NEG element •
+   76 expUn: LOG_OP_NEG expUn •
 
     VIRG                reduzir usando a regra 76 (expUn)
     LOG_OP_OU           reduzir usando a regra 76 (expUn)

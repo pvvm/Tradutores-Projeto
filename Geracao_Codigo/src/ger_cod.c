@@ -29,6 +29,7 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
     strcpy(aux_str, "");
     int opcao_var = 0;
     int so_um_operando = 0;
+    int op_lista = 0;
 
     // Operacoes unarias
     if(operando2 == NULL) {
@@ -40,7 +41,19 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
                 if(!strcmp(no->tipo, "int") || !strcmp(no->tipo, "float")) {
                     strcpy(aux_str, "not ");
                     strcat(aux_str, temp);
-                }   // FAZER O CASO DO ! EM LISTA
+                } else if(!strcmp(no->tipo, "int list") || !strcmp(no->tipo, "float list")) {
+                    strcpy(aux_str, "mov ");
+                    strcat(aux_str, temp);
+                    op_lista = 2;
+                }
+            } else if(!strcmp(operador, "?")){
+                strcpy(aux_str, "mov ");
+                strcat(aux_str, temp);
+                op_lista = 1;
+            } else if(!strcmp(operador, "%")){
+                strcpy(aux_str, "mov ");
+                strcat(aux_str, temp);
+                op_lista = 2;
             } else if(!strcmp(operador, "=")) {
                 opcao_var = 1;
                 strcpy(aux_str, "mov ");
@@ -68,7 +81,32 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             }
             if(so_um_operando == 0)
                 strcat(aux_str, ", ");
+            
             strcat(aux_str, operando1);
+        
+            if(op_lista == 1)
+                strcat(aux_str, "[0]");
+            else if(op_lista == 2)
+                strcat(aux_str, "[1]");
+
+            if(!strcmp(operador, "%")) {
+                (*ger_codigo_var)++;
+                sprintf(aux_num, "%d", *ger_codigo_var);
+                strcpy(temp, "$");
+                strcat(temp, aux_num);
+                strcat(aux_str, "\nmov ");
+                strcat(aux_str, temp);
+                strcat(aux_str, ", ");
+                strcat(aux_str, operando1);
+                strcat(aux_str, "\nmov ");
+                strcat(aux_str, operando1);
+                strcat(aux_str, ", ");
+                strcat(aux_str, operando1);
+                strcat(aux_str, "[1]\nmemf ");
+                strcat(aux_str, temp);
+                opcao_var = 1;
+            }
+
         } else {
             char aux[300];
             char aux_num1[15];
@@ -185,6 +223,19 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             strcpy(aux_str, "and ");
         } else if(!strcmp(operador, "||")) {
             strcpy(aux_str, "or ");
+        } else if(!strcmp(operador, ":")) {
+            sprintf(aux_num, "%d", *ger_codigo_var);
+            strcpy(aux_str, "mema $");
+            strcat(aux_str, aux_num);
+            strcat(aux_str, ", 2\nmov $");
+            strcat(aux_str, aux_num);
+            strcat(aux_str, "[0], ");
+            strcat(aux_str, operando1);
+            strcat(aux_str, "\nmov $");
+            strcat(aux_str, aux_num);
+            strcat(aux_str, "[1], ");
+            strcat(aux_str, operando2);
+            invertido = -1;
         }
 
         if(invertido == 0) {
@@ -305,6 +356,20 @@ void escreveTable(FILE *arquivo, struct tabelaSimb *prim, int contador_string) {
             fputs(aux, arquivo);
             contador_string++;
         }
+        if(prim->escopo == 0 && !strcmp(prim->varOuFunc, "variavel")) {
+            char aux[200];
+            strcpy(aux, prim->tipo);
+            strcat(aux, " ");
+            strcat(aux, prim->var_temp);
+            strcat(aux, " = ");
+            if(!strcmp(prim->tipo, "int") || !strcmp(prim->tipo, "int list") || !strcmp(prim->tipo, "float list")) {
+                strcat(aux, "0\n");
+            } else if(!strcmp(prim->tipo, "float")) {
+                strcat(aux, "0.0\n");
+            }
+            fputs(aux, arquivo);
+        }
+
         escreveTable(arquivo, prim->prox, contador_string);
     }
 }
