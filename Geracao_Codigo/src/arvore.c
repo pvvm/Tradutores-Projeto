@@ -136,10 +136,11 @@ struct No* castNo(char* lexema, struct No* esqNo, struct No* dirNo, int escopo, 
         if(!strcmp(esqNo->tipo, dirNo->tipo)) {
             no = montaNo(lexema, esqNo, dirNo, NULL, NULL, escopo, NULL);
             // Operacoes logicas e relacionais sempre retornam tipo inteiro
-            if(!strcmp(lexema, "==") || !strcmp(lexema, "!=") || !strcmp(lexema, "&&") || !strcmp(lexema, "||") || !strcmp(lexema, ">=") || !strcmp(lexema, "<=") || !strcmp(lexema, "<") || !strcmp(lexema, ">"))
-                strcpy(no->tipo, "int");
-            else
-                strcpy(no->tipo, esqNo->tipo);
+            // Comentado, porque aparentemente o TAC considera que o resultado entre floats tambem eh float
+            //if(!strcmp(lexema, "==") || !strcmp(lexema, "!=") || !strcmp(lexema, "&&") || !strcmp(lexema, "||") || !strcmp(lexema, ">=") || !strcmp(lexema, "<=") || !strcmp(lexema, "<") || !strcmp(lexema, ">"))
+            //    strcpy(no->tipo, "int");
+            //else
+            strcpy(no->tipo, esqNo->tipo);
             return no;
         }
         else {
@@ -150,10 +151,10 @@ struct No* castNo(char* lexema, struct No* esqNo, struct No* dirNo, int escopo, 
                 no = montaNo(lexema, esqNo, NULL, NULL, NULL, escopo, NULL);
                 no->no2 = montaNo("(int_to_float)", dirNo, NULL, NULL, NULL, escopo, NULL);
             }
-            if(!strcmp(lexema, "==") || !strcmp(lexema, "!=") || !strcmp(lexema, "&&") || !strcmp(lexema, "||") || !strcmp(lexema, ">=") || !strcmp(lexema, "<=") || !strcmp(lexema, "<") || !strcmp(lexema, ">"))
-                strcpy(no->tipo, "int");
-            else
-                strcpy(no->tipo, "float");
+            //if(!strcmp(lexema, "==") || !strcmp(lexema, "!=") || !strcmp(lexema, "&&") || !strcmp(lexema, "||") || !strcmp(lexema, ">=") || !strcmp(lexema, "<=") || !strcmp(lexema, "<") || !strcmp(lexema, ">"))
+            //    strcpy(no->tipo, "int");
+            //else
+            strcpy(no->tipo, "float");
             return no;
         }
     } else {

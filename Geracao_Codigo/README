@@ -14,4 +14,7 @@ do projeto (17_0043665) e executar o comando:
 make
 
 Para executar o tradutor utilize o comando:
-./tradutor tests/nome_do_arquivo.ci
+./tradutor tests/nome_do_arquivo.c
+
+Para executar o .tac gerado, em um diretório com o executável do TAC, utilize:
+./tac tests/nome_do_arquivo.tac
