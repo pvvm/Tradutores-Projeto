@@ -22,7 +22,7 @@ int procuraLista(struct tabelaSimb** prim, char *simbolo, int escopo) {
 */
 int push(struct tabelaSimb** ult, char *simbolo, char *varOuFunc, char *tipo, char *valor, int escopo, int linha, int coluna, char *var_temp) {
     struct tabelaSimb **aux = ult;
-    if(procuraLista(aux, simbolo, escopo)) {
+    if(procuraLista(aux, simbolo, escopo) || !strcmp(varOuFunc, "constante")) {
         struct tabelaSimb *aux2 = *ult;
         struct tabelaSimb* novo = (struct tabelaSimb*) malloc (sizeof(struct tabelaSimb));
 

@@ -19,7 +19,7 @@ void inicioDefault(int ger_codigo_var, FILE* escrita, char *tipo) {
     fputs(aux_str, escrita);
 }
 
-void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_codigo_var, FILE* escrita, struct No* no, int incremento, char *inst_incremento, int eh_string, int *label_cont, int *string_cont) {
+void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_codigo_var, FILE* escrita, struct No* no, int incremento, char *inst_incremento, int op_especial, int *label_cont, int *string_cont) {
     char aux_str[300];
     char aux_num[10];
     char temp[11];
@@ -33,7 +33,7 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
 
     // Operacoes unarias
     if(operando2 == NULL) {
-        if(eh_string == 0) {
+        if(op_especial == 0) {
             if(!strcmp(operador, "-")) {
                 strcpy(aux_str, "minus ");
                 strcat(aux_str, temp);
@@ -236,6 +236,227 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             strcat(aux_str, "[1], ");
             strcat(aux_str, operando2);
             invertido = -1;
+
+        } else if(!strcmp(operador, ">>")) {
+            char label[10];
+            char aux_num0[10];                      // Enderecos da lista operada
+            char aux_num1[10];                      // Espacos alocados
+            char aux_num2[10];                      // Elementos da lista operada
+            char aux_num3[10];
+            char aux_num4[10];
+
+            (*ger_codigo_var)++;
+            sprintf(aux_num0, "%d", *ger_codigo_var);
+            strcpy(aux_str, "mov $");
+            strcat(aux_str, aux_num0);
+            strcat(aux_str, ", ");
+            strcat(aux_str, operando2);             // Armazena em aux_num0 o endereco da lista operada
+
+            (*ger_codigo_var)++;
+            sprintf(aux_num1, "%d", *ger_codigo_var);
+            strcat(aux_str, "\nmema $");           // Aloca memoria e coloca em aux_num1
+            strcat(aux_str, aux_num1);
+            strcat(aux_str, ", 2\n");
+
+            strcat(aux_str, "mov ");
+            strcat(aux_str, temp);                  // Inicializa temp
+            strcat(aux_str, ", $");                 // Temp contem o endereco da lista resultante
+            strcat(aux_str, aux_num1);
+            strcat(aux_str, "\nL");
+
+            sprintf(label, "%d", *label_cont);
+            strcat(aux_str, label);                 // Escreve label
+
+            (*ger_codigo_var)++;
+            sprintf(aux_num2, "%d", *ger_codigo_var);
+            strcat(aux_str, ":\nmov $");
+            strcat(aux_str, aux_num2);
+            strcat(aux_str, ", $");
+            strcat(aux_str, aux_num0);
+            strcat(aux_str, "[0]\n");               // Copia o valor do elemento atual de aux_num0 para aux_num2
+
+            if(op_especial == 1) {                  // Caso tenha cast de float para int
+                strcat(aux_str, "fltoint $");
+                strcat(aux_str, aux_num2);
+                strcat(aux_str, ", $");
+                strcat(aux_str, aux_num2);
+                strcat(aux_str, "\n");
+            } else if(op_especial == 2) {           // Caso tenha cast de int para float
+                strcat(aux_str, "inttofl $");
+                strcat(aux_str, aux_num2);
+                strcat(aux_str, ", $");
+                strcat(aux_str, aux_num2);
+                strcat(aux_str, "\n");
+            }
+
+            strcat(aux_str, "param $");           // Define o parametro
+            strcat(aux_str, aux_num2);
+
+            strcat(aux_str, "\ncall ");             // Chamada
+            strcat(aux_str, operando1);
+            strcat(aux_str, ", 1");
+
+            (*ger_codigo_var)++;
+            sprintf(aux_num3, "%d", *ger_codigo_var);
+            strcat(aux_str, "\npop $");             // Pega o retorno e armazena em aux_num1[0]
+            strcat(aux_str, aux_num3);
+
+            strcat(aux_str, "\nmov $");
+            strcat(aux_str, aux_num1);
+            strcat(aux_str, "[0], $");
+            strcat(aux_str, aux_num3);
+
+            (*ger_codigo_var)++;
+            sprintf(aux_num4, "%d", *ger_codigo_var);
+            strcat(aux_str, "\nmema $");              // Aloca memoria e coloca o ponteiro em aux_num1[1]
+            strcat(aux_str, aux_num4);
+            strcat(aux_str, ", 2");
+
+            strcat(aux_str, "\nmov $");
+            strcat(aux_str, aux_num1);
+            strcat(aux_str, "[1], $");
+            strcat(aux_str, aux_num4);
+
+            strcat(aux_str, "\nmov $");               // Copia para aux_num1 o proximo endereco de aux_num1
+            strcat(aux_str, aux_num1);
+            strcat(aux_str, ", $");
+            strcat(aux_str, aux_num1);
+            strcat(aux_str, "[1]\n");
+
+            strcat(aux_str, "mov $");               // Copia para aux_num0 o proximo endereco de aux_num0
+            strcat(aux_str, aux_num0);
+            strcat(aux_str, ", $");
+            strcat(aux_str, aux_num0);
+            strcat(aux_str, "[1]\n");
+
+            strcat(aux_str, "brnz L");               // Se nao for o ultimo endereco (0), volta pro comeco
+            strcat(aux_str, label);
+            strcat(aux_str, ", $");
+            strcat(aux_str, aux_num0);
+
+            strcat(aux_str, "\nmov $");
+            strcat(aux_str, aux_num1);
+            strcat(aux_str, ", 0");                 // Copia 0 para o ultimo endereco da lista
+
+            (*label_cont)++;
+            invertido = -1;
+        
+        } else if(!strcmp(operador, "<<")) {
+            char label[10];
+            char label2[10];
+            char aux_num0[10];                      // Enderecos da lista operada
+            char aux_num1[10];                      // Espacos alocados
+            char aux_num2[10];                      // Elementos da lista operada
+            char aux_num3[10];
+            char aux_num4[10];
+
+            (*ger_codigo_var)++;
+            sprintf(aux_num0, "%d", *ger_codigo_var);
+            strcpy(aux_str, "mov $");
+            strcat(aux_str, aux_num0);
+            strcat(aux_str, ", ");
+            strcat(aux_str, operando2);             // Armazena em aux_num0 o endereco da lista operada
+
+            (*ger_codigo_var)++;
+            sprintf(aux_num1, "%d", *ger_codigo_var);
+            strcat(aux_str, "\nmema $");           // Aloca memoria e coloca em aux_num1
+            strcat(aux_str, aux_num1);
+            strcat(aux_str, ", 2\n");
+
+            strcat(aux_str, "mov ");
+            strcat(aux_str, temp);                  // Inicializa temp
+            strcat(aux_str, ", $");                 // Temp contem o endereco da lista resultante
+            strcat(aux_str, aux_num1);
+            strcat(aux_str, "\nL");
+
+            sprintf(label, "%d", *label_cont);
+            strcat(aux_str, label);                 // Escreve label
+            (*label_cont)++;
+
+            (*ger_codigo_var)++;
+            sprintf(aux_num2, "%d", *ger_codigo_var);
+            strcat(aux_str, ":\nmov $");
+            strcat(aux_str, aux_num2);
+            strcat(aux_str, ", $");
+            strcat(aux_str, aux_num0);
+            strcat(aux_str, "[0]\n");               // Copia o valor do elemento atual de aux_num0 para aux_num2
+
+            if(op_especial == 1) {                  // Caso tenha cast de float para int
+                strcat(aux_str, "fltoint $");
+                strcat(aux_str, aux_num2);
+                strcat(aux_str, ", $");
+                strcat(aux_str, aux_num2);
+                strcat(aux_str, "\n");
+            } else if(op_especial == 2) {           // Caso tenha cast de int para float
+                strcat(aux_str, "inttofl $");
+                strcat(aux_str, aux_num2);
+                strcat(aux_str, ", $");
+                strcat(aux_str, aux_num2);
+                strcat(aux_str, "\n");
+            }
+
+            strcat(aux_str, "param $");           // Define o parametro
+            strcat(aux_str, aux_num2);
+
+            strcat(aux_str, "\ncall ");             // Chamada
+            strcat(aux_str, operando1);
+            strcat(aux_str, ", 1");
+
+            (*ger_codigo_var)++;
+            sprintf(aux_num3, "%d", *ger_codigo_var);
+            strcat(aux_str, "\npop $");             // Pega o retorno e armazena em aux_num1[0]
+            strcat(aux_str, aux_num3);
+
+            // MUDA AQUI
+            sprintf(label2, "%d", *label_cont);
+            (*label_cont)++;
+
+            strcat(aux_str, "\nbrz L");
+            strcat(aux_str, label2);
+            strcat(aux_str, ", $");
+            strcat(aux_str, aux_num3);
+            //
+
+            strcat(aux_str, "\nmov $");
+            strcat(aux_str, aux_num1);
+            strcat(aux_str, "[0], $");
+            strcat(aux_str, aux_num2);
+
+            (*ger_codigo_var)++;
+            sprintf(aux_num4, "%d", *ger_codigo_var);
+            strcat(aux_str, "\nmema $");              // Aloca memoria e coloca o ponteiro em aux_num1[1]
+            strcat(aux_str, aux_num4);
+            strcat(aux_str, ", 2");
+
+            strcat(aux_str, "\nmov $");
+            strcat(aux_str, aux_num1);
+            strcat(aux_str, "[1], $");
+            strcat(aux_str, aux_num4);
+
+            strcat(aux_str, "\nmov $");               // Copia para aux_num1 o proximo endereco de aux_num1
+            strcat(aux_str, aux_num1);
+            strcat(aux_str, ", $");
+            strcat(aux_str, aux_num1);
+            strcat(aux_str, "[1]\n");
+
+            strcat(aux_str, "L");
+            strcat(aux_str, label2);
+
+            strcat(aux_str, ":\nmov $");               // Copia para aux_num0 o proximo endereco de aux_num0
+            strcat(aux_str, aux_num0);
+            strcat(aux_str, ", $");
+            strcat(aux_str, aux_num0);
+            strcat(aux_str, "[1]\n");
+
+            strcat(aux_str, "brnz L");               // Se nao for o ultimo endereco (0), volta pro comeco
+            strcat(aux_str, label);
+            strcat(aux_str, ", $");
+            strcat(aux_str, aux_num0);
+
+            strcat(aux_str, "\nmov $");
+            strcat(aux_str, aux_num1);
+            strcat(aux_str, ", 0");                 // Copia 0 para o ultimo endereco da lista
+            invertido = -1;
         }
 
         if(invertido == 0) {
@@ -358,7 +579,10 @@ void escreveTable(FILE *arquivo, struct tabelaSimb *prim, int contador_string) {
         }
         if(prim->escopo == 0 && !strcmp(prim->varOuFunc, "variavel")) {
             char aux[200];
-            strcpy(aux, prim->tipo);
+            if(!strcmp(prim->tipo, "int") || !strcmp(prim->tipo, "float"))
+                strcpy(aux, prim->tipo);
+            else
+                strcpy(aux, "int");
             strcat(aux, " ");
             strcat(aux, prim->var_temp);
             strcat(aux, " = ");
