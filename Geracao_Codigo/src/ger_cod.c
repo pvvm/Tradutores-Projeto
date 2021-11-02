@@ -244,6 +244,7 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             char aux_num2[10];                      // Elementos da lista operada
             char aux_num3[10];
             char aux_num4[10];
+            char aux_num5[10];
 
             (*ger_codigo_var)++;
             sprintf(aux_num0, "%d", *ger_codigo_var);
@@ -317,6 +318,13 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             strcat(aux_str, "[1], $");
             strcat(aux_str, aux_num4);
 
+            (*ger_codigo_var)++;
+            sprintf(aux_num5, "%d", *ger_codigo_var);
+            strcat(aux_str, "\nmov $");
+            strcat(aux_str, aux_num5);
+            strcat(aux_str, ", $");
+            strcat(aux_str, aux_num1);
+
             strcat(aux_str, "\nmov $");               // Copia para aux_num1 o proximo endereco de aux_num1
             strcat(aux_str, aux_num1);
             strcat(aux_str, ", $");
@@ -335,8 +343,11 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             strcat(aux_str, aux_num0);
 
             strcat(aux_str, "\nmov $");
+            strcat(aux_str, aux_num5);
+            strcat(aux_str, "[1], 0\n");                 // Copia 0 para o ultimo endereco da lista
+
+            strcat(aux_str, "memf $");
             strcat(aux_str, aux_num1);
-            strcat(aux_str, ", 0");                 // Copia 0 para o ultimo endereco da lista
 
             (*label_cont)++;
             invertido = -1;
@@ -349,6 +360,7 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             char aux_num2[10];                      // Elementos da lista operada
             char aux_num3[10];
             char aux_num4[10];
+            char aux_num5[10];
 
             (*ger_codigo_var)++;
             sprintf(aux_num0, "%d", *ger_codigo_var);
@@ -433,6 +445,14 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             strcat(aux_str, "[1], $");
             strcat(aux_str, aux_num4);
 
+
+            (*ger_codigo_var)++;
+            sprintf(aux_num5, "%d", *ger_codigo_var);
+            strcat(aux_str, "\nmov $");
+            strcat(aux_str, aux_num5);
+            strcat(aux_str, ", $");
+            strcat(aux_str, aux_num1);
+
             strcat(aux_str, "\nmov $");               // Copia para aux_num1 o proximo endereco de aux_num1
             strcat(aux_str, aux_num1);
             strcat(aux_str, ", $");
@@ -454,8 +474,12 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             strcat(aux_str, aux_num0);
 
             strcat(aux_str, "\nmov $");
+            strcat(aux_str, aux_num5);
+            strcat(aux_str, "[1], 0");
+
+            strcat(aux_str, "\nmemf $");
             strcat(aux_str, aux_num1);
-            strcat(aux_str, ", 0");                 // Copia 0 para o ultimo endereco da lista
+            
             invertido = -1;
         }
 

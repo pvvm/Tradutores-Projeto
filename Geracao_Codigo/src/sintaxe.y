@@ -294,7 +294,7 @@ conditional:    IF ABRE_P attribuition FECHA_P ifBracesOrNot                    
                                                                                                 popLabel(&topo);
                                                                                             }}
 
-                | IF ABRE_P attribuition FECHA_P ifBracesOrNot ELSE                           {char jump[50];
+                | IF ABRE_P attribuition FECHA_P ifBracesOrNot ELSE                         {char jump[50];
                                                                                             char aux_num[10];
                                                                                             strcpy(jump, "jump L");
                                                                                             sprintf(aux_num, "%d", label_cont);
@@ -308,18 +308,22 @@ conditional:    IF ABRE_P attribuition FECHA_P ifBracesOrNot                    
                                                                                                 fputs(aux, escrita);
                                                                                                 popLabel(&topo);
                                                                                                 tem_else = 1;
-                                                                                            }}
+                                                                                            }
+                                                                                            strcpy(jump, "L");
+                                                                                            strcat(jump, aux_num);
+                                                                                            pushLabel(&topo, jump);
+                                                                                            label_cont++;}
 
                 ifBracesOrNot/* %prec ELSE*/                                                  {$$ = montaNo($1.lexema, NULL, $5, $8, NULL, retUlt(&primeiro), NULL);
                                                                                             $$->no1 = montaNo("condArg", $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);
-                                                                                            char aux_num[10];
-                                                                                            char lab[50];
-                                                                                            strcpy(lab, "L");
-                                                                                            sprintf(aux_num, "%d", label_cont);
-                                                                                            strcat(lab, aux_num);
-                                                                                            strcat(lab, ":\n");
-                                                                                            fputs(lab, escrita);
-                                                                                            tem_else = 0;
+                                                                                            char aux[50];
+                                                                                            if(topo != NULL) {
+                                                                                                strcpy(aux, topo->label);
+                                                                                                strcat(aux, ":\n");
+                                                                                                fputs(aux, escrita);
+                                                                                                popLabel(&topo);
+                                                                                                tem_else = 0;
+                                                                                            }
                                                                                             label_cont++;}
                 | IF ABRE_P error FECHA_P ifBracesOrNot                                       {}
                 ;

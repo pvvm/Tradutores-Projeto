@@ -46,19 +46,9 @@ int main() {
     writeln(?!lista);
 
     writeln("Lista 2:");
-    writeln(?lista2);
-    writeln(?!lista2);
-    writeln(?%lista2);
-    writeln(?!lista2);
-    writeln(?%lista2);
-    writeln(?!lista2);
-    writeln(?%lista2);
-    writeln(?!lista2);
-    writeln(?%lista2);
-    writeln(?lista2);
 
-    int list lista3;
-    lista3 = teste << lista;
+    float list lista3;
+    lista3 = teste << lista2;
 
     writeln("Lista 3:");
     writeln(?lista3);
