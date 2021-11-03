@@ -28,7 +28,7 @@ int subtrai(int elemento) {
 }
 
 int negativo(int elemento) {
-    return elemento < 0;
+    return elemento < 52;
 }
 
 int main() {

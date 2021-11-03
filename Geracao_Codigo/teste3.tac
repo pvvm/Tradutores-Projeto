@@ -16,72 +16,77 @@ char s9[] = "Negativo, senhor"
 .code
 
 fibonacci:
-mov sei_la, 5
-inttofl $1, 0
-seq $2, #0, $1
-inttofl $3, 1
-seq $4, #0, $3
-or $5, $2, $4
-brz L0, $5
+mov $0, #0
+mov $1, &sei_la
+mov $1, 5
+inttofl $2, 0
+seq $3, $0, $2
+inttofl $4, 1
+seq $5, $0, $4
+or $6, $3, $5
+brz L0, $6
 return 1
 jump L1
 L0:
-inttofl $7, 1
-sub $8, #0, $7
-param $8
+inttofl $8, 1
+sub $9, $0, $8
+param $9
 call fibonacci, 1
-pop $10
-inttofl $11, 2
-sub $12, #0, $11
-param $12
+pop $11
+inttofl $12, 2
+sub $13, $0, $12
+param $13
 call fibonacci, 1
-pop $14
-add $15, $10, $14
-return $15
+pop $15
+add $16, $11, $15
+return $16
 L1:
 return 0
 
 _write_list:
-mov $0, 0
+mov $0, #0
 mov $1, 0
-mov $0, 0
+mov $2, 0
+mov $1, 0
 L3:
-slt $3, $0, tamanho
-brz L4, $3
-mov $6, #0[0]
-mov $1, $6
-mov $8, #0[1]
-mov #0, $8
-print $1
-mov $11, 1
-mov $12, 0
+slt $4, $1, tamanho
+brz L4, $4
+mov $7, $0[0]
+mov $2, $7
+mov $9, $0[1]
+mov $0, $9
+print $2
+mov $12, 1
+mov $13, 0
 L5:
-mov $13, &s0
-mov $13, $13[$12]
-print $13
-add $12, $12, 1
-sub $14, $11, $12
-brnz L5, $14
-add $4, $0, 1
-mov $0, $4
+mov $14, &s0
+mov $14, $14[$13]
+print $14
+add $13, $13, 1
+sub $15, $12, $13
+brnz L5, $15
+add $5, $1, 1
+mov $1, $5
 jump L3
 L4:
-fltoint $16, 2.3
-mema $17, 2
-mov $17[0], $16
-mov $17[1], #0
-mov #0, $17
+fltoint $17, 2.3
+mema $18, 2
+mov $18[0], $17
+mov $18[1], $0
+mov $0, $18
 return 1
 return 0
 
 subtrai:
-sub $0, #0, 5
-return $0
+mov $0, #0
+sub $1, $0, 5
+return $1
 return 0
 
 negativo:
-slt $0, #0, 0
-return $0
+mov $0, #0
+slt $1, $0, 52
+return $1
 return 0
 
 main:
@@ -124,7 +129,8 @@ mul $21, $20, 5
 add $22, 2, tamanho
 minus $23, $22
 div $24, $21, $23
-mov sei_la, $24
+mov $25, &sei_la
+mov $25, $24
 mov $26, 31
 mov $27, 0
 L10:
@@ -169,100 +175,104 @@ pop $49
 mov $47[0], $49
 mema $50, 2
 mov $47[1], $50
+mov $51, $47
 mov $47, $47[1]
 mov $46, $46[1]
 brnz L13, $46
-mov $47, 0
+mov $51[1], 0
+memf $47
 mov $44, $45
 param $44
 call _write_list, 1
-pop $53
-mov $54, 18
-mov $55, 0
+pop $54
+mov $55, 18
+mov $56, 0
 L14:
-mov $56, &s5
-mov $56, $56[$55]
-print $56
-add $55, $55, 1
-sub $57, $54, $55
-brnz L14, $57
+mov $57, &s5
+mov $57, $57[$56]
+print $57
+add $56, $56, 1
+sub $58, $55, $56
+brnz L14, $58
 print '\n'
-mov $59, 0
-mov $61, $44
-mema $62, 2
-mov $60, $62
+mov $60, 0
+mov $62, $44
+mema $63, 2
+mov $61, $63
 L15:
-mov $63, $61[0]
-param $63
+mov $64, $62[0]
+param $64
 call negativo, 1
-pop $64
-brz L16, $64
-mov $62[0], $63
-mema $65, 2
-mov $62[1], $65
-mov $62, $62[1]
+pop $65
+brz L16, $65
+mov $63[0], $64
+mema $66, 2
+mov $63[1], $66
+mov $67, $63
+mov $63, $63[1]
 L16:
-mov $61, $61[1]
-brnz L15, $61
-mov $62, 0
-mov $59, $60
-param $59
+mov $62, $62[1]
+brnz L15, $62
+mov $67[1], 0
+memf $63
+mov $60, $61
+param $60
 call _write_list, 1
-pop $68
+pop $70
 jump L17
 L7:
-mov $69, 34
-mov $70, 0
+mov $71, 34
+mov $72, 0
 L18:
-mov $71, &s6
-mov $71, $71[$70]
-print $71
-add $70, $70, 1
-sub $72, $69, $70
-brnz L18, $72
+mov $73, &s6
+mov $73, $73[$72]
+print $73
+add $72, $72, 1
+sub $74, $71, $72
+brnz L18, $74
 print '\n'
 L17:
-mov $74, 0
-mov $74, 0
-scani $74
-slt $77, 0, $74
-brz L20, $77
-slt $78, 10, $74
-brz L21, $78
-mov $79, 16
-mov $80, 0
+mov $76, 0
+mov $76, 0
+scani $76
+slt $79, 0, $76
+brz L20, $79
+slt $80, 10, $76
+brz L21, $80
+mov $81, 16
+mov $82, 0
 L22:
-mov $81, &s7
-mov $81, $81[$80]
-print $81
-add $80, $80, 1
-sub $82, $79, $80
-brnz L22, $82
+mov $83, &s7
+mov $83, $83[$82]
+print $83
+add $82, $82, 1
+sub $84, $81, $82
+brnz L22, $84
 print '\n'
 jump L23
 L21:
-mov $84, 15
-mov $85, 0
+mov $86, 15
+mov $87, 0
 L24:
-mov $86, &s8
-mov $86, $86[$85]
-print $86
-add $85, $85, 1
-sub $87, $84, $85
-brnz L24, $87
+mov $88, &s8
+mov $88, $88[$87]
+print $88
+add $87, $87, 1
+sub $89, $86, $87
+brnz L24, $89
 print '\n'
 L23:
 jump L26
 L20:
-mov $89, 16
-mov $90, 0
+mov $91, 16
+mov $92, 0
 L27:
-mov $91, &s9
-mov $91, $91[$90]
-print $91
-add $90, $90, 1
-sub $92, $89, $90
-brnz L27, $92
+mov $93, &s9
+mov $93, $93[$92]
+print $93
+add $92, $92, 1
+sub $94, $91, $92
+brnz L27, $94
 print '\n'
 L26:
 nop

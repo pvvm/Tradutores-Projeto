@@ -10,11 +10,11 @@
 
 void inicioDefault(int, FILE *, char *);
 
-void geraOperacoes(char *, char *, char *, int *, FILE *, struct No*, int, char *, int, int *, int *);
+void geraOperacoes(char *, char *, char *, int *, FILE *, struct No*, int, char *, int, int *, int *, int *);
 
 void geraCasting(char *, char *, int *, FILE*, struct No*, int, char *);
 
-void mandaLabel(int *, int, char *, FILE *, struct pilhaLabel**);
+void mandaLabel(int *, int, char *, FILE *, struct pilhaLabel**, int *);
 
 void escreveTable(FILE *, struct tabelaSimb *, int);
 

@@ -19,8 +19,8 @@ void inicioDefault(int ger_codigo_var, FILE* escrita, char *tipo) {
     fputs(aux_str, escrita);
 }
 
-void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_codigo_var, FILE* escrita, struct No* no, int incremento, char *inst_incremento, int op_especial, int *label_cont, int *string_cont) {
-    char aux_str[300];
+void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_codigo_var, FILE* escrita, struct No* no, int incremento, char *inst_incremento, int op_especial, int *label_cont, int *string_cont, int *flag_brz) {
+    char aux_str[500];
     char aux_num[10];
     char temp[11];
     sprintf(aux_num, "%d", *ger_codigo_var);
@@ -30,6 +30,7 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
     int opcao_var = 0;
     int so_um_operando = 0;
     int op_lista = 0;
+    int var_global = 0;
 
     // Operacoes unarias
     if(operando2 == NULL) {
@@ -55,9 +56,15 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
                 strcat(aux_str, temp);
                 op_lista = 2;
             } else if(!strcmp(operador, "=")) {
-                opcao_var = 1;
                 strcpy(aux_str, "mov ");
-                strcat(aux_str, no->no1->simbolo->var_temp);
+                if(no->no1->simbolo->escopo != 0) {
+                    strcat(aux_str, no->no1->simbolo->var_temp);
+                    opcao_var = 1;
+                } else {
+                    strcat(aux_str, temp);
+                    var_global = 1;
+                }
+
                 //printf("%s\n\n", operando1);
                 //(*ger_codigo_var)--;      Comentei pra evitar que mov nao aumentasse esse numero
             } else if(!strcmp(operador, "write")) {
@@ -82,7 +89,17 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             if(so_um_operando == 0)
                 strcat(aux_str, ", ");
             
-            strcat(aux_str, operando1);
+            if(var_global == 0)
+                strcat(aux_str, operando1);
+            else if(var_global == 1) {
+                strcat(aux_str, "&");
+                strcat(aux_str, no->no1->simbolo->simbolo);
+                strcat(aux_str, "\nmov ");
+                strcat(aux_str, temp);
+                strcat(aux_str, ", ");
+                strcat(aux_str, operando1);
+                strcpy(no->no1->simbolo->var_temp, temp);
+            }
         
             if(op_lista == 1)
                 strcat(aux_str, "[0]");
@@ -200,25 +217,64 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             strcpy(aux_str, "sleq ");
             invertido = 1;
         } else if(!strcmp(operador, "==")) {
-            strcpy(aux_str, "seq ");
+            if((!strcmp(no->no1->simbolo->tipo, "int list") && !strcmp(no->no2->nome, "NIL")) || (!strcmp(no->no1->simbolo->tipo, "float list") && !strcmp(no->no2->nome, "NIL"))) {
+                strcpy(aux_str, "brnz L");
+                char label[10];
+                sprintf(label, "%d", *label_cont);
+                strcat(aux_str, label);
+                strcat(aux_str, ", ");
+                strcat(aux_str, operando1);
+                invertido = -1;
+                *flag_brz = 1;
+            } else if((!strcmp(no->no1->nome, "NIL") && !strcmp(no->no2->simbolo->tipo, "int list")) || (!strcmp(no->no1->nome, "NIL") && !strcmp(no->no2->simbolo->tipo, "float list"))) {
+                strcpy(aux_str, "brnz L");
+                char label[10];
+                sprintf(label, "%d", *label_cont);
+                strcat(aux_str, label);
+                strcat(aux_str, ", ");
+                strcat(aux_str, operando2);
+                invertido = -1;
+                *flag_brz = 1;
+            } else
+                strcpy(aux_str, "seq ");
         } else if(!strcmp(operador, "!=")) {
-            char copia_temp[11];
-            strcpy(copia_temp, temp);
-            strcpy(aux_str, "seq ");
-            strcat(aux_str, temp);
-            strcat(aux_str, ", ");
-            strcat(aux_str, operando1);
-            strcat(aux_str, ", ");
-            strcat(aux_str, operando2);
-            (*ger_codigo_var)++;
-            sprintf(aux_num, "%d", *ger_codigo_var);
-            strcpy(temp, "$");
-            strcat(temp, aux_num);
-            strcat(aux_str, "\nnot ");
-            strcat(aux_str, temp);
-            strcat(aux_str, ", ");
-            strcat(aux_str, copia_temp);
-            invertido = -1;
+            if((!strcmp(no->no1->simbolo->tipo, "int list") && !strcmp(no->no2->nome, "NIL")) || (!strcmp(no->no1->simbolo->tipo, "float list") && !strcmp(no->no2->nome, "NIL"))) {
+                strcpy(aux_str, "brz L");
+                char label[10];
+                sprintf(label, "%d", *label_cont);
+                strcat(aux_str, label);
+                strcat(aux_str, ", ");
+                strcat(aux_str, operando1);
+                invertido = -1;
+                *flag_brz = 1;
+            } else if((!strcmp(no->no1->nome, "NIL") && !strcmp(no->no2->simbolo->tipo, "int list")) || (!strcmp(no->no1->nome, "NIL") && !strcmp(no->no2->simbolo->tipo, "float list"))) {
+                strcpy(aux_str, "brz L");
+                char label[10];
+                sprintf(label, "%d", *label_cont);
+                strcat(aux_str, label);
+                strcat(aux_str, ", ");
+                strcat(aux_str, operando2);
+                invertido = -1;
+                *flag_brz = 1;
+            } else {
+                char copia_temp[11];
+                strcpy(copia_temp, temp);
+                strcpy(aux_str, "seq ");
+                strcat(aux_str, temp);
+                strcat(aux_str, ", ");
+                strcat(aux_str, operando1);
+                strcat(aux_str, ", ");
+                strcat(aux_str, operando2);
+                (*ger_codigo_var)++;
+                sprintf(aux_num, "%d", *ger_codigo_var);
+                strcpy(temp, "$");
+                strcat(temp, aux_num);
+                strcat(aux_str, "\nnot ");
+                strcat(aux_str, temp);
+                strcat(aux_str, ", ");
+                strcat(aux_str, copia_temp);
+                invertido = -1;
+            }
         } else if(!strcmp(operador, "&&")) {
             strcpy(aux_str, "and ");
         } else if(!strcmp(operador, "||")) {
@@ -564,14 +620,14 @@ void geraCasting(char *operando1, char *operando2, int *ger_codigo_var, FILE* es
     }
 }
 
-void mandaLabel(int *label_cont, int opcao, char *operador, FILE *escrita, struct pilhaLabel **topo) {
+void mandaLabel(int *label_cont, int opcao, char *operador, FILE *escrita, struct pilhaLabel **topo, int *flag_brz) {
     char aux_str[200];
     char aux_num[10];
     char label[11];
     sprintf(aux_num, "%d", *label_cont);
     strcpy(label, "L");
     strcat(label, aux_num);
-    if(opcao == 0) {
+    if(opcao == 0 && *flag_brz == 0) {
         strcpy(aux_str, "brz ");
         strcat(aux_str, label);
         strcat(aux_str, ", ");
@@ -581,8 +637,10 @@ void mandaLabel(int *label_cont, int opcao, char *operador, FILE *escrita, struc
         strcpy(aux_str, label);
         strcat(aux_str, ":\n");
     }
-    fputs(aux_str, escrita);
+    if(*flag_brz == 0)
+        fputs(aux_str, escrita);
     (*label_cont)++;
+    *flag_brz = 0;
 
     pushLabel(topo, label);
 }
@@ -608,7 +666,7 @@ void escreveTable(FILE *arquivo, struct tabelaSimb *prim, int contador_string) {
             else
                 strcpy(aux, "int");
             strcat(aux, " ");
-            strcat(aux, prim->var_temp);
+            strcat(aux, prim->simbolo);
             strcat(aux, " = ");
             if(!strcmp(prim->tipo, "int") || !strcmp(prim->tipo, "int list") || !strcmp(prim->tipo, "float list")) {
                 strcat(aux, "0\n");

@@ -7,14 +7,16 @@ char s2[] = "Lista 3:"
 .code
 
 coisa:
-add $0, #0, 1
-inttofl $1, $0
-return $1
+mov $0, #0
+add $1, $0, 1
+inttofl $2, $1
+return $2
 return 0.0
 
 teste:
-slt $0, 5, #0
-return $0
+mov $0, #0
+slt $1, 5, $0
+return $1
 return 0
 
 main:
@@ -103,93 +105,97 @@ pop $69
 mov $67[0], $69
 mema $70, 2
 mov $67[1], $70
+mov $71, $67
 mov $67, $67[1]
 mov $66, $66[1]
 brnz L0, $66
-mov $67, 0
+mov $71[1], 0
+memf $67
 mov $64, $65
-mov $72, 8
-mov $73, 0
+mov $73, 8
+mov $74, 0
 L1:
-mov $74, &s0
-mov $74, $74[$73]
-print $74
-add $73, $73, 1
-sub $75, $72, $73
-brnz L1, $75
+mov $75, &s0
+mov $75, $75[$74]
+print $75
+add $74, $74, 1
+sub $76, $73, $74
+brnz L1, $76
 print '\n'
-mov $77, $45[0]
-println $77
-mov $79, $45[1]
-mov $80, $79[0]
-println $80
-mov $82, 8
-mov $83, 0
+mov $78, $45[0]
+println $78
+mov $80, $45[1]
+mov $81, $80[0]
+println $81
+mov $83, 8
+mov $84, 0
 L2:
-mov $84, &s1
-mov $84, $84[$83]
-print $84
-add $83, $83, 1
-sub $85, $82, $83
-brnz L2, $85
+mov $85, &s1
+mov $85, $85[$84]
+print $85
+add $84, $84, 1
+sub $86, $83, $84
+brnz L2, $86
 print '\n'
-mov $87, 0
-mov $89, $64
-mema $90, 2
-mov $88, $90
+mov $88, 0
+mov $90, $64
+mema $91, 2
+mov $89, $91
 L3:
-mov $91, $89[0]
-fltoint $91, $91
-param $91
+mov $92, $90[0]
+fltoint $92, $92
+param $92
 call teste, 1
-pop $92
-brz L4, $92
-mov $90[0], $91
-mema $93, 2
-mov $90[1], $93
-mov $90, $90[1]
+pop $93
+brz L4, $93
+mov $91[0], $92
+mema $94, 2
+mov $91[1], $94
+mov $95, $91
+mov $91, $91[1]
 L4:
-mov $89, $89[1]
-brnz L3, $89
-mov $90, 0
-mov $87, $88
-mov $95, 8
-mov $96, 0
+mov $90, $90[1]
+brnz L3, $90
+mov $95[1], 0
+memf $91
+mov $88, $89
+mov $97, 8
+mov $98, 0
 L5:
-mov $97, &s2
-mov $97, $97[$96]
-print $97
-add $96, $96, 1
-sub $98, $95, $96
-brnz L5, $98
+mov $99, &s2
+mov $99, $99[$98]
+print $99
+add $98, $98, 1
+sub $100, $97, $98
+brnz L5, $100
 print '\n'
-mov $100, $87[0]
-println $100
-mov $102, $87[1]
-mov $103, $102[0]
-println $103
-mov $105, $87[1]
-mov $106, $87
-mov $87, $87[1]
-memf $106
-mov $107, $87[0]
-println $107
-mov $109, $87[1]
-mov $110, $109[0]
-println $110
-mov $112, $87[1]
-mov $113, $87
-mov $87, $87[1]
-memf $113
-mov $114, $87[0]
-println $114
-mov $116, $87[0]
+mov $102, $88[0]
+println $102
+mov $104, $88[1]
+mov $105, $104[0]
+println $105
+mov $107, $88[1]
+mov $108, $88
+mov $88, $88[1]
+memf $108
+mov $109, $88[0]
+println $109
+mov $111, $88[1]
+mov $112, $111[0]
+println $112
+mov $114, $88[1]
+mov $115, $88
+mov $88, $88[1]
+memf $115
+mov $116, $88[0]
 println $116
-add $118, $0, 20
-minus $119, 1.3
-inttofl $120, 5
-mul $121, $119, $120
-inttofl $122, $118
-sub $123, $122, $121
-println $123
+mov $118, $88[0]
+println $118
+add $120, $0, 20
+minus $121, 1.3
+inttofl $122, 5
+mul $123, $121, $122
+inttofl $124, $120
+sub $125, $124, $123
+println $125
 nop
