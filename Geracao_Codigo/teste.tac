@@ -11,43 +11,47 @@ char s5[] = "Nesse caso, vamos fazer um calculo...\n"
 .code
 
 funcao:
-mov $0, 0
-fltoint $1, 9.34
-mov $0, $1
-add $3, #0, #1
-div $4, $3, 2
-inttofl $5, $4
-mul $6, $5, 50.3
-inttofl $7, $0
-add $8, $6, $7
-sub $9, #1, $0
-add $10, $9, #0
-minus $11, $0
-sub $12, $10, $11
-add $13, $12, #1
-inttofl $14, $13
-slt $15, $8, $14
-println $15
-mul $17, 81, $0
-sub $18, 90, $17
-println $18
-add $20, #0, #1
-div $21, $20, 2
-inttofl $22, $21
-mul $23, $22, 50.3
-inttofl $24, $0
-add $25, $23, $24
-sub $26, #1, $0
-add $27, $26, #0
-minus $28, $0
-sub $29, $27, $28
-add $30, $29, #1
-inttofl $31, $30
-slt $32, $25, $31
-mul $33, 81, $0
-sub $34, 90, $33
-and $35, $32, $34
-return $35
+mov $0, #0
+mov $1, #1
+mov $2, 0
+fltoint $3, 9.34
+mov $2, $3
+add $5, $0, $1
+div $6, $5, 2
+inttofl $7, $6
+mul $8, $7, 50.3
+inttofl $9, $2
+add $10, $8, $9
+sub $11, $1, $2
+add $12, $11, $0
+minus $13, $2
+sub $14, $12, $13
+add $15, $14, $1
+inttofl $16, $15
+slt $17, $10, $16
+println $17
+mul $19, 81, $2
+sub $20, 90, $19
+println $20
+add $22, $0, $1
+div $23, $22, 2
+inttofl $24, $23
+mul $25, $24, 50.3
+inttofl $26, $2
+add $27, $25, $26
+sub $28, $1, $2
+add $29, $28, $0
+minus $30, $2
+sub $31, $29, $30
+add $32, $31, $1
+inttofl $33, $32
+slt $34, $27, $33
+mul $35, 81, $2
+sub $36, 90, $35
+inttofl $37, $36
+and $38, $34, $37
+fltoint $39, $38
+return $39
 return 0
 
 main:
@@ -98,36 +102,36 @@ jump L5
 L3:
 mov $27, 42
 mov $28, 0
-L5:
+L6:
 mov $29, &s3
 mov $29, $29[$28]
 print $29
 add $28, $28, 1
 sub $30, $27, $28
-brnz L5, $30
+brnz L6, $30
 print '\n'
-L6:
+L5:
 seq $32, $1, 2
-brz L7, $32
+brz L8, $32
 mov $33, 37
 mov $34, 0
-L8:
+L9:
 mov $35, &s4
 mov $35, $35[$34]
 print $35
 add $34, $34, 1
 sub $36, $33, $34
-brnz L8, $36
+brnz L9, $36
 print '\n'
 mov $38, 39
 mov $39, 0
-L9:
+L10:
 mov $40, &s5
 mov $40, $40[$39]
 print $40
 add $39, $39, 1
 sub $41, $38, $39
-brnz L9, $41
+brnz L10, $41
 print '\n'
 scani a
 mov $44, 0
@@ -137,5 +141,6 @@ param $44
 call funcao, 2
 pop $48
 println $48
-L7:
+L8:
 println a
+nop

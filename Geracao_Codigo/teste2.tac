@@ -1,7 +1,23 @@
 .table
 
+char s0[] = "Lista 1:"
+char s1[] = "Lista 2:"
+char s2[] = "Lista 3:"
 
 .code
+
+coisa:
+mov $0, #0
+add $1, $0, 1
+inttofl $2, $1
+return $2
+return 0.0
+
+teste:
+mov $0, #0
+slt $1, 5, $0
+return $1
+return 0
 
 main:
 mov $0, 0
@@ -50,43 +66,136 @@ inttofl $42, $2
 or $43, $41, $42
 mov $1, $43
 mov $45, 0
-fltoint $46, 1.3
+inttofl $46, 55
 mema $47, 2
 mov $47[0], $46
 mov $47[1], $45
 mov $45, $47
-mov $49, $45[0]
-println $49
-mema $51, 2
-mov $51[0], 2
-mov $51[1], $45
-mov $45, $51
-mov $53, $45[0]
-println $53
+inttofl $49, 20
+mema $50, 2
+mov $50[0], $49
+mov $50[1], $45
+mov $45, $50
+mov $52, $45[0]
+println $52
+inttofl $54, 1
 mema $55, 2
-mov $55[0], 3
+mov $55[0], $54
 mov $55[1], $45
 mov $45, $55
 mov $57, $45[0]
 println $57
-mov $59, $45[1]
-mov $60, $59[0]
-println $60
-mov $62, $45[1]
-mov $63, $45
-mov $45, $45[1]
-memf $63
-mov $64, $45[0]
-println $64
-mov $66, $45[1]
-mov $67, $66[0]
-println $67
-mov $69, $45[1]
-mov $70, $45
-mov $45, $45[1]
-memf $70
-mov $71, $45[0]
-println $71
-mov $73, $45[0]
-println $73
+inttofl $59, 6
+mema $60, 2
+mov $60[0], $59
+mov $60[1], $45
+mov $45, $60
+mov $62, $45[0]
+println $62
+mov $64, 0
+mov $66, $45
+mema $67, 2
+mov $65, $67
+L0:
+mov $68, $66[0]
+fltoint $68, $68
+param $68
+call coisa, 1
+pop $69
+mov $67[0], $69
+mema $70, 2
+mov $67[1], $70
+mov $71, $67
+mov $67, $67[1]
+mov $66, $66[1]
+brnz L0, $66
+mov $71[1], 0
+memf $67
+mov $64, $65
+mov $73, 8
+mov $74, 0
+L1:
+mov $75, &s0
+mov $75, $75[$74]
+print $75
+add $74, $74, 1
+sub $76, $73, $74
+brnz L1, $76
+print '\n'
+mov $78, $45[0]
+println $78
+mov $80, $45[1]
+mov $81, $80[0]
+println $81
+mov $83, 8
+mov $84, 0
+L2:
+mov $85, &s1
+mov $85, $85[$84]
+print $85
+add $84, $84, 1
+sub $86, $83, $84
+brnz L2, $86
+print '\n'
+mov $88, 0
+mov $90, $64
+mema $91, 2
+mov $89, $91
+L3:
+mov $92, $90[0]
+fltoint $92, $92
+param $92
+call teste, 1
+pop $93
+brz L4, $93
+mov $91[0], $92
+mema $94, 2
+mov $91[1], $94
+mov $95, $91
+mov $91, $91[1]
+L4:
+mov $90, $90[1]
+brnz L3, $90
+mov $95[1], 0
+memf $91
+mov $88, $89
+mov $97, 8
+mov $98, 0
+L5:
+mov $99, &s2
+mov $99, $99[$98]
+print $99
+add $98, $98, 1
+sub $100, $97, $98
+brnz L5, $100
+print '\n'
+mov $102, $88[0]
+println $102
+mov $104, $88[1]
+mov $105, $104[0]
+println $105
+mov $107, $88[1]
+mov $108, $88
+mov $88, $88[1]
+memf $108
+mov $109, $88[0]
+println $109
+mov $111, $88[1]
+mov $112, $111[0]
+println $112
+mov $114, $88[1]
+mov $115, $88
+mov $88, $88[1]
+memf $115
+mov $116, $88[0]
+println $116
+mov $118, $88[0]
+println $118
+add $120, $0, 20
+minus $121, 1.3
+inttofl $122, 5
+mul $123, $121, $122
+inttofl $124, $120
+sub $125, $124, $123
+println $125
 nop
