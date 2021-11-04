@@ -102,89 +102,94 @@ mov $18, &FL
 mov $18, $11
 mov $20, $18
 mema $21, 2
-mov $19, $21
+mov $19, 0
+mov $22, 0
 L5:
-mov $22, $20[0]
-param $22
+mov $23, $20[0]
+param $23
 call leq_10, 1
-pop $23
-brz L6, $23
-mov $21[0], $22
-mema $24, 2
-mov $21[1], $24
-mov $25, $21
+pop $24
+brz L6, $24
+brnz L7, $22
+mov $19, $21
+mov $22, 1
+L7:
+mov $21[0], $23
+mema $25, 2
+mov $21[1], $25
+mov $26, $21
 mov $21, $21[1]
 L6:
 mov $20, $20[1]
 brnz L5, $20
-mov $25[1], 0
+mov $26[1], 0
 memf $21
 mov $6, $19
-brz L7, $6
-mov $28, 0
+brz L8, $6
 mov $29, 0
-mov $29, 0
-mov $28, $6
-L8:
-brz L9, $28
-add $35, $29, 1
-mov $29, $35
-mov $37, $28[0]
-print $37
-mov $39, 1
-mov $40, 0
-L10:
-mov $41, &s2
-mov $41, $41[$40]
-print $41
-add $40, $40, 1
-sub $42, $39, $40
-brnz L10, $42
-mov $33, $28[1]
-mov $28, $33
-jump L8
+mov $30, 0
+mov $30, 0
+mov $29, $6
 L9:
-mov $44, 1
-mov $45, 0
+brz L10, $29
+add $36, $30, 1
+mov $30, $36
+mov $38, $29[0]
+print $38
+mov $40, 1
+mov $41, 0
 L11:
-mov $46, &s3
-mov $46, $46[$45]
-print $46
-add $45, $45, 1
-sub $47, $44, $45
-brnz L11, $47
-print '\n'
-mov $49, 17
-mov $50, 0
+mov $42, &s2
+mov $42, $42[$41]
+print $42
+add $41, $41, 1
+sub $43, $40, $41
+brnz L11, $43
+mov $34, $29[1]
+mov $29, $34
+jump L9
+L10:
+mov $45, 1
+mov $46, 0
 L12:
-mov $51, &s4
-mov $51, $51[$50]
-print $51
-add $50, $50, 1
-sub $52, $49, $50
-brnz L12, $52
-print $29
-mov $55, 11
-mov $56, 0
+mov $47, &s3
+mov $47, $47[$46]
+print $47
+add $46, $46, 1
+sub $48, $45, $46
+brnz L12, $48
+print '\n'
+mov $50, 17
+mov $51, 0
 L13:
-mov $57, &s5
-mov $57, $57[$56]
-print $57
-add $56, $56, 1
-sub $58, $55, $56
-brnz L13, $58
-print '\n'
-jump L14
-L7:
-mov $60, 35
-mov $61, 0
-L15:
-mov $62, &s6
-mov $62, $62[$61]
-print $62
-add $61, $61, 1
-sub $63, $60, $61
-brnz L15, $63
-print '\n'
+mov $52, &s4
+mov $52, $52[$51]
+print $52
+add $51, $51, 1
+sub $53, $50, $51
+brnz L13, $53
+print $30
+mov $56, 11
+mov $57, 0
 L14:
+mov $58, &s5
+mov $58, $58[$57]
+print $58
+add $57, $57, 1
+sub $59, $56, $57
+brnz L14, $59
+print '\n'
+jump L15
+L8:
+mov $61, 35
+mov $62, 0
+L16:
+mov $63, &s6
+mov $63, $63[$62]
+print $63
+add $62, $62, 1
+sub $64, $61, $62
+brnz L16, $64
+print '\n'
+L15:
 nop

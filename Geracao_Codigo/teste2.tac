@@ -140,62 +140,67 @@ print '\n'
 mov $88, 0
 mov $90, $64
 mema $91, 2
-mov $89, $91
+mov $89, 0
+mov $92, 0
 L3:
-mov $92, $90[0]
-fltoint $92, $92
-param $92
+mov $93, $90[0]
+fltoint $93, $93
+param $93
 call teste, 1
-pop $93
-brz L4, $93
-mov $91[0], $92
-mema $94, 2
-mov $91[1], $94
-mov $95, $91
+pop $94
+brz L4, $94
+brnz L5, $92
+mov $89, $91
+mov $92, 1
+L5:
+mov $91[0], $93
+mema $95, 2
+mov $91[1], $95
+mov $96, $91
 mov $91, $91[1]
 L4:
 mov $90, $90[1]
 brnz L3, $90
-mov $95[1], 0
+mov $96[1], 0
 memf $91
 mov $88, $89
-mov $97, 8
-mov $98, 0
-L5:
-mov $99, &s2
-mov $99, $99[$98]
-print $99
-add $98, $98, 1
-sub $100, $97, $98
-brnz L5, $100
+mov $98, 8
+mov $99, 0
+L6:
+mov $100, &s2
+mov $100, $100[$99]
+print $100
+add $99, $99, 1
+sub $101, $98, $99
+brnz L6, $101
 print '\n'
-mov $102, $88[0]
-println $102
-mov $104, $88[1]
-mov $105, $104[0]
-println $105
-mov $107, $88[1]
-mov $108, $88
+mov $103, $88[0]
+println $103
+mov $105, $88[1]
+mov $106, $105[0]
+println $106
+mov $108, $88[1]
+mov $109, $88
 mov $88, $88[1]
-memf $108
-mov $109, $88[0]
-println $109
-mov $111, $88[1]
-mov $112, $111[0]
-println $112
-mov $114, $88[1]
-mov $115, $88
+memf $109
+mov $110, $88[0]
+println $110
+mov $112, $88[1]
+mov $113, $112[0]
+println $113
+mov $115, $88[1]
+mov $116, $88
 mov $88, $88[1]
-memf $115
-mov $116, $88[0]
-println $116
-mov $118, $88[0]
-println $118
-add $120, $0, 20
-minus $121, 1.3
-inttofl $122, 5
-mul $123, $121, $122
-inttofl $124, $120
-sub $125, $124, $123
-println $125
+memf $116
+mov $117, $88[0]
+println $117
+mov $119, $88[0]
+println $119
+add $121, $0, 20
+minus $122, 1.3
+inttofl $123, 5
+mul $124, $122, $123
+inttofl $125, $121
+sub $126, $125, $124
+println $126
 nop

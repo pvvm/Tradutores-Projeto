@@ -411,12 +411,14 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
         } else if(!strcmp(operador, "<<")) {
             char label[10];
             char label2[10];
+            char label3[10];
             char aux_num0[10];                      // Enderecos da lista operada
             char aux_num1[10];                      // Espacos alocados
             char aux_num2[10];                      // Elementos da lista operada
             char aux_num3[10];
             char aux_num4[10];
             char aux_num5[10];
+            char aux_num6[10];
 
             (*ger_codigo_var)++;
             sprintf(aux_num0, "%d", *ger_codigo_var);
@@ -432,10 +434,14 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             strcat(aux_str, ", 2\n");
 
             strcat(aux_str, "mov ");
-            strcat(aux_str, temp);                  // Inicializa temp
-            strcat(aux_str, ", $");                 // Temp contem o endereco da lista resultante
-            strcat(aux_str, aux_num1);
-            strcat(aux_str, "\nL");
+            strcat(aux_str, temp);                  
+            strcat(aux_str, ", 0");
+
+            (*ger_codigo_var)++;
+            sprintf(aux_num6, "%d", *ger_codigo_var);
+            strcat(aux_str, "\nmov $");
+            strcat(aux_str, aux_num6);                  
+            strcat(aux_str, ", 0\nL");
 
             sprintf(label, "%d", *label_cont);
             strcat(aux_str, label);                 // Escreve label
@@ -485,7 +491,26 @@ void geraOperacoes(char *operador, char *operando1, char *operando2, int *ger_co
             strcat(aux_str, aux_num3);
             //
 
+            sprintf(label3, "%d", *label_cont);
+            (*label_cont)++;
+
+            strcat(aux_str, "\nbrnz L");
+            strcat(aux_str, label3);
+            strcat(aux_str, ", $");
+            strcat(aux_str, aux_num6);
+
+            strcat(aux_str, "\nmov ");
+            strcat(aux_str, temp);
+            strcat(aux_str, ", $");
+            strcat(aux_str, aux_num1);
+
             strcat(aux_str, "\nmov $");
+            strcat(aux_str, aux_num6);
+            strcat(aux_str, ", 1\nL");
+            strcat(aux_str, label3);
+
+
+            strcat(aux_str, ":\nmov $");
             strcat(aux_str, aux_num1);
             strcat(aux_str, "[0], $");
             strcat(aux_str, aux_num2);

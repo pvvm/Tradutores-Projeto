@@ -198,81 +198,86 @@ print '\n'
 mov $60, 0
 mov $62, $44
 mema $63, 2
-mov $61, $63
+mov $61, 0
+mov $64, 0
 L15:
-mov $64, $62[0]
-param $64
+mov $65, $62[0]
+param $65
 call negativo, 1
-pop $65
-brz L16, $65
-mov $63[0], $64
-mema $66, 2
-mov $63[1], $66
-mov $67, $63
+pop $66
+brz L16, $66
+brnz L17, $64
+mov $61, $63
+mov $64, 1
+L17:
+mov $63[0], $65
+mema $67, 2
+mov $63[1], $67
+mov $68, $63
 mov $63, $63[1]
 L16:
 mov $62, $62[1]
 brnz L15, $62
-mov $67[1], 0
+mov $68[1], 0
 memf $63
 mov $60, $61
 param $60
 call _write_list, 1
-pop $70
-jump L17
+pop $71
+jump L18
 L7:
-mov $71, 34
-mov $72, 0
+mov $72, 34
+mov $73, 0
+L19:
+mov $74, &s6
+mov $74, $74[$73]
+print $74
+add $73, $73, 1
+sub $75, $72, $73
+brnz L19, $75
+print '\n'
 L18:
-mov $73, &s6
-mov $73, $73[$72]
-print $73
-add $72, $72, 1
-sub $74, $71, $72
-brnz L18, $74
-print '\n'
-L17:
-mov $76, 0
-mov $76, 0
-scani $76
-slt $79, 0, $76
-brz L20, $79
-slt $80, 10, $76
+mov $77, 0
+mov $77, 0
+scani $77
+slt $80, 0, $77
 brz L21, $80
-mov $81, 16
-mov $82, 0
-L22:
-mov $83, &s7
-mov $83, $83[$82]
-print $83
-add $82, $82, 1
-sub $84, $81, $82
-brnz L22, $84
-print '\n'
-jump L23
-L21:
-mov $86, 15
-mov $87, 0
-L24:
-mov $88, &s8
-mov $88, $88[$87]
-print $88
-add $87, $87, 1
-sub $89, $86, $87
-brnz L24, $89
-print '\n'
+slt $81, 10, $77
+brz L22, $81
+mov $82, 16
+mov $83, 0
 L23:
-jump L26
-L20:
-mov $91, 16
-mov $92, 0
-L27:
-mov $93, &s9
-mov $93, $93[$92]
-print $93
-add $92, $92, 1
-sub $94, $91, $92
-brnz L27, $94
+mov $84, &s7
+mov $84, $84[$83]
+print $84
+add $83, $83, 1
+sub $85, $82, $83
+brnz L23, $85
 print '\n'
-L26:
+jump L24
+L22:
+mov $87, 15
+mov $88, 0
+L25:
+mov $89, &s8
+mov $89, $89[$88]
+print $89
+add $88, $88, 1
+sub $90, $87, $88
+brnz L25, $90
+print '\n'
+L24:
+jump L27
+L21:
+mov $92, 16
+mov $93, 0
+L28:
+mov $94, &s9
+mov $94, $94[$93]
+print $94
+add $93, $93, 1
+sub $95, $92, $93
+brnz L28, $95
+print '\n'
+L27:
 nop
