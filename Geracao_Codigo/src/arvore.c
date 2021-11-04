@@ -116,6 +116,11 @@ struct No* montaNo(char *nome, struct No *no_1, struct No *no_2, struct No *no_3
     return no;
 }
 
+/*
+    Funcao que cria o no de casting
+    Argumentos: o lexema, o no esquerdo, o no direito, escopo, linha, coluna e ponteiro para o numero de erros semanticos
+    Retorna: ponteiro para o novo no
+*/
 struct No* castNo(char* lexema, struct No* esqNo, struct No* dirNo, int escopo, int linha, int coluna, int* num_erros_semanticos) {
     // Checa se eh == ou !=, visto que eh possivel fazer operacao entre listas e NIL
     if(!strcmp(lexema, "==") || !strcmp(lexema, "!=")) {

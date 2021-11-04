@@ -11,10 +11,16 @@ char s5[] = "Digite a sua altura em metros: "
 
 calcula_imc:
 mov $0, #0
-mov $1, #1
-mul $2, $1, $1
-div $3, $0, $2
-return $3
+mov $1, 0.0
+mov $2, 0.0
+mov $3, $0[0]
+mov $2, $3
+mov $5, $0[1]
+mov $6, $5[0]
+mov $1, $6
+mul $8, $2, $2
+div $9, $1, $8
+return $9
 return 0.0
 
 classifica_imc:
@@ -83,37 +89,45 @@ L6:
 return 0
 
 main:
-mov $0, 0.0
+mov $0, 0
 mov $1, 0.0
-mov $2, 29
-mov $3, 0
+mov $2, 0.0
+mov $3, 29
+mov $4, 0
 L8:
-mov $4, &s4
-mov $4, $4[$3]
-print $4
-add $3, $3, 1
-sub $5, $2, $3
-brnz L8, $5
-print '\n'
-scanf $0
-mov $8, 31
-mov $9, 0
-L9:
-mov $10, &s5
-mov $10, $10[$9]
-print $10
-add $9, $9, 1
-sub $11, $8, $9
-brnz L9, $11
+mov $5, &s4
+mov $5, $5[$4]
+print $5
+add $4, $4, 1
+sub $6, $3, $4
+brnz L8, $6
 print '\n'
 scanf $1
-mov $14, 0.0
+mema $9, 2
+mov $9[0], $1
+mov $9[1], $0
+mov $0, $9
+mov $11, 31
+mov $12, 0
+L9:
+mov $13, &s5
+mov $13, $13[$12]
+print $13
+add $12, $12, 1
+sub $14, $11, $12
+brnz L9, $14
+print '\n'
+scanf $2
+mema $17, 2
+mov $17[0], $2
+mov $17[1], $0
+mov $0, $17
+mov $19, 0.0
 param $0
-param $1
-call calcula_imc, 2
-pop $17
-mov $14, $17
-param $14
+call calcula_imc, 1
+pop $21
+mov $19, $21
+param $19
 call classifica_imc, 1
-pop $20
+pop $24
 nop

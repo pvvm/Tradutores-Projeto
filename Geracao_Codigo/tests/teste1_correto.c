@@ -1,5 +1,9 @@
-float calcula_imc(float peso, float altura) {
-    return(peso / (altura * altura));
+float calcula_imc(float list valores) {
+    float peso2;
+    float altura2;
+    altura2 = ?valores;
+    peso2 = ?!valores;
+    return(peso2 / (altura2 * altura2));
 
 }
 
@@ -23,17 +27,20 @@ int classifica_imc(float imc) {
 }
 
 int main() {
+    float list valores;
     float peso;
     float altura;
 
     writeln("Digite o seu peso em quilos: ");
     read(peso);
+    valores = peso : valores;
 
     writeln("Digite a sua altura em metros: ");
     read(altura);
+    valores = altura : valores;
 
     float imc;
-    imc = calcula_imc(peso, altura);
+    imc = calcula_imc(valores);
     classifica_imc(imc);
 
 }

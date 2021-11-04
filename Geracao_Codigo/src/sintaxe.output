@@ -109,8 +109,8 @@ Gramática
    66 expRel: expRel REL_OP_ALTA expList
    67       | expList
 
-   68 expList: expList LIST_OP_BIN expArit
-   69        | expList LIST_OP_CONSTRUTOR expArit
+   68 expList: expArit LIST_OP_BIN expList
+   69        | expArit LIST_OP_CONSTRUTOR expList
    70        | expArit
 
    71 expArit: expArit ARIT_OP_MAIS expMul
@@ -1193,11 +1193,6 @@ Estado 61
 Estado 62
 
    67 expRel: expList •
-   68 expList: expList • LIST_OP_BIN expArit
-   69        | expList • LIST_OP_CONSTRUTOR expArit
-
-    LIST_OP_BIN         deslocar, e ir ao estado 96
-    LIST_OP_CONSTRUTOR  deslocar, e ir ao estado 97
 
     PV            reduzir usando a regra 67 (expRel)
     LOG_OP_OU     reduzir usando a regra 67 (expRel)
@@ -1208,20 +1203,22 @@ Estado 62
 
 Estado 63
 
-   70 expList: expArit •
+   68 expList: expArit • LIST_OP_BIN expList
+   69        | expArit • LIST_OP_CONSTRUTOR expList
+   70        | expArit •
    71 expArit: expArit • ARIT_OP_MAIS expMul
    72        | expArit • ARIT_OP_MENOS expMul
 
-    ARIT_OP_MAIS   deslocar, e ir ao estado 98
-    ARIT_OP_MENOS  deslocar, e ir ao estado 99
+    LIST_OP_BIN         deslocar, e ir ao estado 96
+    LIST_OP_CONSTRUTOR  deslocar, e ir ao estado 97
+    ARIT_OP_MAIS        deslocar, e ir ao estado 98
+    ARIT_OP_MENOS       deslocar, e ir ao estado 99
 
-    PV                  reduzir usando a regra 70 (expList)
-    LOG_OP_OU           reduzir usando a regra 70 (expList)
-    LOG_OP_E            reduzir usando a regra 70 (expList)
-    REL_OP_BAIXA        reduzir usando a regra 70 (expList)
-    REL_OP_ALTA         reduzir usando a regra 70 (expList)
-    LIST_OP_BIN         reduzir usando a regra 70 (expList)
-    LIST_OP_CONSTRUTOR  reduzir usando a regra 70 (expList)
+    PV            reduzir usando a regra 70 (expList)
+    LOG_OP_OU     reduzir usando a regra 70 (expList)
+    LOG_OP_E      reduzir usando a regra 70 (expList)
+    REL_OP_BAIXA  reduzir usando a regra 70 (expList)
+    REL_OP_ALTA   reduzir usando a regra 70 (expList)
 
 
 Estado 64
@@ -1849,7 +1846,7 @@ Estado 95
 
 Estado 96
 
-   68 expList: expList LIST_OP_BIN • expArit
+   68 expList: expArit LIST_OP_BIN • expList
 
     LIST_OP_UN      deslocar, e ir ao estado 40
     LIST_OP_HEADER  deslocar, e ir ao estado 41
@@ -1861,7 +1858,8 @@ Estado 96
     ID              deslocar, e ir ao estado 75
     ABRE_P          deslocar, e ir ao estado 48
 
-    expArit  ir ao estado 126
+    expList  ir ao estado 126
+    expArit  ir ao estado 63
     expMul   ir ao estado 64
     expUn    ir ao estado 65
     element  ir ao estado 66
@@ -1869,7 +1867,7 @@ Estado 96
 
 Estado 97
 
-   69 expList: expList LIST_OP_CONSTRUTOR • expArit
+   69 expList: expArit LIST_OP_CONSTRUTOR • expList
 
     LIST_OP_UN      deslocar, e ir ao estado 40
     LIST_OP_HEADER  deslocar, e ir ao estado 41
@@ -1881,7 +1879,8 @@ Estado 97
     ID              deslocar, e ir ao estado 75
     ABRE_P          deslocar, e ir ao estado 48
 
-    expArit  ir ao estado 127
+    expList  ir ao estado 127
+    expArit  ir ao estado 63
     expMul   ir ao estado 64
     expUn    ir ao estado 65
     element  ir ao estado 66
@@ -2267,11 +2266,6 @@ Estado 124
 Estado 125
 
    66 expRel: expRel REL_OP_ALTA expList •
-   68 expList: expList • LIST_OP_BIN expArit
-   69        | expList • LIST_OP_CONSTRUTOR expArit
-
-    LIST_OP_BIN         deslocar, e ir ao estado 96
-    LIST_OP_CONSTRUTOR  deslocar, e ir ao estado 97
 
     PV            reduzir usando a regra 66 (expRel)
     LOG_OP_OU     reduzir usando a regra 66 (expRel)
@@ -2282,38 +2276,24 @@ Estado 125
 
 Estado 126
 
-   68 expList: expList LIST_OP_BIN expArit •
-   71 expArit: expArit • ARIT_OP_MAIS expMul
-   72        | expArit • ARIT_OP_MENOS expMul
+   68 expList: expArit LIST_OP_BIN expList •
 
-    ARIT_OP_MAIS   deslocar, e ir ao estado 98
-    ARIT_OP_MENOS  deslocar, e ir ao estado 99
-
-    PV                  reduzir usando a regra 68 (expList)
-    LOG_OP_OU           reduzir usando a regra 68 (expList)
-    LOG_OP_E            reduzir usando a regra 68 (expList)
-    REL_OP_BAIXA        reduzir usando a regra 68 (expList)
-    REL_OP_ALTA         reduzir usando a regra 68 (expList)
-    LIST_OP_BIN         reduzir usando a regra 68 (expList)
-    LIST_OP_CONSTRUTOR  reduzir usando a regra 68 (expList)
+    PV            reduzir usando a regra 68 (expList)
+    LOG_OP_OU     reduzir usando a regra 68 (expList)
+    LOG_OP_E      reduzir usando a regra 68 (expList)
+    REL_OP_BAIXA  reduzir usando a regra 68 (expList)
+    REL_OP_ALTA   reduzir usando a regra 68 (expList)
 
 
 Estado 127
 
-   69 expList: expList LIST_OP_CONSTRUTOR expArit •
-   71 expArit: expArit • ARIT_OP_MAIS expMul
-   72        | expArit • ARIT_OP_MENOS expMul
+   69 expList: expArit LIST_OP_CONSTRUTOR expList •
 
-    ARIT_OP_MAIS   deslocar, e ir ao estado 98
-    ARIT_OP_MENOS  deslocar, e ir ao estado 99
-
-    PV                  reduzir usando a regra 69 (expList)
-    LOG_OP_OU           reduzir usando a regra 69 (expList)
-    LOG_OP_E            reduzir usando a regra 69 (expList)
-    REL_OP_BAIXA        reduzir usando a regra 69 (expList)
-    REL_OP_ALTA         reduzir usando a regra 69 (expList)
-    LIST_OP_BIN         reduzir usando a regra 69 (expList)
-    LIST_OP_CONSTRUTOR  reduzir usando a regra 69 (expList)
+    PV            reduzir usando a regra 69 (expList)
+    LOG_OP_OU     reduzir usando a regra 69 (expList)
+    LOG_OP_E      reduzir usando a regra 69 (expList)
+    REL_OP_BAIXA  reduzir usando a regra 69 (expList)
+    REL_OP_ALTA   reduzir usando a regra 69 (expList)
 
 
 Estado 128
@@ -3519,11 +3499,6 @@ Estado 183
 Estado 184
 
    67 expRel: expList •
-   68 expList: expList • LIST_OP_BIN expArit
-   69        | expList • LIST_OP_CONSTRUTOR expArit
-
-    LIST_OP_BIN         deslocar, e ir ao estado 224
-    LIST_OP_CONSTRUTOR  deslocar, e ir ao estado 225
 
     LOG_OP_OU     reduzir usando a regra 67 (expRel)
     LOG_OP_E      reduzir usando a regra 67 (expRel)
@@ -3534,20 +3509,22 @@ Estado 184
 
 Estado 185
 
-   70 expList: expArit •
+   68 expList: expArit • LIST_OP_BIN expList
+   69        | expArit • LIST_OP_CONSTRUTOR expList
+   70        | expArit •
    71 expArit: expArit • ARIT_OP_MAIS expMul
    72        | expArit • ARIT_OP_MENOS expMul
 
-    ARIT_OP_MAIS   deslocar, e ir ao estado 226
-    ARIT_OP_MENOS  deslocar, e ir ao estado 227
+    LIST_OP_BIN         deslocar, e ir ao estado 224
+    LIST_OP_CONSTRUTOR  deslocar, e ir ao estado 225
+    ARIT_OP_MAIS        deslocar, e ir ao estado 226
+    ARIT_OP_MENOS       deslocar, e ir ao estado 227
 
-    LOG_OP_OU           reduzir usando a regra 70 (expList)
-    LOG_OP_E            reduzir usando a regra 70 (expList)
-    REL_OP_BAIXA        reduzir usando a regra 70 (expList)
-    REL_OP_ALTA         reduzir usando a regra 70 (expList)
-    LIST_OP_BIN         reduzir usando a regra 70 (expList)
-    LIST_OP_CONSTRUTOR  reduzir usando a regra 70 (expList)
-    FECHA_P             reduzir usando a regra 70 (expList)
+    LOG_OP_OU     reduzir usando a regra 70 (expList)
+    LOG_OP_E      reduzir usando a regra 70 (expList)
+    REL_OP_BAIXA  reduzir usando a regra 70 (expList)
+    REL_OP_ALTA   reduzir usando a regra 70 (expList)
+    FECHA_P       reduzir usando a regra 70 (expList)
 
 
 Estado 186
@@ -3843,11 +3820,6 @@ Estado 202
 Estado 203
 
    67 expRel: expList •
-   68 expList: expList • LIST_OP_BIN expArit
-   69        | expList • LIST_OP_CONSTRUTOR expArit
-
-    LIST_OP_BIN         deslocar, e ir ao estado 239
-    LIST_OP_CONSTRUTOR  deslocar, e ir ao estado 240
 
     VIRG          reduzir usando a regra 67 (expRel)
     LOG_OP_OU     reduzir usando a regra 67 (expRel)
@@ -3859,21 +3831,23 @@ Estado 203
 
 Estado 204
 
-   70 expList: expArit •
+   68 expList: expArit • LIST_OP_BIN expList
+   69        | expArit • LIST_OP_CONSTRUTOR expList
+   70        | expArit •
    71 expArit: expArit • ARIT_OP_MAIS expMul
    72        | expArit • ARIT_OP_MENOS expMul
 
-    ARIT_OP_MAIS   deslocar, e ir ao estado 241
-    ARIT_OP_MENOS  deslocar, e ir ao estado 242
+    LIST_OP_BIN         deslocar, e ir ao estado 239
+    LIST_OP_CONSTRUTOR  deslocar, e ir ao estado 240
+    ARIT_OP_MAIS        deslocar, e ir ao estado 241
+    ARIT_OP_MENOS       deslocar, e ir ao estado 242
 
-    VIRG                reduzir usando a regra 70 (expList)
-    LOG_OP_OU           reduzir usando a regra 70 (expList)
-    LOG_OP_E            reduzir usando a regra 70 (expList)
-    REL_OP_BAIXA        reduzir usando a regra 70 (expList)
-    REL_OP_ALTA         reduzir usando a regra 70 (expList)
-    LIST_OP_BIN         reduzir usando a regra 70 (expList)
-    LIST_OP_CONSTRUTOR  reduzir usando a regra 70 (expList)
-    FECHA_P             reduzir usando a regra 70 (expList)
+    VIRG          reduzir usando a regra 70 (expList)
+    LOG_OP_OU     reduzir usando a regra 70 (expList)
+    LOG_OP_E      reduzir usando a regra 70 (expList)
+    REL_OP_BAIXA  reduzir usando a regra 70 (expList)
+    REL_OP_ALTA   reduzir usando a regra 70 (expList)
+    FECHA_P       reduzir usando a regra 70 (expList)
 
 
 Estado 205
@@ -4229,7 +4203,7 @@ Estado 223
 
 Estado 224
 
-   68 expList: expList LIST_OP_BIN • expArit
+   68 expList: expArit LIST_OP_BIN • expList
 
     LIST_OP_UN      deslocar, e ir ao estado 172
     LIST_OP_HEADER  deslocar, e ir ao estado 173
@@ -4241,7 +4215,8 @@ Estado 224
     ID              deslocar, e ir ao estado 179
     ABRE_P          deslocar, e ir ao estado 180
 
-    expArit  ir ao estado 263
+    expList  ir ao estado 263
+    expArit  ir ao estado 185
     expMul   ir ao estado 186
     expUn    ir ao estado 187
     element  ir ao estado 188
@@ -4249,7 +4224,7 @@ Estado 224
 
 Estado 225
 
-   69 expList: expList LIST_OP_CONSTRUTOR • expArit
+   69 expList: expArit LIST_OP_CONSTRUTOR • expList
 
     LIST_OP_UN      deslocar, e ir ao estado 172
     LIST_OP_HEADER  deslocar, e ir ao estado 173
@@ -4261,7 +4236,8 @@ Estado 225
     ID              deslocar, e ir ao estado 179
     ABRE_P          deslocar, e ir ao estado 180
 
-    expArit  ir ao estado 264
+    expList  ir ao estado 264
+    expArit  ir ao estado 185
     expMul   ir ao estado 186
     expUn    ir ao estado 187
     element  ir ao estado 188
@@ -4521,7 +4497,7 @@ Estado 238
 
 Estado 239
 
-   68 expList: expList LIST_OP_BIN • expArit
+   68 expList: expArit LIST_OP_BIN • expList
 
     LIST_OP_UN      deslocar, e ir ao estado 191
     LIST_OP_HEADER  deslocar, e ir ao estado 192
@@ -4533,7 +4509,8 @@ Estado 239
     ID              deslocar, e ir ao estado 198
     ABRE_P          deslocar, e ir ao estado 199
 
-    expArit  ir ao estado 275
+    expList  ir ao estado 275
+    expArit  ir ao estado 204
     expMul   ir ao estado 205
     expUn    ir ao estado 206
     element  ir ao estado 207
@@ -4541,7 +4518,7 @@ Estado 239
 
 Estado 240
 
-   69 expList: expList LIST_OP_CONSTRUTOR • expArit
+   69 expList: expArit LIST_OP_CONSTRUTOR • expList
 
     LIST_OP_UN      deslocar, e ir ao estado 191
     LIST_OP_HEADER  deslocar, e ir ao estado 192
@@ -4553,7 +4530,8 @@ Estado 240
     ID              deslocar, e ir ao estado 198
     ABRE_P          deslocar, e ir ao estado 199
 
-    expArit  ir ao estado 276
+    expList  ir ao estado 276
+    expArit  ir ao estado 204
     expMul   ir ao estado 205
     expUn    ir ao estado 206
     element  ir ao estado 207
@@ -4894,11 +4872,6 @@ Estado 261
 Estado 262
 
    66 expRel: expRel REL_OP_ALTA expList •
-   68 expList: expList • LIST_OP_BIN expArit
-   69        | expList • LIST_OP_CONSTRUTOR expArit
-
-    LIST_OP_BIN         deslocar, e ir ao estado 224
-    LIST_OP_CONSTRUTOR  deslocar, e ir ao estado 225
 
     LOG_OP_OU     reduzir usando a regra 66 (expRel)
     LOG_OP_E      reduzir usando a regra 66 (expRel)
@@ -4909,38 +4882,24 @@ Estado 262
 
 Estado 263
 
-   68 expList: expList LIST_OP_BIN expArit •
-   71 expArit: expArit • ARIT_OP_MAIS expMul
-   72        | expArit • ARIT_OP_MENOS expMul
+   68 expList: expArit LIST_OP_BIN expList •
 
-    ARIT_OP_MAIS   deslocar, e ir ao estado 226
-    ARIT_OP_MENOS  deslocar, e ir ao estado 227
-
-    LOG_OP_OU           reduzir usando a regra 68 (expList)
-    LOG_OP_E            reduzir usando a regra 68 (expList)
-    REL_OP_BAIXA        reduzir usando a regra 68 (expList)
-    REL_OP_ALTA         reduzir usando a regra 68 (expList)
-    LIST_OP_BIN         reduzir usando a regra 68 (expList)
-    LIST_OP_CONSTRUTOR  reduzir usando a regra 68 (expList)
-    FECHA_P             reduzir usando a regra 68 (expList)
+    LOG_OP_OU     reduzir usando a regra 68 (expList)
+    LOG_OP_E      reduzir usando a regra 68 (expList)
+    REL_OP_BAIXA  reduzir usando a regra 68 (expList)
+    REL_OP_ALTA   reduzir usando a regra 68 (expList)
+    FECHA_P       reduzir usando a regra 68 (expList)
 
 
 Estado 264
 
-   69 expList: expList LIST_OP_CONSTRUTOR expArit •
-   71 expArit: expArit • ARIT_OP_MAIS expMul
-   72        | expArit • ARIT_OP_MENOS expMul
+   69 expList: expArit LIST_OP_CONSTRUTOR expList •
 
-    ARIT_OP_MAIS   deslocar, e ir ao estado 226
-    ARIT_OP_MENOS  deslocar, e ir ao estado 227
-
-    LOG_OP_OU           reduzir usando a regra 69 (expList)
-    LOG_OP_E            reduzir usando a regra 69 (expList)
-    REL_OP_BAIXA        reduzir usando a regra 69 (expList)
-    REL_OP_ALTA         reduzir usando a regra 69 (expList)
-    LIST_OP_BIN         reduzir usando a regra 69 (expList)
-    LIST_OP_CONSTRUTOR  reduzir usando a regra 69 (expList)
-    FECHA_P             reduzir usando a regra 69 (expList)
+    LOG_OP_OU     reduzir usando a regra 69 (expList)
+    LOG_OP_E      reduzir usando a regra 69 (expList)
+    REL_OP_BAIXA  reduzir usando a regra 69 (expList)
+    REL_OP_ALTA   reduzir usando a regra 69 (expList)
+    FECHA_P       reduzir usando a regra 69 (expList)
 
 
 Estado 265
@@ -5078,11 +5037,6 @@ Estado 273
 Estado 274
 
    66 expRel: expRel REL_OP_ALTA expList •
-   68 expList: expList • LIST_OP_BIN expArit
-   69        | expList • LIST_OP_CONSTRUTOR expArit
-
-    LIST_OP_BIN         deslocar, e ir ao estado 239
-    LIST_OP_CONSTRUTOR  deslocar, e ir ao estado 240
 
     VIRG          reduzir usando a regra 66 (expRel)
     LOG_OP_OU     reduzir usando a regra 66 (expRel)
@@ -5094,40 +5048,26 @@ Estado 274
 
 Estado 275
 
-   68 expList: expList LIST_OP_BIN expArit •
-   71 expArit: expArit • ARIT_OP_MAIS expMul
-   72        | expArit • ARIT_OP_MENOS expMul
+   68 expList: expArit LIST_OP_BIN expList •
 
-    ARIT_OP_MAIS   deslocar, e ir ao estado 241
-    ARIT_OP_MENOS  deslocar, e ir ao estado 242
-
-    VIRG                reduzir usando a regra 68 (expList)
-    LOG_OP_OU           reduzir usando a regra 68 (expList)
-    LOG_OP_E            reduzir usando a regra 68 (expList)
-    REL_OP_BAIXA        reduzir usando a regra 68 (expList)
-    REL_OP_ALTA         reduzir usando a regra 68 (expList)
-    LIST_OP_BIN         reduzir usando a regra 68 (expList)
-    LIST_OP_CONSTRUTOR  reduzir usando a regra 68 (expList)
-    FECHA_P             reduzir usando a regra 68 (expList)
+    VIRG          reduzir usando a regra 68 (expList)
+    LOG_OP_OU     reduzir usando a regra 68 (expList)
+    LOG_OP_E      reduzir usando a regra 68 (expList)
+    REL_OP_BAIXA  reduzir usando a regra 68 (expList)
+    REL_OP_ALTA   reduzir usando a regra 68 (expList)
+    FECHA_P       reduzir usando a regra 68 (expList)
 
 
 Estado 276
 
-   69 expList: expList LIST_OP_CONSTRUTOR expArit •
-   71 expArit: expArit • ARIT_OP_MAIS expMul
-   72        | expArit • ARIT_OP_MENOS expMul
+   69 expList: expArit LIST_OP_CONSTRUTOR expList •
 
-    ARIT_OP_MAIS   deslocar, e ir ao estado 241
-    ARIT_OP_MENOS  deslocar, e ir ao estado 242
-
-    VIRG                reduzir usando a regra 69 (expList)
-    LOG_OP_OU           reduzir usando a regra 69 (expList)
-    LOG_OP_E            reduzir usando a regra 69 (expList)
-    REL_OP_BAIXA        reduzir usando a regra 69 (expList)
-    REL_OP_ALTA         reduzir usando a regra 69 (expList)
-    LIST_OP_BIN         reduzir usando a regra 69 (expList)
-    LIST_OP_CONSTRUTOR  reduzir usando a regra 69 (expList)
-    FECHA_P             reduzir usando a regra 69 (expList)
+    VIRG          reduzir usando a regra 69 (expList)
+    LOG_OP_OU     reduzir usando a regra 69 (expList)
+    LOG_OP_E      reduzir usando a regra 69 (expList)
+    REL_OP_BAIXA  reduzir usando a regra 69 (expList)
+    REL_OP_ALTA   reduzir usando a regra 69 (expList)
+    FECHA_P       reduzir usando a regra 69 (expList)
 
 
 Estado 277

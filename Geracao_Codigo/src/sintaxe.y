@@ -1,12 +1,10 @@
+/*
+Pedro Vitor Valenca Mizuno
+17/0043665
+*/
+
 %define parse.error verbose
 %define lr.type canonical-lr
-
-/*
-TODO:   ADICIONAR A CONDICAO PRA FAZER AS OPERACOES DE GERAR CODIGO (SE TIVER ERROS LEXICOS, SINTATICOS...)
-        CORRIGIR A QUESTAO DO ELSE IF
-        CORRIGIR O CASO DE HAVER UM LABEL NO FIM DO ARQUIVO, OU SEJA, NENHUMA INSTRUCAO DEPOIS DELE
-        VER COMO DEFINE UMA LIST GLOBAL
-*/
 
 %{
 #include <stdio.h>
@@ -189,7 +187,9 @@ function:       funcDecl ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos 
                         ret_default->no1 = montaNo("0", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                         strcpy(ret_default->no1->tipo, "NIL");
                     }
-                    if(strcmp(aux, "main")) {     // RETIRAR CASO A RECLAMACAO DO TAC NAO SEJA UM PROBLEMA
+
+                    // Caso nao seja a main, gera a instrucao de retorno default
+                    if(strcmp(aux, "main")) { 
                         if(num_erros_sintaticos == 0 && num_erros_lexicos == 0 && num_erros_semanticos == 0)
                             geraOperacoes("return", ret_default->no1->nome, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont, &flag_brz);
                     }
@@ -216,7 +216,8 @@ function:       funcDecl ABRE_P {pushEsc(&primeiro, escopo_max + 1); argumentos 
                         ret_default->no1 = montaNo("0", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                         strcpy(ret_default->no1->tipo, tipo_func_return);
                     }
-                    if(strcmp(aux, "main")) {    // RETIRAR CASO A RECLAMACAO DO TAC NAO SEJA UM PROBLEMA
+                    // Caso nao seja a main, gera a instrucao de retorno default
+                    if(strcmp(aux, "main")) {
                         if(num_erros_sintaticos == 0 && num_erros_lexicos == 0 && num_erros_semanticos == 0)
                             geraOperacoes("return", ret_default->no1->nome, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont, &flag_brz);
                     }
@@ -292,6 +293,7 @@ stmt:           conditional                             {$$ = $1;}
 conditional:    IF ABRE_P attribuition FECHA_P ifBracesOrNot                                {$$ = montaNo($1.lexema, NULL, $5, NULL, NULL, retUlt(&primeiro), NULL);
                                                                                             $$->no1 = montaNo("condArg", $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                                                             char aux[50];
+                                                                                            // Adiciona a label apos os statements
                                                                                             if(topo != NULL) {
                                                                                                 strcpy(aux, topo->label);
                                                                                                 strcat(aux, ":\n");
@@ -301,12 +303,14 @@ conditional:    IF ABRE_P attribuition FECHA_P ifBracesOrNot                    
 
                 | IF ABRE_P attribuition FECHA_P ifBracesOrNot ELSE                         {char jump[50];
                                                                                             char aux_num[10];
+                                                                                            // Adiciona o jump apos o primeiro statement
                                                                                             strcpy(jump, "jump L");
                                                                                             sprintf(aux_num, "%d", label_cont);
                                                                                             strcat(jump, aux_num);
                                                                                             strcat(jump, "\n");
                                                                                             fputs(jump, escrita);
                                                                                             char aux[50];
+                                                                                            // Adiciona a label apos o primeiro statement
                                                                                             if(topo != NULL) {
                                                                                                 strcpy(aux, topo->label);
                                                                                                 strcat(aux, ":\n");
@@ -314,6 +318,7 @@ conditional:    IF ABRE_P attribuition FECHA_P ifBracesOrNot                    
                                                                                                 popLabel(&topo);
                                                                                                 tem_else = 1;
                                                                                             }
+                                                                                            // Empilha a label do jump
                                                                                             strcpy(jump, "L");
                                                                                             strcat(jump, aux_num);
                                                                                             pushLabel(&topo, jump);
@@ -322,6 +327,7 @@ conditional:    IF ABRE_P attribuition FECHA_P ifBracesOrNot                    
                 ifBracesOrNot/* %prec ELSE*/                                                  {$$ = montaNo($1.lexema, NULL, $5, $8, NULL, retUlt(&primeiro), NULL);
                                                                                             $$->no1 = montaNo("condArg", $3, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                                                             char aux[50];
+                                                                                            // Adiciona a label apos o segundo statement
                                                                                             if(topo != NULL) {
                                                                                                 strcpy(aux, topo->label);
                                                                                                 strcat(aux, ":\n");
@@ -333,6 +339,7 @@ conditional:    IF ABRE_P attribuition FECHA_P ifBracesOrNot                    
                 | IF ABRE_P error FECHA_P ifBracesOrNot                                       {}
                 ;
 
+                    // Adiciona a instrucao brz
 ifBracesOrNot:    ABRE_C {if(tem_else == 0) mandaLabel(&label_cont, 0, retorno_expressao, escrita, &topo, &flag_brz);} moreStmt FECHA_C                 {$$ = montaNo("statements", NULL, NULL, NULL, $3, retUlt(&primeiro), NULL);}
                 | {if(tem_else == 0) mandaLabel(&label_cont, 0, retorno_expressao, escrita, &topo, &flag_brz);} stmt                                  {$$ = montaNo("statements", $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);}
                 ;
@@ -342,11 +349,14 @@ iteration:      FOR ABRE_P iteArgs FECHA_P forBracesOrNot                       
                                                                                     popIncremento(&topoInc);
                                                                                     char labelInicio[15];
                                                                                     char labelCondicional[15];
+                                                                                    // Label para onde deve pular ao depender da condicao
                                                                                     strcpy(labelCondicional, topo->label);
                                                                                     popLabel(&topo);
+                                                                                    // Label do inicio da iteracao
                                                                                     strcpy(labelInicio, topo->label);
                                                                                     popLabel(&topo);
                                                                                     char jump[50];
+                                                                                    // Adiciona as instrucoes jump e do label
                                                                                     strcpy(jump, "jump ");
                                                                                     strcat(jump, labelInicio);
                                                                                     strcat(jump, "\n");
@@ -358,9 +368,11 @@ iteration:      FOR ABRE_P iteArgs FECHA_P forBracesOrNot                       
                 | FOR ABRE_P error {yyerrok;} FECHA_P forBracesOrNot                   {}
                 ;
 
+                                        // Cria a instrucao da label e a de brz
 iteArgs:        expIte PV               {mandaLabel(&label_cont, 1, retorno_expressao, escrita, &topo, &flag_brz);}
-                 expIte PV              {mandaLabel(&label_cont, 0, retorno_expressao, escrita, &topo, &flag_brz); strcpy(instrucao_incremento, ""); flag_incremento = 1;}
-                 expIte                 {$$ = montaNo("iteArgs", $1, $4, $7, NULL, retUlt(&primeiro), NULL); pushIncremento(&topoInc, instrucao_incremento); flag_incremento = 0;}
+                expIte PV               {mandaLabel(&label_cont, 0, retorno_expressao, escrita, &topo, &flag_brz); strcpy(instrucao_incremento, ""); flag_incremento = 1;}
+                                        // As instrucoes de incremento nao sao escritas agora, mas sao empilhadas para serem escritas no fim da iteracao
+                expIte                  {$$ = montaNo("iteArgs", $1, $4, $7, NULL, retUlt(&primeiro), NULL); pushIncremento(&topoInc, instrucao_incremento); flag_incremento = 0;}
                 ;
 
 forBracesOrNot: ABRE_C moreStmt FECHA_C                 {$$ = montaNo("statements", NULL, NULL, NULL, $2, retUlt(&primeiro), NULL);}
@@ -422,10 +434,12 @@ varDecl:        TIPO ID                                 {$$ = NULL;
                                                                 num_erros_semanticos += push(&cabeca, $2.lexema, "variavel", $1.lexema, retUlt(&primeiro), $1.linha, $1.coluna, num_var);
                                                             }
                                                         }
+                                                        // Caso seja o argumento de uma funcao
                                                         else if(argumentos == 1) {
                                                             strcpy(num_var, "$");
                                                             strcat(num_var, aux_num);
                                                             char string[100];
+                                                            // Copiamos o valor do argumento para uma variavel temporaria
                                                             strcpy(string, "mov ");
                                                             strcat(string, num_var);
                                                             strcat(string, ", #");
@@ -547,6 +561,7 @@ attribuition:   ID ATRIB expLogic                       {struct tabelaSimb *simb
                                                         strcpy(retorno_expressao, $$->valor_temp);}
                 ;
 
+                                                        // As seguintes regras tem o casting escrito por geraCasting e suas operacoes por geraOperacoes
 expLogic:       expLogic LOG_OP_OU andLogic             {$$ = castNo($2.lexema, $1, $3, retUlt(&primeiro), yylval.tok.linha, yylval.tok.coluna, &num_erros_semanticos);
                                                         if(num_erros_sintaticos == 0 && num_erros_lexicos == 0 && num_erros_semanticos == 0) {
                                                             geraCasting($1->valor_temp, $3->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
@@ -579,7 +594,7 @@ expRel:         expRel REL_OP_ALTA expList              {$$ = castNo($2.lexema, 
                 | expList                               {$$ = $1;}
                 ;
 
-expList:        expList LIST_OP_BIN expArit             {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);
+expList:        expArit LIST_OP_BIN expList             {$$ = montaNo($2.lexema, $1, $3, NULL, NULL, retUlt(&primeiro), NULL);
                                                         int cont_erro = 0;
                                                         if($1->simbolo != NULL) {
                                                             if(strcmp($1->simbolo->varOuFunc, "funcao")) {
@@ -601,14 +616,17 @@ expList:        expList LIST_OP_BIN expArit             {$$ = montaNo($2.lexema,
                                                             }
                                                             //Controla o tipo do no apos a operacao de >> ou <<
                                                             if(cont_erro == 0) {
+                                                                // O retorno do map eh uma lista do tipo da funcao
                                                                 if(!strcmp($2.lexema, ">>")) {
                                                                     char aux[15];
                                                                     strcpy(aux, $1->simbolo->tipo);
                                                                     strcat(aux, " list");
                                                                     strcpy($$->tipo, aux);
+                                                                // O retorno do filter eh uma lista do tipo da lista operada
                                                                 } else if(!strcmp($2.lexema, "<<")) {
                                                                     strcpy($$->tipo, $3->tipo);
                                                                 }
+                                                                // Este caso eh especial e o casting eh feito no proprio geraOPeracoes, denotados pelas constantes 1, 2 e 0
                                                                 if(!strcmp($1->simbolo->tipoArgs->tipo, "int") && !strcmp($3->tipo, "float list")) {
                                                                     if(num_erros_sintaticos == 0 && num_erros_lexicos == 0 && num_erros_semanticos == 0)
                                                                         geraOperacoes($2.lexema, $$->no1->nome, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 1, &label_cont, &string_cont, &flag_brz);
@@ -628,7 +646,7 @@ expList:        expList LIST_OP_BIN expArit             {$$ = montaNo($2.lexema,
                                                             strcpy($$->tipo, "undefined");
                                                         }
                                                         }
-                | expList LIST_OP_CONSTRUTOR expArit    {$$ = montaNo($2.lexema, NULL, $3, NULL, NULL, retUlt(&primeiro), NULL);
+                | expArit LIST_OP_CONSTRUTOR expList    {$$ = montaNo($2.lexema, NULL, $3, NULL, NULL, retUlt(&primeiro), NULL);
                                                         // Checa se o tipo do operador da direita eh lista e se o da esquerda eh int ou float
                                                         if((strcmp($3->tipo, "int list") && strcmp($3->tipo, "float list") && strcmp($3->tipo, "NIL")) || (strcmp($1->tipo, "int") && strcmp($1->tipo, "float"))) {
                                                             printf("ERRO SEMANTICO: tipo errado na operacao %s (%s, %s)\nLinha: %d\nColuna: %d\n\n", $2.lexema, $1->tipo, $3->tipo, yylval.tok.linha, yylval.tok.coluna);
@@ -653,8 +671,16 @@ expList:        expList LIST_OP_BIN expArit             {$$ = montaNo($2.lexema,
                                                                         geraCasting($1->valor_temp, $3->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
                                                                         geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont, &flag_brz);
                                                                     }
+                                                                    strcpy($$->tipo, $3->tipo);
                                                                 } else {
+                                                                    // Se o operador a direita for NIL, o tipo sera definido pelo operador esquerdo
                                                                     $$->no1 = $1;
+                                                                    if(!strcmp($1->tipo, "int") || !strcmp($1->tipo, "float")) {
+                                                                        char tipo[20];
+                                                                        strcpy(tipo, $1->tipo);
+                                                                        strcat(tipo, " list");
+                                                                        strcpy($$->tipo, tipo);
+                                                                    }
                                                                     if(num_erros_sintaticos == 0 && num_erros_lexicos == 0 && num_erros_semanticos == 0)
                                                                         geraOperacoes($2.lexema, $$->no1->valor_temp, "0", &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont, &flag_brz);
                                                                 }
@@ -662,8 +688,8 @@ expList:        expList LIST_OP_BIN expArit             {$$ = montaNo($2.lexema,
                                                                 $$->no1 = $1;
                                                                 if(num_erros_sintaticos == 0 && num_erros_lexicos == 0 && num_erros_semanticos == 0)
                                                                     geraOperacoes($2.lexema, $$->no1->valor_temp, $$->no2->valor_temp, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont, &flag_brz);
+                                                                strcpy($$->tipo, $3->tipo);
                                                             }
-                                                            strcpy($$->tipo, $3->tipo);
                                                         }
                                                         }
                 | expArit                               {$$ = $1;}
@@ -694,7 +720,6 @@ expMul:         expMul ARIT_OP_ALTA expUn               {$$ = castNo($2.lexema, 
                 ;
 
 
-                // Ao inves de expUn era elemento (mudou pra aceitar !%?lista)
 expUn:          LOG_OP_NEG expUn                        {$$ = montaNo($1.lexema, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                         if(!strcmp($2->tipo, "int list") || !strcmp($2->tipo, "float list") || !strcmp($2->tipo, "int") || !strcmp($2->tipo, "float") || !strcmp($2->tipo, "NIL")) {
                                                             if(strcmp($2->tipo, "NIL")) {
@@ -814,7 +839,7 @@ element:        ID                                      {struct tabelaSimb *simb
                                                                                 strcpy(aux, "(");
                                                                                 if(!strcmp(aux1->tipo, "int")) {
                                                                                     strcat(aux, "float_to_int)");
-
+                                                                                    // Eh escrita a instrucao de casting
                                                                                     strcpy(casting, "fltoint ");
                                                                                     sprintf(aux_num, "%d", ger_codigo_var);
                                                                                     strcpy(temp, "$");
@@ -824,12 +849,13 @@ element:        ID                                      {struct tabelaSimb *simb
                                                                                     strcat(casting, aux2->var_temp);
                                                                                     strcat(casting, "\n");
                                                                                     fputs(casting, escrita);
+                                                                                    // Eh escrita a instrucao de parameter
                                                                                     if(num_erros_sintaticos == 0 && num_erros_lexicos == 0 && num_erros_semanticos == 0)
                                                                                         geraOperacoes("parameter", temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont, &flag_brz);
 
                                                                                 } else if(!strcmp(aux1->tipo, "float")) {
                                                                                     strcat(aux, "int_to_float)");
-
+                                                                                    // Eh escrita a instrucao de casting
                                                                                     strcpy(casting, "inttofl ");
                                                                                     sprintf(aux_num, "%d", ger_codigo_var);
                                                                                     strcpy(temp, "$");
@@ -839,6 +865,7 @@ element:        ID                                      {struct tabelaSimb *simb
                                                                                     strcat(casting, aux2->var_temp);
                                                                                     strcat(casting, "\n");
                                                                                     fputs(casting, escrita);
+                                                                                    // Eh escrita a instrucao de parameter
                                                                                     if(num_erros_sintaticos == 0 && num_erros_lexicos == 0 && num_erros_semanticos == 0)
                                                                                         geraOperacoes("parameter", temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento, 0, &label_cont, &string_cont, &flag_brz);
 
@@ -875,6 +902,7 @@ element:        ID                                      {struct tabelaSimb *simb
                                                             char aux[200];
                                                             char num_args[5];
                                                             char num_temp[6];
+                                                            // Sao escritas as instrucoes de chamada e o pop da pilha
                                                             strcpy(aux, "call ");
                                                             strcat(aux, $1.lexema);
                                                             strcat(aux, ", ");
@@ -903,6 +931,7 @@ element:        ID                                      {struct tabelaSimb *simb
                                                             char aux[200];
                                                             char num[5];
                                                             char num_temp[6];
+                                                            // Sao escritas as instrucoes de chamada e o pop da pilha
                                                             strcpy(aux, "call ");
                                                             strcat(aux, $1.lexema);
                                                             strcat(aux, "\npop ");
@@ -936,6 +965,7 @@ element:        ID                                      {struct tabelaSimb *simb
 
                 | NIL                                   {$$ = montaNo("NIL", NULL, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                         strcpy($$->tipo, "NIL");
+                                                        // Define que o valor de NIL na geracao de codigo eh 0
                                                         strcpy($$->valor_temp, "0");}
                 ;
 
@@ -1006,8 +1036,10 @@ int main(int argc, char **argv) {
         nome = strtok(NULL, "/");
     }
     nome = strtok(aux_nome, ".");
+    // Abre o arquivo de escrita do .code
     escrita = fopen("code321.tac", "w");
     strcat(nome, ".tac");
+    // Define o nome do arquivo final
     strcpy(nome_arq, nome);
     fputs(".code\n", escrita);
 

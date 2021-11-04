@@ -113,6 +113,12 @@ struct tabelaSimb* retSimb(struct tabelaSimb ** prim, char *simbolo, struct list
     return retSimb(&(*prim)->prox, simbolo, cabecaEsc);
 }
 
+
+/*
+    Funcao adiciona um novo argumento na lista de argumentos
+    Argumentos: o primeiro elemento da lista, o tipo do argumento e a variavel temporaria do argumento
+    Retorno: a entrada da lista
+*/
 struct listaArgs* pushArgs(struct listaArgs** prim, char *tipo, char *var_temp) {
     struct listaArgs *aux = *prim;
     struct listaArgs* novo = (struct listaArgs*) malloc (sizeof(struct listaArgs));
@@ -131,6 +137,11 @@ struct listaArgs* pushArgs(struct listaArgs** prim, char *tipo, char *var_temp) 
     return *prim;
 }
 
+/*
+    Funcao que libera a lista de argumentos
+    Argumentos: o elemento da lista
+    Retorno: 1 ao atingir o fim da lista
+*/
 int liberaArgs(struct listaArgs *prim) {
     if(prim == NULL) {
         return 1;
