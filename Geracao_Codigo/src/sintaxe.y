@@ -998,6 +998,7 @@ ret:            RETURN expLogic                         {if(!strcmp($2->tipo, ti
                                                                     strcat(aux, "int_to_float)");
                                                                 struct No* no = montaNo(aux, $2, NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                                 $$->no1 = no;
+                                                                // Se nao for a funcao main, escreve a instrucao de retorno
                                                                 if(na_main != 1) {
                                                                     if(num_erros_sintaticos == 0 && num_erros_lexicos == 0 && num_erros_semanticos == 0) {
                                                                         geraCasting($2->valor_temp, NULL, &ger_codigo_var, escrita, $$, flag_incremento, instrucao_incremento);
