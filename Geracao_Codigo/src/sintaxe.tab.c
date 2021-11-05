@@ -3491,6 +3491,7 @@ yyreduce:
                                                                     strcat(aux, "int_to_float)");
                                                                 struct No* no = montaNo(aux, (yyvsp[0].no), NULL, NULL, NULL, retUlt(&primeiro), NULL);
                                                                 (yyval.no)->no1 = no;
+                                                                // Se nao for a funcao main, escreve a instrucao de retorno
                                                                 if(na_main != 1) {
                                                                     if(num_erros_sintaticos == 0 && num_erros_lexicos == 0 && num_erros_semanticos == 0) {
                                                                         geraCasting((yyvsp[0].no)->valor_temp, NULL, &ger_codigo_var, escrita, (yyval.no), flag_incremento, instrucao_incremento);
@@ -3504,11 +3505,11 @@ yyreduce:
                                                             }
                                                         }
                                                         }
-#line 3508 "./src/sintaxe.tab.c"
+#line 3509 "./src/sintaxe.tab.c"
     break;
 
 
-#line 3512 "./src/sintaxe.tab.c"
+#line 3513 "./src/sintaxe.tab.c"
 
       default: break;
     }
@@ -3733,7 +3734,7 @@ yyreturn:
   return yyresult;
 }
 
-#line 1016 "./src/sintaxe.y"
+#line 1017 "./src/sintaxe.y"
 
 
 
