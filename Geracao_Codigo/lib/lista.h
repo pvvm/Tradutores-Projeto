@@ -9,7 +9,6 @@ typedef struct tabelaSimb {
     char simbolo[500];           // Simbolo que representa
     char varOuFunc[15];         // Se eh var, func ou const
     char tipo[15];              // Tipo
-    char valor[50];             // Valor armazenado (se tiver)
     int numArgs;                // Numero de argumentos, caso seja uma funcao
     int escopo;                 // Escopo ao qual pertence
     int linha;                  // Linha onde foi declarado
@@ -36,7 +35,7 @@ typedef struct listaArgs {
 
 int procuraLista(struct tabelaSimb**, char *, int);
 
-int push(struct tabelaSimb**, char *, char *, char *, char *, int, int, int, char *);
+int push(struct tabelaSimb**, char *, char *, char *, int, int, int, char *);
 
 void printaArgs(struct listaArgs *);
 

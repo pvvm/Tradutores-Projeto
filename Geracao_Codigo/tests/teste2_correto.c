@@ -1,60 +1,65 @@
-int a;
-int teste;
+int sei_la;
+int tamanho;
 
-int repete() {
-    int a;
-    int b;
-    int c;
-    c = 0;
-    for(a = 0; a < 3; a = a + 1) {
-        for(b = 0; b < 2; b = b + 1) {
-            write("c agora eh: ");
-            c = c + 1;
-            writeln(c);
-        }
+int fibonacci(float num) {
+    sei_la = 5;
+    if(num == 0 || num == 1) {
+        return 1;
+    } else {
+        return fibonacci(num-1) + fibonacci(num-2);
     }
 }
 
-float funcao(int a, int b) {
-    writeln(a + b);
-    return a == a+b;
+int _write_list(int list lista) {
+    int i;
+    int header;
+    int list aux;
+
+    for(aux = lista; aux != NIL; aux = !aux) {
+        write(?aux);
+        write(" ");
+    }
+    return 1;
+}
+
+int divide(int elemento) {
+    return elemento / 2;
+}
+
+int filtra(int elemento) {
+    return elemento < 50;
 }
 
 int main() {
-    teste = 20 + 1;
-    int e;
-    e = a;
+    writeln("Digite um numero positivo: ");
+    read(tamanho);
 
-    read(a);
-    write(a);
-    e = teste;
-    int a;
+    if(tamanho > 0) {
+        int i;
+        int list lista;
+        lista = NIL;
+        for(i = tamanho-1; i >= 0; i = i - 1){
+            lista = fibonacci(i) : lista;
+        }
+        sei_la = (1 - 2 * 3) * 5/-(2 + tamanho);
 
-    for(a = 0; a < 10; a = a + 1)
-        writeln("Vamos imprimir 10 vezes");
+        write("A sequencia de fibonacci ate a ");
+        write(tamanho);
+        write(" posicao eh:");
+        _write_list(lista);
 
-    writeln(funcao(3, 7.156));
+        writeln("\nTestando map...");
+        int list lista1;
+        lista1 = divide >> lista;
+        _write_list(lista1);
 
-    a = 2 + funcao(a, e);
-    writeln(a);
+        writeln("\nTestando filter...");
+        int list lista2;
+        lista2 = filtra << lista1;
+        _write_list(lista2);
 
-    writeln("So mais uma vez");
-    write(20 + 3);  
-    a = 0;
-    if(a > 21) {
-        writeln("a eh maior que 21");
     } else {
-        writeln("a eh menor ou igual a 21");
+        writeln("ISSO COM CERTEZA NAO VAI DAR CERTO");
     }
-    int b;
-    writeln(e);
-    b = 2 * (90 + 2 - - 1) + e;
-    writeln(b);
-
-    read(e);
-    b = e;
-
-    writeln(b);
-
-    repete();
+    return 0;
 }

@@ -17,10 +17,10 @@ int procuraLista(struct tabelaSimb** prim, char *simbolo, int escopo) {
 
 /*
     Funcao que adiciona o novo simbolo no fim da lista (fica melhor ordenado na hora de imprimir)
-    Argumentos: o elemento atual e o simbolo, se eh variavel, funcao ou constante, tipo, valor, escopo, linha e coluna do novo elemento
+    Argumentos: o elemento atual e o simbolo, se eh variavel, funcao ou constante, tipo, escopo, linha e coluna do novo elemento
     Retorno: 0 se foi adicionado o simbolo na tabela e 1 se nao
 */
-int push(struct tabelaSimb** ult, char *simbolo, char *varOuFunc, char *tipo, char *valor, int escopo, int linha, int coluna, char *var_temp) {
+int push(struct tabelaSimb** ult, char *simbolo, char *varOuFunc, char *tipo, int escopo, int linha, int coluna, char *var_temp) {
     struct tabelaSimb **aux = ult;
     if(procuraLista(aux, simbolo, escopo) || !strcmp(varOuFunc, "constante")) {
         struct tabelaSimb *aux2 = *ult;
@@ -29,7 +29,6 @@ int push(struct tabelaSimb** ult, char *simbolo, char *varOuFunc, char *tipo, ch
         strcpy(novo->simbolo, simbolo);
         strcpy(novo->varOuFunc, varOuFunc);
         strcpy(novo->tipo, tipo);
-        strcpy(novo->valor, valor);
         novo->numArgs = 0;
         novo->escopo = escopo;
         novo->linha = linha;
@@ -114,6 +113,12 @@ struct tabelaSimb* retSimb(struct tabelaSimb ** prim, char *simbolo, struct list
     return retSimb(&(*prim)->prox, simbolo, cabecaEsc);
 }
 
+
+/*
+    Funcao adiciona um novo argumento na lista de argumentos
+    Argumentos: o primeiro elemento da lista, o tipo do argumento e a variavel temporaria do argumento
+    Retorno: a entrada da lista
+*/
 struct listaArgs* pushArgs(struct listaArgs** prim, char *tipo, char *var_temp) {
     struct listaArgs *aux = *prim;
     struct listaArgs* novo = (struct listaArgs*) malloc (sizeof(struct listaArgs));
@@ -132,6 +137,11 @@ struct listaArgs* pushArgs(struct listaArgs** prim, char *tipo, char *var_temp) 
     return *prim;
 }
 
+/*
+    Funcao que libera a lista de argumentos
+    Argumentos: o elemento da lista
+    Retorno: 1 ao atingir o fim da lista
+*/
 int liberaArgs(struct listaArgs *prim) {
     if(prim == NULL) {
         return 1;
